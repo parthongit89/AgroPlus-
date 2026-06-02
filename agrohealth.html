@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agrohealth: Pest and Cure Methods Dashboard</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Google Fonts - Plus Jakarta Sans (for Header) & Inter (for Body) -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Custom config for Tailwind colors and fonts -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'agro-500': '#00C853', // Brand Color from Agromart+
+                        'agro-dark': '#1e3a24', // Dark green for content accents
+                        'agro-light': '#22c55e', // Green for icons/accents
+                        'agro-gold': '#FBBF24', // Gold/Amber for gradient mix
+                        'agro-bg': '#f3f4f6', // Light gray background
+                        'agro-purple': '#5b21b6', // Deep purple for premium sections
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f3f4f6;
+            font-family: 'Inter', sans-serif; /* Default body font */
+        }
+
+        /* Responsive Image Grid for Pests/Diseases */
+        .pest-grid {
+            /* 2 columns on mobile for better visibility of images */
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 1rem; /* 4 units of Tailwind gap */
+        }
+        /* On medium screens (md) and up, expand to 3 columns */
+        @media (min-width: 768px) {
+            .pest-grid {
+                grid-template-columns: repeat(3, minmax(0, 1fr));
+            }
+        }
+
+        /* Individual Pest Card Styling */
+        .pest-item {
+            position: relative;
+            width: 100%;
+            aspect-ratio: 1 / 1; /* Makes the card square */
+            overflow: hidden;
+            border-radius: 0.75rem; /* rounded-xl */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1); /* shadow-lg */
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+        .pest-item:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1); /* hover:shadow-xl */
+        }
+        .pest-item:active {
+            transform: scale(0.98);
+        }
+        
+        /* Image Placeholder Style */
+        .pest-img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Green band at the bottom of the image (Now a button container) */
+        .pest-band {
+            /* Positioned over the bottom of the image */
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            /* Flex container for the button */
+            display: flex;
+            justify-content: flex-end; /* Align button to the right */
+            align-items: center;
+            padding: 0.5rem; /* Give it some height/padding */
+            background-color: #1e3a24d9; /* agro-dark with 85% opacity */
+            z-index: 15; /* Ensure it's above the image */
+            /* Ensure the bottom corners match the card's rounded corners */
+            border-bottom-left-radius: 0.75rem;
+            border-bottom-right-radius: 0.75rem;
+        }
+
+        /* Premium Feature Button Style */
+        .premium-btn {
+            width: 100%;
+            padding: 1rem 1rem; /* py-4 px-4 */
+            border-radius: 0.75rem; /* rounded-xl */
+            color: white;
+            font-weight: 700; /* font-bold */
+            font-size: 1.125rem; /* text-lg */
+            margin-bottom: 0.75rem; /* mb-3 */
+            display: flex;
+            align-items: center;
+            transition: all 0.3s;
+
+            /* Gradient Border Setup */
+            position: relative;
+            border: none;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            background-clip: padding-box;
+        }
+
+        /* Gradient Border Pseudo-element (Green + Gold + Purple Mix) */
+        .premium-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            margin: -2px; /* Border thickness */
+            border-radius: 0.85rem; /* Slightly larger than content rounded-xl (0.75rem) */
+            /* Gradient: Green (agro-light), Gold (agro-gold), Purple (agro-purple) */
+            background: linear-gradient(90deg, var(--colors-agro-light), var(--colors-agro-gold), var(--colors-agro-purple));
+            z-index: -1;
+        }
+        
+        .premium-btn:hover {
+            opacity: 0.95;
+        }
+        .premium-btn:active {
+            transform: scale(0.99);
+        }
+    </style>
+</head>
+<body class="bg-agro-bg">
+
+    <!-- HEADER (UPDATED to match Agromart+ style) -->
+    <header class="bg-agro-500 pt-8 px-6 pb-12 flex justify-between items-center shadow-lg relative z-20 rounded-br-[5rem] shrink-0">
+        <!-- Left Icon -->
+        <a href="home page.html" class="text-white hover:text-green-100 transition transform hover:-translate-x-1">
+             <i class="fas fa-arrow-left text-xl"></i>
+        </a>
+        
+        <!-- Center Title -->
+        <div class="text-center">
+            <h1 class="text-white text-3xl font-sans font-normal tracking-wide">Agrohealth+</h1>
+        </div>
+
+        <!-- Right Icon -->
+        <a href="profile.html" class="text-white hover:text-green-100 transition transform hover:scale-110" aria-label="User Profile">
+            <i class="fas fa-circle-user text-3xl"></i>
+        </a>
+    </header>
+
+    <!-- Banner Section (Pulls up slightly to tuck under the curved header if desired, or sits flush) -->
+    <!-- Added -mt-4 to integrate slightly with the header curve visually -->
+   
+    <main class="p-4 space-y-8 font-body">
+        
+        <!-- PEST & DISEASE SECTION -->
+        <section>
+            <h2 class="text-xl font-extrabold text-agro-dark mb-4 border-b-2 border-agro-light pb-2">Common Pests and Diseases</h2>
+            
+            <!-- FLEX CONTAINER FOR PESTS (GRID) AND MAIN ICON (CIRCLE) -->
+            <div class="flex flex-col md:flex-row md:space-x-8">
+
+                <!-- Left Column: Pest Cards Grid (60% width on desktop) -->
+                <div class="md:w-3/5">
+                    <div class="pest-grid">
+                        
+                        <!-- Pest/Disease Items -->
+                        <!-- 1. Leaf Spot -->
+                        <div class="pest-item" onclick="showMessage('Viewing Leaf Spot details and images')">
+                            <img src="https://placehold.co/150x150/d45050/ffffff?text=Leaf+Spot" class="pest-img" alt="Leaf Spot Disease">
+                            <div class="pest-band">
+                                <button onclick="event.stopPropagation(); showMessage('Showing Cure Methods for Leaf Spot')" 
+                                        class="px-3 py-1 bg-agro-light text-white text-xs font-bold rounded-full hover:bg-agro-light/90 transition shadow-lg">
+                                    <a href="information1disease.html"> cure </a> <i class="fas fa-microscope ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 2. Aphids -->
+                        <div class="pest-item" onclick="showMessage('Viewing Aphids details and images')">
+                            <img src="https://placehold.co/150x150/50d48f/ffffff?text=Aphids" class="pest-img" alt="Aphids Pest">
+                            <div class="pest-band">
+                                <button onclick="event.stopPropagation(); showMessage('Showing Cure Methods for Aphids')" 
+                                        class="px-3 py-1 bg-agro-light text-white text-xs font-bold rounded-full hover:bg-agro-light/90 transition shadow-lg">
+                                    <a href="information5disease.html"> cure </a> <i class="fas fa-microscope ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- 3. Root Rot -->
+                        <div class="pest-item" onclick="showMessage('Viewing Root Rot details and images')">
+                            <img src="https://placehold.co/150x150/8a50d4/ffffff?text=Root+Rot" class="pest-img" alt="Root Rot Disease">
+                            <div class="pest-band">
+                                <button onclick="event.stopPropagation(); showMessage('Showing Cure Methods for Root Rot')" 
+                                        class="px-3 py-1 bg-agro-light text-white text-xs font-bold rounded-full hover:bg-agro-light/90 transition shadow-lg">
+                                    <a href="information6disease.html"> cure </a> <i class="fas fa-microscope ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                    
+
+                        <!-- 5. Powdery Mildew -->
+                        <div class="pest-item" onclick="showMessage('Viewing Powdery Mildew details and images')">
+                            <img src="https://placehold.co/150x150/5050d4/ffffff?text=Powdery+Mildew" class="pest-img" alt="Powdery Mildew Disease">
+                            <div class="pest-band">
+                                <button onclick="event.stopPropagation(); showMessage('Showing Cure Methods for Powdery Mildew')" 
+                                        class="px-3 py-1 bg-agro-light text-white text-xs font-bold rounded-full hover:bg-agro-light/90 transition shadow-lg">
+                                    <a href="informationdiseases3.html"> cure </a> <i class="fas fa-microscope ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- 6. Leaf Hopper -->
+                        <div class="pest-item" onclick="showMessage('Viewing Leaf Hopper details and images')">
+                            <img src="https://placehold.co/150x150/d4509e/ffffff?text=Leaf+Hopper" class="pest-img" alt="Leaf Hopper Pest">
+                            <div class="pest-band">
+                                <button onclick="event.stopPropagation(); showMessage('Showing Cure Methods for Leaf Hopper')" 
+                                        class="px-3 py-1 bg-agro-light text-white text-xs font-bold rounded-full hover:bg-agro-light/90 transition shadow-lg">
+                                    <a href="informationdisease2(1).html"> cure </a> <i class="fas fa-microscope ml-1"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            
+                <!-- Right Column: Main Plant Icon (Geometric Circle) (40% width on desktop) -->
+                <div class="md:w-2/5 flex items-center justify-center p-6 mt-4 md:mt-0">
+                    <div class="w-32 h-32 flex items-center justify-center border-4 border-agro-purple/50 rounded-full bg-agro-purple/10 shadow-lg">
+                        <i class="fas fa-seedling text-6xl text-agro-light"></i>
+                    </div>
+                </div>
+
+            </div>
+            <!-- END FLEX CONTAINER -->
+
+        </section>
+
+        <!-- PREMIUM FEATURES SECTION -->
+        <section class="bg-white p-4 rounded-xl shadow-2xl">
+            <h2 class="text-xl font-extrabold text-agro-purple mb-4">Premium Hits</h2>
+            
+            <!-- AI Infect Detector (Icon size reduced to text-lg, Gradient Border applied) -->
+            <a href="#" class="premium-btn bg-agro-purple" onclick="showMessage('Launching AI Detector...')">
+                <i class="fas fa-atom text-lg mr-4"></i>
+                Free AI Infect Detector
+            </a>
+
+            <!-- Best Farming Methods (Icon size reduced to text-lg, Gradient Border applied) -->
+           <a href="BETTER FARMING.html"> <a href="BETTER FARMING.html" class="premium-btn bg-agro-purple" onclick="showMessage('Viewing Premium Farming Methods...')">
+                <i class="fas fa-book-reader text-lg mr-4"></i>
+                Best farming methods
+            </a>
+
+            <!-- Pest Database (Icon size reduced to text-lg, Gradient Border applied) -->
+             <a href="#" class="premium-btn bg-agro-purple" onclick="showMessage('Accessing Full Pest Database...')">
+                <i class="fas fa-bug text-lg mr-4"></i>
+                Full Pest Database
+            </a>
+        </section>
+
+    </main>
+
+    <!-- Simple Message Box for Clicks (Notification style - STRICTLY COPIED) -->
+    <div id="message-box" class="fixed bottom-4 left-4 right-4 bg-agro-dark text-white p-3 rounded-lg shadow-xl hidden transition transform duration-300 z-30" role="alert">
+        <p id="message-content" class="text-center"></p>
+    </div>
+
+    <!-- JAVASCRIPT BLOCK (STRICTLY COPIED) -->
+    <script>
+        /**
+         * Shows a temporary notification message at the bottom of the screen.
+         * @param {string} content The message to display.
+         */
+        function showMessage(content) {
+            const messageBox = document.getElementById('message-box');
+            const messageContent = document.getElementById('message-content');
+            
+            messageContent.textContent = content;
+            messageBox.classList.remove('hidden');
+            
+            clearTimeout(messageBox.timer);
+            
+            messageBox.timer = setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 2000);
+        }
+
+        // No dynamic data generation needed for this fixed layout.
+    </script>
+</body>
+</html>

@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>दैनिक बाजार+ प्रो</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap');
+        
+        /* --- THEME VARIABLES --- */
+        :root {
+            /* Default Dark Theme */
+            --bg-main: #0f172a;
+            --bg-secondary: #1e293b;
+            --text-main: #e2e8f0;
+            --text-muted: #94a3b8;
+            
+            --glass-bg: rgba(30, 41, 59, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.1);
+            
+            --card-grad-1: rgba(51, 65, 85, 0.4);
+            --card-grad-2: rgba(30, 41, 59, 0.4);
+            
+            --nav-bg: rgba(15, 23, 42, 0.8);
+            --border-color: #1e293b;
+
+            --chart-line: #4ade80; /* Neon Green */
+            --chart-fill-start: rgba(34, 197, 94, 0.2);
+            --chart-fill-end: rgba(34, 197, 94, 0);
+            --chart-grid: rgba(148, 163, 184, 0.1);
+        }
+
+        .light-mode {
+            /* Light Theme Overrides */
+            --bg-main: #f8fafc; /* Slate 50 */
+            --bg-secondary: #e2e8f0;
+            --text-main: #1e293b; /* Slate 800 */
+            --text-muted: #64748b; /* Slate 500 */
+            
+            --glass-bg: rgba(255, 255, 255, 0.85);
+            --glass-border: rgba(0, 0, 0, 0.05);
+            
+            --card-grad-1: rgba(255, 255, 255, 0.9);
+            --card-grad-2: rgba(241, 245, 249, 0.8);
+            
+            --nav-bg: rgba(255, 255, 255, 0.9);
+            --border-color: #cbd5e1;
+
+            --chart-line: #15803d; /* Darker Green */
+            --chart-fill-start: rgba(22, 163, 74, 0.2);
+            --chart-fill-end: rgba(22, 163, 74, 0);
+            --chart-grid: rgba(0, 0, 0, 0.05);
+        }
+        
+        body {
+            font-family: 'Noto Sans Devanagari', 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            transition: background-color 0.3s, color 0.3s;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .font-mono { font-family: 'JetBrains Mono', monospace; }
+
+        /* Dynamic Classes using Variables */
+        .theme-glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--glass-border);
+        }
+
+        .theme-glass-card {
+            background: linear-gradient(145deg, var(--card-grad-1), var(--card-grad-2));
+            border: 1px solid var(--glass-border);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-text-muted { color: var(--text-muted); }
+        .theme-border { border-color: var(--border-color); }
+        .theme-bg-main { background-color: var(--bg-main); }
+        .theme-bg-sec { background-color: var(--bg-secondary); }
+
+        /* Ticker Animation */
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+        .ticker-wrap { overflow: hidden; white-space: nowrap; }
+        .ticker-content { display: inline-block; animation: ticker 25s linear infinite; }
+
+        /* Live Pulse */
+        @keyframes pulse-neon {
+            0% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(34, 197, 94, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        .live-indicator { animation: pulse-neon 2s infinite; }
+
+        /* Custom Scrollbar */
+        .hide-scroll::-webkit-scrollbar { display: none; }
+        .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
+
+        canvas { width: 100%; height: 100%; }
+
+        /* Item Selection Effect */
+        .market-item { transition: all 0.2s ease; }
+        .market-item.active {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 3px solid #3b82f6;
+        }
+        
+        /* Toggle Switch Animation */
+        .mode-icon { transition: transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55); }
+        .light-mode .mode-icon { transform: rotate(180deg); }
+    </style>
+</head>
+<body class="h-screen flex flex-col overflow-hidden text-sm">
+
+    <!-- TOP TICKER -->
+    <div class="theme-bg-main theme-border border-b h-8 flex items-center text-xs font-mono theme-text-muted overflow-hidden relative z-20 transition-colors duration-300">
+        <div class="ticker-wrap w-full">
+            <div class="ticker-content">
+                <span class="mr-6"><span class="text-green-500">▲</span> जागतिक भाजीपाला +2.4%</span>
+                <span class="mr-6"><span class="text-red-500">▼</span> फळे -1.1%</span>
+                <span class="mr-6"><span class="text-green-500">▲</span> सेंद्रिय +5.2%</span>
+                <span class="mr-6">हिवाळी हंगाम साठा जास्त</span>
+                <span class="mr-6"><span class="text-green-500">▲</span> बटाटा मागणी वाढली</span>
+                <span class="mr-6"><span class="text-red-500">▼</span> कांदा पुरवठा स्थिर</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- APP HEADER -->
+    <header class="bg-[#00c853] px-4 py-3 flex justify-between items-center z-10 shrink-0 shadow-md transition-colors duration-300">
+        <div class="flex items-center gap-4">
+            <!-- Back Arrow (from image) -->
+            <button class="text-white hover:bg-white/20 p-2 rounded-full transition">
+              <a href="home page(M).html">  <i class="fas fa-arrow-left text-xl"></i></a>
+            </button>
+            
+            <!-- Title (from image) -->
+            <h1 class="text-2xl text-white tracking-wide font-light">
+                दैनिक बाजार<span class="font-bold">+</span>
+            </h1>
+        </div>
+        
+        <div class="flex items-center gap-4 text-white">
+            <!-- THEME TOGGLE BUTTON -->
+            <button onclick="toggleTheme()" class="hover:bg-white/20 rounded-full transition relative p-2">
+                <i id="themeIcon" class="fas fa-moon mode-icon text-lg"></i>
+            </button>
+            
+            <button class="hover:bg-white/20 rounded-full p-2 transition relative">
+                <i class="fas fa-bell"></i>
+                <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border border-[#00c853]"></span>
+            </button>
+            
+              <a href="profile(M).html">  <i class="fas fa-user text-white w-4 h-4 flex items-center justify-center"></i></a>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN SCROLL AREA -->
+    <main class="flex-1 overflow-y-auto theme-bg-main pb-20 relative transition-colors duration-300">
+        
+        <!-- DASHBOARD CONTROLS -->
+        <div class="px-4 py-3 flex justify-between items-center sticky top-0 theme-glass-panel z-10 theme-border border-b backdrop-blur transition-colors duration-300">
+            <div class="flex items-center gap-2">
+                <div class="live-indicator w-2 h-2 bg-green-500 rounded-full"></div>
+                <span class="text-green-500 font-mono text-xs font-bold tracking-wider">थेट बाजार</span>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="editTime()" class="theme-glass-card px-2 py-1 rounded text-xs font-mono theme-text-muted flex items-center gap-1 hover:text-blue-500">
+                    <i class="far fa-clock text-[10px]"></i> <span id="timeDisplay">10:30</span>
+                </button>
+                <button onclick="editDate()" class="theme-glass-card px-2 py-1 rounded text-xs font-mono theme-text-muted flex items-center gap-1 hover:text-blue-500">
+                    <i class="far fa-calendar text-[10px]"></i> <span id="dateDisplay">19|12</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- MAIN GRAPH CARD -->
+        <div class="mx-4 mt-4 theme-glass-card rounded-2xl p-4 relative overflow-hidden transition-all duration-300">
+            <!-- Asset Info Overlay -->
+            <div class="flex justify-between items-start mb-2">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 theme-bg-sec rounded-lg p-1 border theme-border flex items-center justify-center">
+                        <img id="currentVegIcon" src="" class="w-full h-full object-contain">
+                    </div>
+                    <div>
+                        <h2 id="assetName" class="text-lg font-bold leading-tight">...</h2>
+                        <div class="flex items-center gap-2 text-xs font-mono">
+                            <span class="theme-text-muted">भाव</span>
+                            <span id="currentPrice" class="font-bold text-sm">--.--</span>
+                            <span class="text-green-500 bg-green-500/10 px-1 rounded">+2.4%</span>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="toggleVisibility()" class="theme-text-muted hover:text-blue-500">
+                    <i id="eyeIcon" class="far fa-eye"></i>
+                </button>
+            </div>
+
+            <!-- Canvas Container -->
+            <div class="h-48 w-full relative" id="graphContainer">
+                <canvas id="marketChart"></canvas>
+            </div>
+
+            <!-- Quick Stats Bar -->
+            <div class="grid grid-cols-3 gap-2 mt-4 pt-4 theme-border border-t">
+                <div class="text-center">
+                    <div class="text-[10px] theme-text-muted font-mono uppercase">२४ तास उच्च</div>
+                    <div id="statHigh" class="text-xs font-bold">--</div>
+                </div>
+                <div class="text-center theme-border border-l">
+                    <div class="text-[10px] theme-text-muted font-mono uppercase">२४ तास वॉल्यूम</div>
+                    <div class="text-xs font-bold">4.2K किग्रॅ</div>
+                </div>
+                <div class="text-center theme-border border-l">
+                    <div class="text-[10px] theme-text-muted font-mono uppercase">कल</div>
+                    <div class="text-xs font-bold text-green-500">तेजी</div>
+                </div>
+            </div>
+            
+            <!-- Graph Tools -->
+            <div class="absolute top-16 right-2 flex flex-col gap-2">
+                 <button onclick="toggleZoom()" class="w-8 h-8 rounded-full theme-bg-sec text-blue-500 flex items-center justify-center backdrop-blur hover:opacity-80 border theme-border shadow-sm">
+                    <i class="fas fa-search-plus text-xs"></i>
+                </button>
+                <button onclick="showDataTable()" class="w-8 h-8 rounded-full theme-bg-sec theme-text-muted flex items-center justify-center backdrop-blur hover:text-blue-500 border theme-border shadow-sm">
+                    <i class="fas fa-list text-xs"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- CATEGORIES / WATCHLIST -->
+        <div class="mt-6 px-4">
+            <h3 class="text-xs font-bold theme-text-muted uppercase tracking-widest mb-3 px-1">बाजार वॉचलिस्ट</h3>
+            
+            <!-- Filter Tabs -->
+            <div class="flex gap-2 mb-4 overflow-x-auto hide-scroll pb-1">
+                <button onclick="filterCat('all')" class="px-3 py-1 bg-blue-600 text-white rounded-full text-xs font-medium whitespace-nowrap shadow-lg shadow-blue-500/20">सर्व</button>
+                <button onclick="filterCat('trending')" class="px-3 py-1 theme-glass-card theme-text-muted rounded-full text-xs font-medium whitespace-nowrap hover:text-blue-500">ट्रेंडिंग</button>
+                <button onclick="filterCat('healthy')" class="px-3 py-1 theme-glass-card theme-text-muted rounded-full text-xs font-medium whitespace-nowrap hover:text-blue-500">आरोग्यदायी</button>
+                <button onclick="filterCat('winter')" class="px-3 py-1 theme-glass-card theme-text-muted rounded-full text-xs font-medium whitespace-nowrap hover:text-blue-500">हिवाळी</button>
+            </div>
+
+            <!-- List Container -->
+            <div id="marketList" class="space-y-2">
+                <!-- Rendered by JS -->
+            </div>
+        </div>
+        
+        <div class="h-20"></div> <!-- Spacer -->
+    </main>
+
+    <!-- BOTTOM NAVIGATION -->
+    <nav class="fixed bottom-0 w-full theme-glass-panel border-t theme-border pb-safe pt-2 px-6 flex justify-between items-center z-50 transition-colors duration-300">
+        <button class="flex flex-col items-center gap-1 text-blue-500">
+            <i class="fas fa-chart-line text-lg"></i>
+            <span class="text-[10px] font-medium">बाजार</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 theme-text-muted hover:text-blue-500 transition">
+            <i class="fas fa-wallet text-lg"></i>
+            <span class="text-[10px] font-medium">पोर्टफोलिओ</span>
+        </button>
+        <div class="relative -top-6">
+            <button class="w-12 h-12 rounded-full bg-gradient-to-r from-green-500 to-emerald-600 flex items-center justify-center text-white shadow-lg shadow-green-500/30 border-4 theme-border transform active:scale-95 transition">
+                <i class="fas fa-plus"></i>
+            </button>
+        </div>
+        <button class="flex flex-col items-center gap-1 theme-text-muted hover:text-blue-500 transition">
+            <i class="fas fa-newspaper text-lg"></i>
+            <span class="text-[10px] font-medium">बातम्या</span>
+        </button>
+        <button class="flex flex-col items-center gap-1 theme-text-muted hover:text-blue-500 transition">
+            <i class="fas fa-cog text-lg"></i>
+            <span class="text-[10px] font-medium">सेटिंग्ज</span>
+        </button>
+    </nav>
+
+    <!-- FLOATING DATA TABLE -->
+    <div id="dataTable" class="hidden fixed inset-0 z-50 p-6 flex flex-col backdrop-blur-md bg-black/50">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-white font-bold text-lg">ऑर्डर बुक डेटा</h3>
+            <button onclick="showDataTable()" class="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-slate-400 hover:text-white"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="flex-1 overflow-auto theme-glass-card rounded-xl p-4 bg-slate-900">
+            <table class="w-full text-left">
+                <thead class="text-xs text-slate-500 uppercase border-b border-slate-700 font-mono">
+                    <tr><th class="pb-2">वेळ</th><th class="pb-2 text-right">भाव (₹)</th></tr>
+                </thead>
+                <tbody id="tableBody" class="text-sm font-mono text-slate-300"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // --- CONFIG & DATA ---
+        const vegData = {
+            trending: [
+                { name: 'कांदा', price: 35.50, img: 'https://img.icons8.com/color/96/onion.png', change: '+2.4%' },
+                { name: 'बटाटा', price: 22.10, img: 'https://img.icons8.com/color/96/potato.png', change: '-0.8%' },
+                { name: 'टोमॅटो', price: 45.00, img: 'https://img.icons8.com/color/96/tomato.png', change: '+5.1%' },
+                { name: 'ढोबळी मिरची', price: 60.25, img: 'https://img.icons8.com/color/96/paprika.png', change: '+1.2%' }
+            ],
+            healthy: [
+                { name: 'ब्रोकोली', price: 55.00, img: 'https://img.icons8.com/color/96/cauliflower.png', change: '+0.5%' },
+                { name: 'गाजर', price: 40.00, img: 'https://img.icons8.com/color/96/carrot.png', change: '-1.5%' },
+                { name: 'पालक', price: 15.00, img: 'https://img.icons8.com/color/96/spinach.png', change: '+3.2%' }
+            ],
+            winter: [
+                { name: 'वाटाणे', price: 80.00, img: 'https://img.icons8.com/color/96/peas.png', change: '-2.1%' },
+                { name: 'घेवडा', price: 45.50, img: 'https://img.icons8.com/color/96/green-beans.png', change: '+0.9%' }
+            ]
+        };
+
+        const state = {
+            currentName: 'बटाटा',
+            currentImg: vegData.trending[1].img,
+            currentPrice: 22.10,
+            basePrice: 22.10,
+            dataPoints: [],
+            maxPoints: 8,
+            isLive: true,
+            isZoomed: false,
+            isVisible: true,
+            updateInterval: null,
+            isDarkMode: true
+        };
+
+        // --- INIT ---
+        const canvas = document.getElementById('marketChart');
+        const ctx = canvas.getContext('2d');
+        let width, height;
+
+        function init() {
+            renderList('all');
+            setupResize();
+            selectItem(vegData.trending[1]);
+            startLiveUpdate();
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('timeDisplay').innerText = now.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'});
+            }, 1000);
+        }
+
+        // --- THEME LOGIC ---
+        function toggleTheme() {
+            state.isDarkMode = !state.isDarkMode;
+            document.body.classList.toggle('light-mode');
+            
+            const icon = document.getElementById('themeIcon');
+            if(state.isDarkMode) {
+                icon.className = "fas fa-moon mode-icon text-lg";
+            } else {
+                icon.className = "fas fa-sun mode-icon text-yellow-500 text-lg";
+            }
+            
+            // Redraw graph to update colors
+            drawGraph();
+        }
+
+        // --- RENDER LIST ---
+        function renderList(filter) {
+            const container = document.getElementById('marketList');
+            container.innerHTML = '';
+            
+            let items = [];
+            if (filter === 'all') {
+                items = [...vegData.trending, ...vegData.healthy, ...vegData.winter];
+            } else {
+                items = vegData[filter] || [];
+            }
+
+            items.forEach((item) => {
+                const isPos = item.change.includes('+');
+                const colorClass = isPos ? 'text-green-500' : 'text-red-500';
+                const bgClass = isPos ? 'bg-green-500/10' : 'bg-red-500/10';
+                const arrow = isPos ? '▲' : '▼';
+
+                const div = document.createElement('div');
+                div.className = `market-item theme-glass-card rounded-xl p-3 flex items-center justify-between cursor-pointer border-l-4 border-transparent hover:border-blue-500`;
+                div.id = `item-${item.name}`;
+                div.onclick = () => selectItem(item);
+                
+                div.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 theme-bg-sec rounded-lg p-1 flex-shrink-0">
+                            <img src="${item.img}" class="w-full h-full object-contain">
+                        </div>
+                        <div>
+                            <div class="font-bold text-sm leading-tight">${item.name}</div>
+                            <div class="text-[10px] theme-text-muted font-mono">मार्केट कॅप 2.4M</div>
+                        </div>
+                    </div>
+                    
+                    <div class="hidden sm:block w-16 h-8 opacity-30">
+                        <svg viewBox="0 0 50 20" class="w-full h-full stroke-current ${colorClass} fill-none" stroke-width="2">
+                            <polyline points="0,15 10,10 20,18 30,5 40,12 50,8" />
+                        </svg>
+                    </div>
+
+                    <div class="text-right">
+                        <div class="font-mono font-bold text-sm">₹${item.price.toFixed(2)}</div>
+                        <div class="text-[10px] font-mono ${colorClass} ${bgClass} px-1.5 py-0.5 rounded inline-block">
+                            ${arrow} ${item.change}
+                        </div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+        
+        function filterCat(cat) { renderList(cat); }
+
+        function selectItem(item) {
+            state.currentName = item.name;
+            state.currentImg = item.img;
+            state.basePrice = item.price;
+            state.currentPrice = item.price;
+
+            document.getElementById('currentVegIcon').src = item.img;
+            document.getElementById('assetName').innerText = item.name;
+            document.getElementById('currentPrice').innerText = "₹" + item.price.toFixed(2);
+            document.getElementById('statHigh').innerText = "₹" + (item.price * 1.2).toFixed(2);
+
+            document.querySelectorAll('.market-item').forEach(el => el.classList.remove('active'));
+            const activeEl = document.getElementById(`item-${item.name}`);
+            if(activeEl) activeEl.classList.add('active');
+
+            generateInitialData();
+            drawGraph();
+        }
+
+        // --- GRAPH LOGIC ---
+        function setupResize() {
+            const resize = () => {
+                const container = document.getElementById('graphContainer');
+                width = container.clientWidth;
+                height = container.clientHeight;
+                canvas.width = width;
+                canvas.height = height;
+                drawGraph();
+            };
+            window.addEventListener('resize', resize);
+            resize();
+        }
+
+        function generateInitialData() {
+            state.dataPoints = [];
+            let val = state.basePrice;
+            for(let i=0; i<state.maxPoints; i++) {
+                val += (Math.random() * 4 - 2);
+                if(val < 5) val = 5;
+                state.dataPoints.push(val);
+            }
+        }
+
+        function startLiveUpdate() {
+            if(state.updateInterval) clearInterval(state.updateInterval);
+            state.updateInterval = setInterval(() => {
+                if(!state.isLive) return;
+                const last = state.dataPoints[state.dataPoints.length-1];
+                let next = last + (Math.random() * 4 - 2);
+                if(next > state.basePrice * 1.5) next -= 2;
+                if(next < state.basePrice * 0.5) next += 2;
+
+                state.dataPoints.shift();
+                state.dataPoints.push(next);
+                
+                state.currentPrice = next;
+                document.getElementById('currentPrice').innerText = "₹" + next.toFixed(2);
+                drawGraph();
+                updateTable();
+            }, 2000);
+        }
+
+        function drawGraph() {
+            if (!state.isVisible) { ctx.clearRect(0,0,width,height); return; }
+            ctx.clearRect(0,0,width,height);
+
+            const pad = { t: 20, b: 20, l: 0, r: 0 };
+            const cw = width - pad.l - pad.r;
+            const ch = height - pad.t - pad.b;
+
+            let min = Math.min(...state.dataPoints);
+            let max = Math.max(...state.dataPoints);
+            if(state.isZoomed) { min *= 0.95; max *= 1.05; } else { min = 0; max *= 1.3; }
+
+            const getX = (i) => pad.l + (i / (state.maxPoints - 1)) * cw;
+            const getY = (v) => pad.t + ch - ((v - min) / (max - min)) * ch;
+
+            // Get Colors from CSS Vars
+            const styles = getComputedStyle(document.documentElement);
+            const lineColor = styles.getPropertyValue('--chart-line').trim();
+            const fillStart = styles.getPropertyValue('--chart-fill-start').trim();
+            const fillEnd = styles.getPropertyValue('--chart-fill-end').trim();
+            const gridColor = styles.getPropertyValue('--chart-grid').trim();
+
+            // 1. Draw Gradient Area
+            const gradient = ctx.createLinearGradient(0, 0, 0, height);
+            gradient.addColorStop(0, fillStart);
+            gradient.addColorStop(1, fillEnd);
+
+            ctx.beginPath();
+            ctx.moveTo(getX(0), getY(state.dataPoints[0]));
+            for(let i=1; i<state.dataPoints.length; i++) {
+                ctx.lineTo(getX(i), getY(state.dataPoints[i])); 
+            }
+            ctx.lineTo(getX(state.dataPoints.length-1), height);
+            ctx.lineTo(getX(0), height);
+            ctx.closePath();
+            ctx.fillStyle = gradient;
+            ctx.fill();
+
+            // 2. Draw Line
+            ctx.beginPath();
+            ctx.strokeStyle = lineColor;
+            ctx.lineWidth = 3;
+            ctx.lineJoin = 'round';
+            ctx.moveTo(getX(0), getY(state.dataPoints[0]));
+            for(let i=1; i<state.dataPoints.length; i++) {
+                ctx.lineTo(getX(i), getY(state.dataPoints[i]));
+            }
+            ctx.stroke();
+
+            // 3. Highlight Last Point
+            const lastIdx = state.dataPoints.length - 1;
+            const lx = getX(lastIdx);
+            const ly = getY(state.dataPoints[lastIdx]);
+
+            ctx.beginPath();
+            ctx.arc(lx, ly, 8, 0, Math.PI*2);
+            ctx.fillStyle = fillStart; // Use fill color for glow
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.arc(lx, ly, 4, 0, Math.PI*2);
+            ctx.fillStyle = "#fff";
+            ctx.fill();
+
+            // 4. Subtle Grid
+            ctx.beginPath();
+            ctx.strokeStyle = gridColor;
+            ctx.lineWidth = 1;
+            for(let i=1; i<4; i++) {
+                const y = pad.t + (ch * i/4);
+                ctx.moveTo(0, y);
+                ctx.lineTo(width, y);
+            }
+            ctx.stroke();
+        }
+
+        // --- INTERACTIONS ---
+        function toggleZoom() { state.isZoomed = !state.isZoomed; drawGraph(); }
+        function toggleVisibility() { 
+            state.isVisible = !state.isVisible; 
+            document.getElementById('eyeIcon').className = state.isVisible ? 'far fa-eye' : 'far fa-eye-slash';
+            drawGraph();
+        }
+        function showDataTable() {
+            const table = document.getElementById('dataTable');
+            table.classList.toggle('hidden');
+            updateTable();
+        }
+        function updateTable() {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '';
+            const now = new Date();
+            state.dataPoints.slice().reverse().forEach((val, i) => {
+                const row = document.createElement('tr');
+                row.className = "border-b border-gray-700/50";
+                const time = new Date(now - i*2000).toLocaleTimeString([], {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+                row.innerHTML = `<td class="py-2 text-gray-400">${time}</td><td class="py-2 text-right text-green-500">₹${val.toFixed(2)}</td>`;
+                tbody.appendChild(row);
+            });
+        }
+        function editTime() { prompt("वेळ अपडेट करा:", "10:30 AM"); }
+        function editDate() { prompt("तारीख अपडेट करा:", "19 | 12"); }
+
+        init();
+    </script>
+</body>
+</html>

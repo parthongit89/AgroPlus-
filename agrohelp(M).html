@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ॲग्रोहेल्प+ योजना</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'agro-blue': '#4F6BF5',      /* Primary Blue */
+                        'agro-blue-dark': '#3b52c0',
+                        'agro-bg-rupee': '#E0E7FF',
+                        'tech-text': '#475569',
+                    },
+                    fontFamily: {
+                        sans: ['Noto Sans Devanagari', 'Plus Jakarta Sans', 'sans-serif'],
+                        body: ['Noto Sans Devanagari', 'Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'bounce-gentle': 'float 3s ease-in-out infinite',
+                    },
+                    fontSize: {
+                        'xxs': '0.6rem',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #F8FAFC;
+            overflow: hidden; /* Fixed viewport */
+            font-family: 'Noto Sans Devanagari', 'Inter', sans-serif;
+        }
+
+        /* Technical Background Grid */
+        .bg-grid {
+            background-size: 20px 20px;
+            background-image: linear-gradient(to right, #f1f5f9 1px, transparent 1px),
+                              linear-gradient(to bottom, #f1f5f9 1px, transparent 1px);
+            position: absolute;
+            inset: 0;
+            z-index: -1;
+        }
+
+        /* Giant Rupee */
+        .bg-rupee {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 70vh; 
+            font-weight: 700;
+            color: #E0E7FF;
+            z-index: 0;
+            pointer-events: none;
+            line-height: 1;
+            font-family: sans-serif;
+            opacity: 0.6;
+        }
+
+        /* Platform Interactions */
+        .platform-item {
+            transition: transform 0.2s active;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .platform-item:active {
+            transform: scale(0.96);
+        }
+
+        /* Animation */
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-6px); }
+        }
+
+        /* Slider Styles */
+        .slider-container {
+            position: relative;
+            /* Replaced solid color with gradient in HTML class, fallback here removed */
+            border-radius: 9999px;
+            overflow: hidden;
+            box-shadow: 0 4px 10px rgba(79, 107, 245, 0.4);
+        }
+
+        .slider-text {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.9rem;
+            pointer-events: none;
+            z-index: 10;
+        }
+
+        .slider-thumb {
+            position: absolute;
+            top: 3px;
+            bottom: 3px;
+            left: 3px;
+            width: 44px; 
+            background: #1e1b4b; /* Dark Navy matches image */
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            z-index: 20;
+            transition: transform 0.1s;
+        }
+
+        /* Marquee */
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 20s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* Modal */
+        .scheme-modal {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+        .scheme-modal.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+    </style>
+</head>
+<body class="h-screen w-full flex flex-col relative bg-white font-body text-slate-700">
+
+    <!-- HEADER -->
+    <header class="bg-gradient-to-r from-cyan-500 to-blue-700 pt-8 px-6 pb-12 flex justify-between items-center shadow-lg relative z-50 rounded-br-[5rem] shrink-0">
+        <!-- Left Icon -->
+        <a href="home page(M).html" class="text-white hover:text-blue-100 transition transform hover:-translate-x-1">
+             <i class="fas fa-arrow-left text-xl"></i>
+        </a>
+        
+        <!-- Center Title -->
+        <div class="text-center">
+            <h1 class="text-white text-3xl font-sans font-normal tracking-wide">ॲग्रोहेल्प+</h1>
+        </div>
+
+        <!-- Right Icon -->
+        <a href="profile(M).html" class="text-white hover:text-blue-100 transition transform hover:scale-110" aria-label="User Profile">
+            <i class="fas fa-circle-user text-3xl"></i>
+        </a>
+    </header>
+
+    <!-- News Ticker -->
+    <div class="bg-blue-50 border-b border-blue-100 py-2 marquee-container z-40 shrink-0">
+        <div class="marquee-content text-xs font-semibold text-agro-blue-dark font-mono">
+            <span class="mx-4">📢 अपडेट: KCC व्याज सवलत २% पर्यंत वाढली आहे.</span> • 
+            <span class="mx-4">🚜 AIF: कोल्ड स्टोरेजसाठी नवीन वित्तपुरवठा पर्याय.</span> • 
+            <span class="mx-4">🏦 सामान्य कर्ज प्रक्रिया वेळ ४८ तासांपर्यंत कमी.</span> • 
+            <span class="mx-4">📅 खरीप विम्याची अंतिम मुदत जवळ येत आहे.</span>
+        </div>
+    </div>
+
+    <!-- Main Canvas -->
+    <main class="flex-grow relative w-full h-full overflow-hidden">
+        
+        <!-- Backgrounds -->
+        <div class="bg-grid"></div>
+        <div class="bg-rupee">₹</div>
+
+        <!-- Page Title & Stats -->
+        <div class="absolute top-4 left-6 z-10">
+            <h1 class="text-2xl text-[#0f172a] font-normal tracking-tight mb-1">योजना</h1>
+            <div class="text-[10px] font-mono text-slate-500 bg-white/80 backdrop-blur px-2 py-0.5 rounded border border-slate-200 inline-block">
+                सक्रिय: १२ • प्रलंबित: ०
+            </div>
+        </div>
+
+        <!-- Decorative Elements -->
+        <div class="absolute top-[12%] left-[8%] w-8 h-8 rounded-full bg-agro-blue/10 border border-agro-blue/30 z-10 flex items-center justify-center">
+            <i class="fas fa-satellite-dish text-[10px] text-agro-blue"></i>
+        </div>
+
+        <!-- === PLATFORM 1: Top Right (Kisan Credit Card) === -->
+        <div class="absolute top-[18%] right-[-8%] z-20 platform-item group" 
+             onclick="openScheme('किसान क्रेडिट कार्ड (KCC)', 'पिके आणि मुदत कर्जासाठी अल्पकालीन क्रेडिट. २% वार्षिक व्याज सवलत उपलब्ध.')">
+            <div class="relative">
+                <!-- Stat Badge -->
+                <div class="absolute -top-12 left-0 bg-yellow-100 text-yellow-800 text-[9px] font-bold px-1.5 py-0.5 rounded border border-yellow-200 shadow-sm animate-bounce-gentle">
+                    ७% व्याज
+                </div>
+                <!-- Ball -->
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 absolute -top-6 left-4 animate-bounce-gentle shadow-lg z-30 border-2 border-white"></div>
+                <!-- Bar -->
+                <div class="w-56 h-12 bg-gradient-to-r from-cyan-500 to-blue-700 rounded-l-full shadow-md flex items-center pl-18 relative z-20 border-b-4 border-blue-800/30">
+                    <div class="pl-16 flex flex-col justify-center">
+                        <span class="text-white text-xs font-bold leading-tight">किसान क्रेडिट कार्ड</span>
+                        <span class="text-blue-200 text-[9px] font-mono">मर्यादा: ₹३ लाख</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === PLATFORM 2: Middle Left (Agri Infra Fund) === -->
+        <div class="absolute top-[42%] left-[-8%] z-20 platform-item group" 
+             onclick="openScheme('ऍग्री इन्फ्रा फंड', 'कापणी पश्चात व्यवस्थापन पायाभूत सुविधांसाठी वित्तपुरवठा. ३% वार्षिक व्याज सवलत.')">
+            <div class="relative">
+                 <!-- Stat Badge -->
+                 <div class="absolute -top-12 right-0 bg-green-100 text-green-800 text-[9px] font-bold px-1.5 py-0.5 rounded border border-green-200 shadow-sm animate-bounce-gentle" style="animation-delay: 0.5s;">
+                    अनुदानित
+                </div>
+                <!-- Ball -->
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 absolute -top-6 right-4 animate-bounce-gentle shadow-lg z-30 border-2 border-white" style="animation-delay: 0.5s;"></div>
+                <!-- Bar -->
+                <div class="w-60 h-12 bg-gradient-to-r from-cyan-500 to-blue-700 rounded-r-full shadow-md flex items-center justify-end pr-18 relative z-20 border-b-4 border-blue-800/30">
+                    <div class="pr-16 flex flex-col justify-center text-right">
+                        <span class="text-white text-xs font-bold leading-tight">ऍग्री इन्फ्रा फंड</span>
+                        <span class="text-blue-200 text-[9px] font-mono">कालावधी: ७ वर्षे</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- === PLATFORM 3: Bottom Right (General Loans) === -->
+        <div class="absolute bottom-[25%] right-[-10%] z-20 platform-item group" 
+             onclick="openScheme('सामान्य कर्ज', 'पिक कर्ज आणि दुग्धव्यवसाय, मत्स्यपालन इत्यादी संबंधित उपक्रमांसाठी गुंतवणूक क्रेडिट.')">
+            <div class="relative">
+                <!-- Stat Badge -->
+                <div class="absolute -top-12 left-4 bg-purple-100 text-purple-800 text-[9px] font-bold px-1.5 py-0.5 rounded border border-purple-200 shadow-sm animate-bounce-gentle" style="animation-delay: 1s;">
+                    फास्ट ट्रॅक
+                </div>
+                <!-- Ball -->
+                <div class="w-12 h-12 rounded-full bg-gradient-to-br from-cyan-400 to-blue-600 absolute -top-6 left-8 animate-bounce-gentle shadow-lg z-30 border-2 border-white" style="animation-delay: 1s;"></div>
+                <!-- Bar -->
+                <div class="w-64 h-12 bg-gradient-to-r from-cyan-500 to-blue-700 rounded-l-full shadow-md flex items-center pl-22 relative z-20 border-b-4 border-blue-800/30">
+                    <div class="pl-20 flex flex-col justify-center">
+                        <span class="text-white text-xs font-bold leading-tight">सामान्य कर्ज</span>
+                        <span class="text-blue-200 text-[9px] font-mono">ROI: परिवर्तनशील</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Slider Footer -->
+    <div class="absolute bottom-6 left-0 right-0 px-8 z-50">
+        <!-- UPDATED: Added bg-gradient to slider track to match uploaded image -->
+        <div class="slider-container h-14 w-full max-w-sm mx-auto cursor-pointer bg-gradient-to-r from-[#4F6BF5] to-[#3b52c0]" id="slider-track">
+            <div class="slider-text" id="slider-label">संपर्क करण्यासाठी स्लाइड करा</div>
+            <div class="slider-thumb h-12 w-12 shadow-lg" id="slider-thumb">
+                <i class="fas fa-arrow-right text-white text-lg"></i>
+            </div>
+        </div>
+        <div class="text-center mt-2">
+            <p class="text-[9px] text-slate-400 font-mono tracking-wider">सुरक्षित कनेक्शन • २५६-बिट एन्क्रिप्शन</p>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="scheme-modal" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-900/80 scheme-modal backdrop-blur-sm">
+        <div class="bg-white rounded-xl shadow-2xl p-5 max-w-xs w-full transform transition-all scale-95 border border-slate-200" id="modal-content">
+            <div class="flex justify-between items-center mb-3 border-b border-slate-100 pb-2">
+                <div class="flex items-center space-x-2">
+                    <div class="w-8 h-8 bg-blue-50 rounded-lg flex items-center justify-center text-agro-blue border border-blue-100">
+                        <i class="fas fa-file-alt text-sm"></i>
+                    </div>
+                    <span class="text-[10px] font-mono text-slate-400">योजना-ID: #८८२१</span>
+                </div>
+                <button onclick="closeModal()" class="w-6 h-6 flex items-center justify-center rounded bg-slate-100 text-slate-500 hover:bg-slate-200">
+                    <i class="fas fa-times text-xs"></i>
+                </button>
+            </div>
+            <h2 id="modal-title" class="text-lg font-bold text-slate-800 mb-2 leading-tight">शीर्षक</h2>
+            <div class="bg-slate-50 p-3 rounded-lg border border-slate-100 mb-4">
+                <p id="modal-desc" class="text-xs text-slate-600 leading-relaxed font-medium">वर्णन...</p>
+            </div>
+            <button class="w-full bg-agro-blue text-white text-xs font-bold py-3 rounded-lg hover:bg-blue-600 active:scale-95 transition shadow-lg shadow-blue-200">
+                पात्रता आता तपासा
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- Modal Logic ---
+        const modal = document.getElementById('scheme-modal');
+        const modalContent = document.getElementById('modal-content');
+        const modalTitle = document.getElementById('modal-title');
+        const modalDesc = document.getElementById('modal-desc');
+
+        function openScheme(title, desc) {
+            modalTitle.innerText = title;
+            modalDesc.innerText = desc;
+            modal.classList.add('active');
+            modalContent.classList.remove('scale-95');
+            modalContent.classList.add('scale-100');
+        }
+
+        function closeModal() {
+            modal.classList.remove('active');
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+        }
+
+        // --- Slider Logic ---
+        const sliderTrack = document.getElementById('slider-track');
+        const sliderThumb = document.getElementById('slider-thumb');
+        const sliderLabel = document.getElementById('slider-label');
+        
+        let isDragging = false;
+        let startX = 0;
+        let currentX = 0;
+        const padding = 3;
+        
+        function getX(e) {
+            return e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+        }
+
+        function startDrag(e) {
+            isDragging = true;
+            startX = getX(e);
+            sliderThumb.style.transition = 'none'; 
+        }
+
+        function moveDrag(e) {
+            if (!isDragging) return;
+            if(e.type.includes('touch')) e.preventDefault();
+
+            const trackRect = sliderTrack.getBoundingClientRect();
+            const maxTravel = trackRect.width - sliderThumb.offsetWidth - (padding * 2);
+            
+            let moveX = getX(e) - trackRect.left - padding - (sliderThumb.offsetWidth / 2);
+            
+            if (moveX < 0) moveX = 0;
+            if (moveX > maxTravel) moveX = maxTravel;
+            
+            currentX = moveX;
+            sliderThumb.style.transform = `translateX(${currentX}px)`;
+            
+            const opacity = 1 - (currentX / maxTravel);
+            sliderLabel.style.opacity = Math.max(0, opacity);
+        }
+
+        function endDrag() {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            const trackRect = sliderTrack.getBoundingClientRect();
+            const maxTravel = trackRect.width - sliderThumb.offsetWidth - (padding * 2);
+            
+            if (currentX > maxTravel * 0.8) {
+                sliderThumb.style.transition = 'transform 0.2s ease-out';
+                sliderThumb.style.transform = `translateX(${maxTravel}px)`;
+                sliderLabel.textContent = "जोडत आहे...";
+                sliderLabel.style.opacity = 1;
+                
+                setTimeout(() => {
+                    alert("सुरक्षित कॉल सुरू करत आहे...");
+                    resetSlider();
+                }, 600);
+            } else {
+                resetSlider();
+            }
+        }
+
+        function resetSlider() {
+            sliderThumb.style.transition = 'transform 0.3s ease-out';
+            sliderThumb.style.transform = `translateX(0px)`;
+            sliderLabel.style.opacity = 1;
+            setTimeout(() => {
+                sliderLabel.textContent = "संपर्क करण्यासाठी स्लाइड करा";
+            }, 300);
+        }
+
+        sliderThumb.addEventListener('mousedown', startDrag);
+        sliderThumb.addEventListener('touchstart', startDrag);
+        document.addEventListener('mousemove', moveDrag);
+        document.addEventListener('touchmove', moveDrag, { passive: false });
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchend', endDrag);
+    </script>
+</body>
+</html>

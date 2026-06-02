@@ -1,0 +1,603 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Leaf Scanner — Crop Health Detector & Treatment Suggestion</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- Load Font Awesome Icons for better UI feedback -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+<style>
+    :root{
+        --bg: #f6fbf6;
+        --card: #fff;
+        --accent: #2e7d32;
+        --muted: #58616a;
+        --danger: #b91c1c;
+    }
+    *{box-sizing:border-box}
+    body{
+        margin:0;font-family:"Poppins",system-ui,Segoe UI,Roboto,Arial;background:linear-gradient(180deg,var(--bg),#eaf3ea);
+        color:#07221a;padding:12px; /* Reduced padding for mobile */
+    }
+    .app {
+        max-width:1000px; /* Increased max width slightly */
+        margin:0 auto;
+        display:grid;
+        grid-template-columns: 1fr 380px; /* Slightly wider right column for desktop */
+        gap: 16px; /* Adjusted gap */
+    }
+    header{
+        display:flex;
+        align-items:center;
+        gap:12px;
+        margin-bottom: 16px; /* Increased margin for visual separation */
+    }
+    .logo{
+        width:52px;height:52px;border-radius:12px;
+        background:linear-gradient(135deg,#66bb6a,#2e7d32);
+        display:flex;align-items:center;justify-content:center;
+        color:white;font-weight:700;font-size: 1.5rem;
+        box-shadow: 0 4px 8px rgba(46, 125, 50, 0.4);
+    }
+    h1{font-size:1.25rem;margin:0;font-weight:700;} /* Larger, bolder title */
+    .card{
+        background:var(--card);
+        padding:18px; /* Increased padding */
+        border-radius:12px;
+        box-shadow:0 8px 20px rgba(4,8,6,0.08); /* Stronger, cleaner shadow */
+        border: 1px solid #eef6ee;
+    }
+    .controls{
+        display:flex;
+        flex-direction:column;
+        gap:10px;
+        width: 100%;
+    }
+    button{
+        background:linear-gradient(135deg,#66bb6a,#2e7d32);
+        color:#fff;
+        border:0;
+        padding:12px 14px; /* Increased padding for better touch targets */
+        border-radius:9px;
+        font-weight:600;
+        cursor:pointer;
+        transition: transform 0.1s, box-shadow 0.1s;
+        box-shadow: 0 2px 4px rgba(46, 125, 50, 0.4);
+        display: flex; /* Flex for icon/text alignment */
+        align-items: center;
+        justify-content: center;
+    }
+    button:active{ transform: scale(0.98); }
+    .btn-secondary{
+        background:#f1f6f1;
+        color:var(--accent);
+        border:1px solid #e6f0e6;
+        box-shadow: none;
+    }
+    .btn-secondary:hover { background: #e6f0e6; }
+
+    /* New styles for input group on mobile */
+    .input-group {
+        display: flex;
+        flex-wrap: wrap; /* Allows wrapping on small screens */
+        gap: 8px;
+        margin-top: 10px;
+    }
+    .input-group > * {
+        flex: 1 1 45%; /* Default split */
+        min-width: 120px; /* Minimum size */
+    }
+    .input-group.full-width > * {
+        flex: 1 1 100%;
+        min-width: 100%;
+    }
+
+    input[type="file"]{
+        padding: 8px;
+        border-radius: 8px;
+        border: 1px solid #e6eee6;
+        background: #fdfdfd;
+        font-size: 0.86rem;
+    }
+    input[type="file"]::file-selector-button {
+        background: var(--accent);
+        color: white;
+        border: none;
+        padding: 6px 10px;
+        border-radius: 6px;
+        margin-right: 8px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: background 0.1s;
+    }
+    input[type="file"]::file-selector-button:hover {
+        background: #388e3c;
+    }
+
+    .video-wrap{position:relative;border-radius:10px;overflow:hidden;border:1px solid #e8f1e8}
+    video{width:100%;height:auto;display:block}
+    canvas{
+        max-width:100%;
+        border-radius:8px;
+        background:#fff;
+        border: 1px dashed #cccccc; /* Added visual border to canvas */
+    }
+    .small{font-size:0.9rem;color:var(--muted)} /* Adjusted small font size */
+    .diagnosis{margin-top:12px;padding: 8px; border-radius: 8px; border: 1px solid #e6f0e6;} /* Added padding to result box */
+    .label{
+        display:inline-block;
+        padding:6px 10px;
+        border-radius:8px;
+        background:#ecf8ea;
+        color:var(--accent);
+        font-weight:600;
+        font-size: 0.95rem;
+    }
+    .treatment{margin-top:10px}
+    .treatment ul{margin:8px 0 0 0;padding-left: 20px;} /* Better list spacing */
+    .treatment ul li { margin-bottom: 4px; }
+    .warning{color:var(--danger);font-weight:600}
+    footer{margin-top:18px;color:var(--muted);font-size:0.86rem;text-align:center}
+
+    /* Responsive Layout Fixes */
+    @media (max-width: 900px) {
+        .app {
+            grid-template-columns: 1fr; /* Stack columns on mobile/tablet */
+        }
+        .right-col {
+            order: 2; /* Put results below camera area on mobile */
+        }
+        .app > .card:first-child {
+            order: 1; /* Keep camera area on top */
+        }
+        h1{ font-size: 1.15rem; }
+    }
+    /* Small Phone optimization */
+    @media (max-width: 480px) {
+        .input-group {
+            flex-direction: column; /* Force buttons/inputs to stack vertically */
+        }
+        .input-group > * {
+            flex: 1 1 100%;
+            min-width: 100%;
+        }
+        input[type="file"] {
+            margin-top: -4px; /* Adjust spacing */
+        }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <div class="logo"><i class="fas fa-leaf"></i></div>
+    <div>
+        <h1>Leaf Scanner — Crop Health Detector</h1>
+        <div class="small">Take a photo or upload a leaf image. Get diagnosis + suggested treatment.</div>
+    </div>
+</header>
+
+<div class="app">
+    <!-- LEFT: Camera / Image area -->
+    <div class="card">
+        <div style="display:flex;gap:10px;align-items:center;justify-content:space-between; flex-wrap: wrap;">
+            <div>
+                <strong>Scan leaf</strong><div class="small">Use camera for best results</div>
+            </div>
+            <div class="small" id="status">Model: <span id="modelStatus">Heuristic (no ML)</span></div>
+        </div>
+
+        <div style="height:12px"></div>
+
+        <div class="video-wrap" id="cameraWrap">
+            <video id="video" autoplay playsinline></video>
+        </div>
+
+        <!-- Camera/Upload Controls (Responsive Group) -->
+        <div class="input-group">
+            <button id="btn-start"><i class="fas fa-camera mr-2"></i> Start Camera</button>
+            <button id="btn-capture" class="btn-secondary"><i class="fas fa-bullseye mr-2"></i> Capture</button>
+            <!-- File Input hidden, replaced by button -->
+            <label for="fileInput" class="btn-secondary" style="text-align: center; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 12px 14px;">
+                <i class="fas fa-upload mr-2"></i> Upload
+            </label>
+            <input id="fileInput" type="file" accept="image/*" style="display: none;" />
+        </div>
+
+        <div style="margin-top:16px; text-align: center;">
+            <canvas id="preview" width="640" height="480" style="width:100%; height:auto;"></canvas>
+        </div>
+
+        <!-- Analysis & Model Controls (Responsive Group) -->
+        <div class="input-group full-width">
+            <button id="btn-analyze"><i class="fas fa-chart-bar mr-2"></i> Analyze Image</button>
+        </div>
+
+        <div class="input-group full-width">
+            <input id="modelUrl" placeholder="Paste model.json URL (optional)" style="flex:1;padding:8px;border-radius:8px;border:1px solid #e6eee6" />
+            <button id="btn-load-model" class="btn-secondary"><i class="fas fa-brain mr-2"></i> Load ML Model</button>
+        </div>
+
+        <div class="small" style="margin-top:8px">Tips: clean leaf on neutral background, good lighting, whole leaf visible.</div>
+    </div>
+
+    <!-- RIGHT: Results & Guidance -->
+    <div class="card right-col">
+        <h3 style="margin:0">Diagnosis & Treatment</h3>
+        <div id="resultBox" class="diagnosis small">
+            <div class="muted">No analysis yet. Capture or upload an image and click Analyze.</div>
+        </div>
+
+        <div id="treatmentBox" class="treatment"></div>
+
+        <div style="margin-top:20px">
+            <strong>How it works</strong>
+            <div class="small" style="margin-top:6px">
+                This tool uses a simple **heuristic** (color/spot detection) or a custom **TensorFlow.js classification model** (if you load one) to identify the likely health issue.
+            </div>
+        </div>
+
+        <hr style="margin:16px 0;border:none;border-top:1px solid #eef6ee">
+
+        <div>
+            <strong>Common diseases (demo)</strong>
+            <div class="small" style="margin-top:6px">
+                Healthy • Nitrogen deficiency • Fungal leaf spot • Bacterial blight • Pest damage • Overwatering
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>Prototype — load a trained TFJS model for accurate production results.</footer>
+
+<!-- TFJS optional: only load if user loads a model -->
+<script>
+/*
+    Leaf Scanner Prototype Logic (Maintained functionality)
+*/
+
+// UI refs
+const video = document.getElementById('video');
+const btnStart = document.getElementById('btn-start');
+const btnCapture = document.getElementById('btn-capture');
+const fileInput = document.getElementById('fileInput');
+const preview = document.getElementById('preview');
+const ctx = preview.getContext('2d');
+const btnAnalyze = document.getElementById('btn-analyze');
+const resultBox = document.getElementById('resultBox');
+const treatmentBox = document.getElementById('treatmentBox');
+const btnLoadModel = document.getElementById('btn-load-model');
+const modelUrlInput = document.getElementById('modelUrl');
+const modelStatus = document.getElementById('modelStatus');
+const uploadLabel = document.querySelector('label[for="fileInput"]');
+
+let stream = null;
+let currentImage = null; // Image object drawn on canvas
+let tfModel = null;
+let tf = null; // lazy-loaded TensorFlow.js
+
+// Start camera
+btnStart.addEventListener('click', async ()=>{
+    if(stream){
+        // stop
+        stream.getTracks().forEach(t=>t.stop());
+        stream = null;
+        video.srcObject = null;
+        btnStart.innerHTML = '<i class="fas fa-camera mr-2"></i> Start Camera';
+        return;
+    }
+    try{
+        // Use 'environment' for rear camera on mobile
+        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false});
+        video.srcObject = stream;
+        btnStart.innerHTML = '<i class="fas fa-stop mr-2"></i> Stop Camera';
+    }catch(e){
+        alert('Camera access failed: ' + e.message);
+    }
+});
+
+// Capture frame from video to canvas
+btnCapture.addEventListener('click', ()=>{
+    if(stream){
+        // draw current video frame
+        const w = preview.width;
+        const h = preview.height;
+        ctx.drawImage(video, 0, 0, w, h);
+        currentImage = new Image();
+        currentImage.src = preview.toDataURL('image/png');
+        modelStatus.innerText = tfModel ? 'ML model ready' : 'Heuristic (no ML)';
+    } else {
+        alert('Start camera first or upload an image.');
+    }
+});
+
+// Upload image (using FileReader)
+fileInput.addEventListener('change', (ev)=>{
+    const f = ev.target.files[0];
+    if(!f) return;
+    uploadLabel.innerHTML = `<i class="fas fa-circle-notch fa-spin mr-2"></i> Loading...`;
+
+    const reader = new FileReader();
+    reader.onload = function(e){
+        const img = new Image();
+        img.onload = ()=>{
+            // draw fit to canvas while keeping aspect ratio
+            drawImageFit(img);
+            currentImage = img;
+            modelStatus.innerText = tfModel ? 'ML model ready' : 'Heuristic (no ML)';
+            uploadLabel.innerHTML = `<i class="fas fa-check mr-2"></i> Image Loaded`;
+        };
+        img.src = e.target.result;
+    };
+    reader.readAsDataURL(f);
+});
+
+// Draw image into canvas maintaining aspect ratio and centering
+function drawImageFit(img){
+    const cw = preview.width, ch = preview.height;
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0,0,cw,ch);
+    const r = Math.min(cw/img.width, ch/img.height);
+    const nw = img.width * r, nh = img.height * r;
+    const dx = (cw - nw)/2, dy = (ch - nh)/2;
+    ctx.drawImage(img, dx, dy, nw, nh);
+}
+
+// Analyze image: either ML model or heuristic
+btnAnalyze.addEventListener('click', async ()=>{
+    if(!currentImage){
+        alert('No image to analyze. Capture or upload an image first.');
+        return;
+    }
+    btnAnalyze.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Analyzing...';
+    resultBox.innerHTML = '<div class="small muted">Analyzing…</div>';
+    treatmentBox.innerHTML = '';
+
+    try{
+        // Preprocess: resize to 224x224 image data for both heuristic or model
+        const inputSize = 224;
+        const tmp = document.createElement('canvas');
+        tmp.width = inputSize; tmp.height = inputSize;
+        const tctx = tmp.getContext('2d');
+        // draw current canvas content (preview) scaled to tmp
+        tctx.drawImage(preview, 0, 0, inputSize, inputSize);
+        const imgData = tctx.getImageData(0,0,inputSize,inputSize);
+        let label, confidence, details = {};
+
+        // If ML model loaded, run prediction
+        if(tfModel && tf){
+            // Delay analysis slightly to show 'Analyzing...' status
+            await new Promise(r => setTimeout(r, 500)); 
+            const t = tf.browser.fromPixels(imgData).toFloat().div(255.0).expandDims(0); // [1,h,w,3]
+            const logits = await tfModel.predict(t);
+            
+            let probs;
+            if(Array.isArray(logits)){
+                // Handle models that return multiple outputs (e.g., if you only want the first)
+                probs = await Promise.all(logits.map(async x=> (await x.data())[0] )); 
+            } else {
+                const data = await logits.data();
+                probs = Array.from(data);
+            }
+            
+            // NOTE: Replace these labels with your model's labels/order!
+            const labels = ['Healthy','Nitrogen deficiency','Fungal leaf spot','Bacterial blight','Pest damage','Overwatering'];
+            const maxIdx = probs.indexOf(Math.max(...probs));
+            label = labels[maxIdx] ?? 'Unknown';
+            confidence = (probs[maxIdx]*100).toFixed(1);
+        } else {
+            // Heuristic fallback: color & spot analysis
+            // Delay analysis slightly to show 'Analyzing...' status
+            await new Promise(r => setTimeout(r, 1000));
+            const diagnosis = heuristicDetect(imgData);
+            label = diagnosis.label;
+            confidence = diagnosis.confidence;
+            details = diagnosis.details;
+        }
+
+        showResult(label, confidence, details);
+
+    }catch(e){
+        console.error(e);
+        alert('Analysis failed: ' + e.message);
+        resultBox.innerHTML = '<div class="small warning">Analysis error. Check console for details.</div>';
+    } finally {
+        btnAnalyze.innerHTML = '<i class="fas fa-chart-bar mr-2"></i> Analyze Image';
+    }
+});
+
+// Heuristic detector: simple statistical rules on RGB pixels
+function heuristicDetect(imgData){
+    const data = imgData.data;
+    const px = data.length/4;
+    let sumR=0,sumG=0,sumB=0;
+    let yellowCount=0;
+    let brownSpotCount=0;
+    
+    // Simplified Heuristic Scan
+    for(let i=0;i<data.length;i+=4){
+        const r=data[i], g=data[i+1], b=data[i+2];
+
+        // Yellow pixel heuristic (high R/G, low B)
+        if(r>150 && g>150 && Math.abs(r-g) < 40 && b < 100) yellowCount++;
+        
+        // Brown/Dark spot heuristic (low R/G/B, slightly reddish hint)
+        if(r<150 && g<120 && b<100 && r>g+10 && r>40) brownSpotCount++;
+        
+        sumR += r; sumG += g; sumB += b;
+    }
+    
+    const avgR = sumR/px, avgG = sumG/px, avgB = sumB/px;
+
+    // percent metrics
+    const pctYellow = (yellowCount/px)*100;
+    const pctBrown = (brownSpotCount/px)*100;
+
+    // decision logic
+    if(pctBrown > 3.5) {
+        return { label: 'Fungal leaf spot', confidence: '75%', details: {pctBrown: pctBrown.toFixed(2) + '% area'} };
+    }
+    if(pctYellow > 5 || (avgG < 110 && avgR > avgG + 15)) {
+        return { label: 'Nitrogen deficiency (yellowing)', confidence: '65%', details: {pctYellow: pctYellow.toFixed(2) + '% area', avgG: Math.round(avgG)} };
+    }
+    // Very dark leaf - possible severe rot/pest damage
+    if(avgR < 50 && avgG < 50 && avgB < 50) {
+        return { label: 'Overwatering / rot', confidence: '80%', details: {avgBrightness: (avgR+avgG+avgB/3).toFixed(0)} };
+    }
+    
+    // Default: Healthy if average color is green and no specific spots found
+    if (avgG > avgR && avgG > avgB && avgG > 120) {
+        return { label: 'Healthy', confidence: '95%', details: {avgGreen: Math.round(avgG)} };
+    }
+
+    // fallback
+    return { label: 'Unknown', confidence: '50%', details: {} };
+}
+
+// Show diagnosis and suggested treatments
+function showResult(label, confidence='—', details={}){
+    resultBox.innerHTML = `
+        <div style="display:flex;justify-content:space-between;align-items:center">
+            <div style="font-weight:700">${label}</div>
+            <div class="label">${label}</div>
+        </div>
+        <div class="small" style="margin-top:4px">Confidence: <strong style="color:var(--accent)">${confidence}%</strong></div>
+        ${Object.keys(details).length ? `<div class="small" style="margin-top:6px">Heuristic data: ${JSON.stringify(details).replace(/"/g, '')}</div>` : ''}
+    `;
+
+    // mapping diagnosis -> treatment suggestions
+    const suggestions = treatmentSuggestions(label);
+    treatmentBox.innerHTML = `
+        <div style="font-weight:600;margin-top:8px">Suggested Treatment Plan</div>
+        <div class="small" style="margin-top:6px; color: #07221a;">${suggestions.summary}</div>
+        <div style="margin-top:10px">
+            <strong style="font-size: 0.95rem;">Key Actions:</strong>
+            <ul class="small">
+                ${suggestions.actions.map(a=>`<li><i class="fas fa-check-circle" style="color:var(--accent); margin-right: 6px;"></i>${a}</li>`).join('')}
+            </ul>
+        </div>
+        ${suggestions.warning ? `<div class="small warning" style="margin-top:12px; padding: 8px; background: #fee2e2; border-radius: 6px;">
+        <i class="fas fa-exclamation-triangle mr-1"></i> ${suggestions.warning}</div>` : ''}
+    `;
+}
+
+// Treatment mapping: keep it general and non-prescriptive
+function treatmentSuggestions(label){
+    const map = {
+        'Healthy': {
+            summary: 'Leaf looks healthy! Maintain optimal conditions and continue regular monitoring.',
+            actions: ['Maintain balanced NPK fertilizer schedule', 'Monitor moisture and drainage weekly', 'Check for early pest signs'],
+            warning: ''
+        },
+        'Nitrogen deficiency (yellowing)': {
+            summary: 'Indicates severe nitrogen deficiency, causing pale or yellow leaves starting from the older growth.',
+            actions: [
+                'Immediately apply fast-acting N-fertilizer (e.g., Foliar Urea)',
+                'Increase compost/organic matter to the soil',
+                'Do a soil test to check pH and other nutrients'
+            ],
+            warning: 'Severe deficiency can drastically reduce yield. Fertilize carefully based on local guidelines.'
+        },
+        'Fungal leaf spot': {
+            summary: 'The presence of dark spots suggests a common fungal disease (like Early Blight or Septoria Leaf Spot).',
+            actions: [
+                'Remove and destroy infected leaves/debris immediately',
+                'Apply copper-based fungicide or specific contact fungicide (e.g., Mancozeb)',
+                'Water at the base of the plant to keep foliage dry (avoid overhead irrigation)'
+            ],
+            warning: 'Fungal diseases spread quickly in humid conditions. Ensure proper air flow.'
+        },
+        'Bacterial blight': {
+            summary: 'Suggests a bacterial infection, often causing angular, water-soaked spots that become dry and brown.',
+            actions: [
+                'Use copper bactericide sprays (less effective than prevention)',
+                'Prune heavily infected parts with sanitized tools',
+                'Avoid working in the field when foliage is wet'
+            ],
+            warning: 'Bacterial diseases are difficult to cure. Prevention (clean seeds, rotation) is critical.'
+        },
+        'Pest damage': {
+            summary: 'The damage pattern points toward chewing insects (caterpillars, beetles, or grasshoppers).',
+            actions: [
+                'Apply organic Neem oil (3% - 5%) spray',
+                'If damage is severe, use targeted bio-pesticides (e.g., Bt - Bacillus thuringiensis)',
+                'Use pheromone or sticky traps to monitor and catch adult insects'
+            ],
+            warning: 'Identify the specific pest before applying strong chemicals; target life stage for best results.'
+        },
+        'Overwatering / rot': {
+            summary: 'Dark, soggy, or pale, weak leaves often indicate poor drainage, root stress, or root rot.',
+            actions: [
+                'Immediately reduce irrigation frequency; allow topsoil to dry',
+                'Improve soil aeration (light cultivation/poking holes)',
+                'If confirmed root rot, apply a systemic fungicide (ee.g., Metalaxyl, if allowed)'
+            ],
+            warning: 'Poor drainage kills roots. Check soil texture and ensure runoff.'
+        },
+        'Unknown': {
+            summary: 'Analysis could not confirm a specific disease. Consult a local expert for a precise diagnosis.',
+            actions: ['Take clear photos to local agri-extension', 'Do a full soil/leaf sample test'],
+            warning: ''
+        }
+    };
+
+    return map[label] || map['Unknown'];
+}
+
+/* MODEL LOADING: optional TFJS model */
+btnLoadModel.addEventListener('click', async ()=>{
+    const url = modelUrlInput.value.trim();
+    if(!url){ alert('Paste the model.json URL in the input box first.'); return; }
+    
+    btnLoadModel.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Loading...';
+    modelStatus.innerText = 'Loading TFJS...';
+
+    try{
+        // lazy load TFJS
+        if(!tf){
+            await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.12.0/dist/tf.min.js');
+            tf = window.tf;
+        }
+        modelStatus.innerText = 'Loading model...';
+        tfModel = await tf.loadLayersModel(url);
+        modelStatus.innerText = 'ML model loaded';
+        btnLoadModel.innerHTML = '<i class="fas fa-check mr-2"></i> Model Loaded';
+        alert('Model loaded successfully. The Analyze button will now use the ML model.');
+    }catch(e){
+        console.error(e);
+        tfModel = null;
+        modelStatus.innerText = 'Model load failed — heuristic retained';
+        btnLoadModel.innerHTML = '<i class="fas fa-exclamation-triangle mr-2"></i> Load ML Model (Failed)';
+        alert('Failed to load model: ' + e.message);
+    }
+});
+
+// small helper to load script dynamically
+function loadScript(src){
+    return new Promise((resolve, reject)=>{
+        const s = document.createElement('script');
+        s.src = src; s.onload = ()=>resolve(); s.onerror = (e)=>reject(e);
+        document.head.appendChild(s);
+    });
+}
+
+// On page load, draw a placeholder on preview
+(function init(){
+    const cw = preview.width, ch = preview.height;
+    ctx.fillStyle = '#fff';
+    ctx.fillRect(0,0,cw,ch);
+    ctx.fillStyle = '#cfe9d2';
+    ctx.fillRect(16,16,cw-32,ch-32);
+    ctx.fillStyle = '#2e7d32';
+    ctx.font = '700 20px Poppins';
+    ctx.textAlign = 'center';
+    ctx.fillText('Image Preview', cw/2, ch/2 - 10);
+    ctx.font = '16px Poppins';
+    ctx.fillText('Capture a photo or upload an image', cw/2, ch/2 + 20);
+})();
+</script>
+</body>
+</html>
