@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Farmpay+ Ultra Scan</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-primary': '#6366f1',
+                        'brand-accent': '#8b5cf6',
+                        'brand-success': '#10b981',
+                        'brand-error': '#ef4444',
+                        'dark-bg': '#0f172a',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['Space Mono', 'monospace'],
+                    },
+                    animation: {
+                        'scan-laser': 'scan 2s cubic-bezier(0.4, 0, 0.2, 1) infinite',
+                    },
+                    keyframes: {
+                        scan: {
+                            '0%': { top: '0%', opacity: '0' },
+                            '10%': { opacity: '1' },
+                            '90%': { opacity: '1' },
+                            '100%': { top: '100%', opacity: '0' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #020617;
+            color: #e2e8f0;
+            overflow-x: hidden;
+            min-height: 100vh;
+            background-image: 
+                radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
+            background-size: 150% 150%;
+        }
+
+        /* Glassmorphism Utilities */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* Credit Card Mockup */
+        .credit-card-mockup {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border-radius: 24px;
+            aspect-ratio: 1.586;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Dynamic Bank Styles */
+        .card-sbi {
+            background: linear-gradient(135deg, #005A9C 0%, #00a4e4 100%);
+            border-color: #93c5fd;
+        }
+        .card-union {
+            background: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+            border-color: #fca5a5;
+        }
+
+        /* Input Styles */
+        .floating-input-group { position: relative; margin-bottom: 0.5rem; }
+        .floating-input {
+            width: 100%; background: transparent; border-bottom: 2px solid rgba(255,255,255,0.2);
+            padding: 12px 0; font-size: 1.1rem; color: white; outline: none;
+            transition: all 0.3s; font-family: 'Space Mono', monospace; border-radius: 0;
+        }
+        .floating-input:focus { border-color: #8b5cf6; }
+        .floating-input.error { border-color: #ef4444; color: #fca5a5; }
+        .floating-input.success { border-color: #10b981; }
+        
+        .floating-label {
+            position: absolute; top: 12px; left: 0; color: rgba(255,255,255,0.5);
+            font-size: 0.9rem; transition: all 0.3s ease; pointer-events: none;
+        }
+        .floating-input:focus ~ .floating-label,
+        .floating-input:not(:placeholder-shown) ~ .floating-label {
+            top: -12px; font-size: 0.75rem; color: #8b5cf6;
+        }
+
+        .error-msg {
+            font-size: 0.75rem; color: #ef4444; height: 1.2rem; margin-top: 0.2rem;
+            opacity: 0; transition: opacity 0.3s;
+        }
+        .error-msg.visible { opacity: 1; }
+
+        /* Scanner */
+        .scanner-hud {
+            position: relative; border-radius: 24px; overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.1); background: black;
+            height: 220px; display: flex; align-items: center; justify-content: center;
+            box-shadow: inset 0 0 40px rgba(0,0,0,0.8); transition: border-color 0.3s;
+        }
+        .scanner-hud.scanning-success { border-color: #10b981; box-shadow: inset 0 0 40px rgba(16, 185, 129, 0.2); }
+        .scanner-overlay { position: absolute; inset: 20px; border: 2px solid transparent; z-index: 10; }
+        
+        .corner { position: absolute; width: 20px; height: 20px; border: 2px solid #8b5cf6; transition: all 0.3s; }
+        .active .corner { border-color: #22d3ee; box-shadow: 0 0 10px #22d3ee; }
+        .scanning-success .corner { border-color: #10b981 !important; box-shadow: 0 0 20px #10b981 !important; }
+        
+        .c-tl { top: 0; left: 0; border-right: 0; border-bottom: 0; }
+        .c-tr { top: 0; right: 0; border-left: 0; border-bottom: 0; }
+        .c-bl { bottom: 0; left: 0; border-right: 0; border-top: 0; }
+        .c-br { bottom: 0; right: 0; border-left: 0; border-top: 0; }
+
+        .laser-beam {
+            position: absolute; width: 100%; height: 2px; background: #22d3ee;
+            box-shadow: 0 0 20px #22d3ee; top: 0; opacity: 0;
+            animation: scan-laser 2s linear infinite; display: none;
+        }
+        .active .laser-beam { display: block; }
+
+        /* Button */
+        .btn-glow {
+            background: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            box-shadow: 0 10px 30px -10px rgba(168, 85, 247, 0.6);
+            transition: all 0.3s ease;
+        }
+        .btn-glow:active { transform: scale(0.98); }
+        .btn-glow:disabled { background: #1e293b; color: #475569; box-shadow: none; cursor: not-allowed; }
+
+        .scanning-text {
+            position: absolute; bottom: 10px; left: 0; right: 0; text-align: center;
+            font-family: 'Space Mono', monospace; font-size: 0.8rem; color: #22d3ee; opacity: 0;
+        }
+        .active .scanning-text { opacity: 1; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col font-sans">
+
+    <!-- Header -->
+    <header class="flex items-center justify-between px-6 pt-8 pb-4 relative z-20">
+        <button onclick="window.history.back()" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-white hover:bg-white/10 transition">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <span class="text-sm font-bold tracking-[0.2em] text-white/50 uppercase">Secure Scan</span>
+        <div class="w-10"></div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow px-6 pb-24 relative z-10 flex flex-col gap-6">
+        
+        <!-- Live Card Preview -->
+        <div class="perspective-[1000px] shrink-0">
+            <div id="cardMockup" class="credit-card-mockup p-6 flex flex-col justify-between text-white shadow-2xl transition-all duration-500">
+                <!-- Chip & Logo -->
+                <div class="flex justify-between items-start z-10">
+                    <img src="https://raw.githubusercontent.com/dasShounak/freeUseImages/main/chip.png" class="h-10 opacity-90" alt="Chip">
+                    <div id="bankLogoContainer" class="flex items-center gap-2">
+                         <i class="fab fa-cc-visa text-4xl opacity-80" id="defaultLogo"></i>
+                         <!-- Dynamic Bank Text -->
+                         <span id="bankNameDisplay" class="font-bold tracking-wider text-lg hidden">BANK</span>
+                    </div>
+                </div>
+                
+                <!-- Card Number Display -->
+                <div class="z-10 mt-4">
+                    <p class="text-[10px] text-white/60 font-medium mb-1 tracking-widest">CARD NUMBER (12 DIGITS)</p>
+                    <div class="text-xl md:text-2xl font-mono tracking-widest transition-colors duration-300" id="previewAC">
+                        •••• •••• ••••
+                    </div>
+                </div>
+
+                <!-- Footer Info -->
+                <div class="flex justify-between items-end z-10">
+                    <div>
+                        <p class="text-[10px] text-white/60 font-bold mb-0.5">CARD HOLDER</p>
+                        <p class="text-sm font-medium tracking-wide">FARMER JOHN</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-[10px] text-white/60 font-bold mb-0.5">EXPIRES</p>
+                        <p class="text-sm font-mono tracking-wide" id="previewExpiry">MM/YY</p>
+                    </div>
+                </div>
+                
+                <!-- Shine effect -->
+                <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl transform translate-x-10 -translate-y-10"></div>
+            </div>
+        </div>
+
+        <!-- Scanner Viewport -->
+        <div class="scanner-hud shrink-0" id="camera-container" onclick="toggleCamera()">
+            <video id="camera-video" autoplay playsinline muted class="absolute inset-0 w-full h-full object-cover opacity-60 hidden"></video>
+            
+            <div class="relative z-20 text-center pointer-events-none" id="scan-prompt">
+                <div class="w-14 h-14 rounded-full border border-white/20 bg-white/5 flex items-center justify-center mx-auto mb-3 animate-pulse">
+                    <i class="fas fa-camera text-xl text-brand-accent"></i>
+                </div>
+                <p class="text-xs font-medium tracking-widest text-white/70">TAP TO SCAN CARD</p>
+            </div>
+
+            <!-- Overlay Elements -->
+            <div class="scanner-overlay">
+                <div class="corner c-tl"></div>
+                <div class="corner c-tr"></div>
+                <div class="corner c-bl"></div>
+                <div class="corner c-br"></div>
+                <div class="laser-beam"></div>
+                <div class="scanning-text">LOCATING CHIP...</div>
+            </div>
+        </div>
+
+        <!-- Inputs -->
+        <div class="mt-2 flex flex-col gap-2">
+            <!-- A/C -->
+            <div>
+                <div class="floating-input-group">
+                    <input type="text" id="inputAC" class="floating-input" placeholder=" " inputmode="numeric" maxlength="14">
+                    <label class="floating-label">Card Number (12 Digits)</label>
+                </div>
+                <div id="error-ac" class="error-msg">Must be exactly 12 digits</div>
+            </div>
+
+            <div class="flex gap-6">
+                <!-- Expiry -->
+                <div class="flex-1">
+                    <div class="floating-input-group">
+                        <input type="month" id="inputExpiry" class="floating-input" placeholder=" " style="color-scheme: dark;">
+                        <label class="floating-label">Expiry Date</label>
+                    </div>
+                    <div id="error-exp" class="error-msg">Required</div>
+                </div>
+                <!-- CVV -->
+                <div class="w-28">
+                    <div class="floating-input-group">
+                        <input type="password" id="inputCVV" class="floating-input" placeholder=" " maxlength="3" inputmode="numeric">
+                        <label class="floating-label">CVV (3)</label>
+                    </div>
+                    <div id="error-cvv" class="error-msg">Must be 3</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Bottom Action Bar -->
+    <div class="fixed bottom-0 left-0 right-0 p-6 bg-gradient-to-t from-black/95 to-transparent z-50">
+        <button id="verifyBtn" onclick="submitData()" class="btn-glow w-full py-4 rounded-xl text-white font-bold tracking-wide text-lg flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            <span>Verify & Link</span>
+            <i class="fas fa-arrow-right opacity-50 group-hover:opacity-100 transition-opacity"></i>
+        </button>
+    </div>
+
+    <script>
+        const videoElement = document.getElementById('camera-video');
+        const cameraContainer = document.getElementById('camera-container');
+        const scanPrompt = document.getElementById('scan-prompt');
+        const inputAC = document.getElementById('inputAC');
+        const inputExpiry = document.getElementById('inputExpiry');
+        const inputCVV = document.getElementById('inputCVV');
+        const previewAC = document.getElementById('previewAC');
+        const verifyBtn = document.getElementById('verifyBtn');
+        const scanningText = document.querySelector('.scanning-text');
+        
+        // Visual Elements for Bank Logic
+        const cardMockup = document.getElementById('cardMockup');
+        const defaultLogo = document.getElementById('defaultLogo');
+        const bankNameDisplay = document.getElementById('bankNameDisplay');
+        
+        let stream = null;
+        let isScanning = false;
+        let detectedBank = 'Unknown';
+
+        // 1. Logic: Input & Bank Detection
+        inputAC.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 12) value = value.slice(0, 12);
+            
+            // Format 1234 5678 1234
+            let formatted = value.match(/.{1,4}/g)?.join(' ') || value;
+            e.target.value = formatted;
+            
+            updateCardPreview(value);
+            detectBank(value);
+            validateForm();
+        });
+
+        // 2. Logic: Detect Bank based on last 2 digits
+        function detectBank(rawNum) {
+            // Need at least 12 digits to check the end accurately
+            if (rawNum.length < 12) {
+                resetCardStyle();
+                return;
+            }
+
+            const lastTwo = rawNum.slice(-2);
+            
+            if (lastTwo === '48') {
+                setBankStyle('SBI', 'card-sbi', 'State Bank');
+            } else if (lastTwo === '54') {
+                setBankStyle('UNION', 'card-union', 'Union Bank');
+            } else {
+                resetCardStyle();
+            }
+        }
+
+        function setBankStyle(code, className, displayName) {
+            detectedBank = code;
+            cardMockup.className = `credit-card-mockup p-6 flex flex-col justify-between text-white shadow-2xl transition-all duration-500 ${className}`;
+            defaultLogo.classList.add('hidden');
+            bankNameDisplay.classList.remove('hidden');
+            bankNameDisplay.innerText = displayName;
+        }
+
+        function resetCardStyle() {
+            detectedBank = 'Unknown';
+            cardMockup.className = `credit-card-mockup p-6 flex flex-col justify-between text-white shadow-2xl transition-all duration-500`;
+            defaultLogo.classList.remove('hidden');
+            bankNameDisplay.classList.add('hidden');
+        }
+
+        inputCVV.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length > 3) value = value.slice(0, 3);
+            e.target.value = value;
+            validateForm();
+        });
+
+        inputExpiry.addEventListener('input', () => validateForm());
+
+        function updateCardPreview(rawAc) {
+            const formattedDisplay = rawAc ? rawAc.match(/.{1,4}/g)?.join(' ') : "";
+            previewAC.innerText = formattedDisplay || "•••• •••• ••••";
+            
+            const expVal = inputExpiry.value;
+            if(expVal) {
+                const [year, month] = expVal.split('-');
+                document.getElementById('previewExpiry').innerText = `${month}/${year.slice(2)}`;
+            }
+        }
+
+        function validateForm() {
+            const rawAC = inputAC.value.replace(/\D/g, '');
+            const rawCVV = inputCVV.value;
+            const hasExpiry = inputExpiry.value !== "";
+
+            const isAcValid = rawAC.length === 12;
+            const isCvvValid = rawCVV.length === 3;
+
+            toggleError('error-ac', rawAC.length > 0 && !isAcValid);
+            toggleError('error-cvv', rawCVV.length > 0 && !isCvvValid);
+
+            if (isAcValid && isCvvValid && hasExpiry) {
+                verifyBtn.disabled = false;
+                verifyBtn.style.filter = "grayscale(0)";
+            } else {
+                verifyBtn.disabled = true;
+                verifyBtn.style.filter = "grayscale(1)";
+            }
+        }
+
+        function toggleError(id, show) {
+            const el = document.getElementById(id);
+            if(show) el.classList.add('visible');
+            else el.classList.remove('visible');
+        }
+
+        // --- Camera Logic (Simulated) ---
+        async function toggleCamera() {
+            if (isScanning) stopCamera();
+            else startCamera();
+        }
+
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+                videoElement.srcObject = stream;
+                videoElement.classList.remove('hidden');
+                scanPrompt.classList.add('hidden');
+                cameraContainer.classList.add('active'); 
+                isScanning = true;
+                simulateScanningProcess();
+            } catch (err) {
+                alert("Camera access required.");
+            }
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            videoElement.classList.add('hidden');
+            scanPrompt.classList.remove('hidden');
+            cameraContainer.classList.remove('active');
+            cameraContainer.classList.remove('scanning-success');
+            isScanning = false;
+        }
+
+        function simulateScanningProcess() {
+            scanningText.innerText = "ALIGNING EDGES...";
+            setTimeout(() => {
+                if(!isScanning) return;
+                scanningText.innerText = "READING CHIP...";
+                setTimeout(() => {
+                    if(!isScanning) return;
+                    cameraContainer.classList.add('scanning-success');
+                    scanningText.innerText = "CARD DETECTED";
+                    scanningText.style.color = "#10b981";
+                    
+                    setTimeout(() => {
+                        autoFillScannedData();
+                        stopCamera();
+                    }, 800);
+                }, 1500);
+            }, 1000);
+        }
+
+        function autoFillScannedData() {
+            // Logic to generate ending in 48 (SBI) or 54 (Union) randomly for demo
+            // Or just a random 12 digit
+            const isSBI = Math.random() > 0.5;
+            const suffix = isSBI ? '48' : '54';
+            const prefix = Math.floor(Math.random() * 9000000000) + 1000000000;
+            const generatedNum = prefix.toString().substring(0, 10) + suffix;
+
+            inputAC.value = generatedNum.match(/.{1,4}/g).join(' ');
+            
+            // Random Date
+            const now = new Date();
+            const futureYear = now.getFullYear() + 2;
+            inputExpiry.value = `${futureYear}-12`;
+            
+            inputCVV.value = '';
+            inputCVV.focus();
+
+            updateCardPreview(generatedNum);
+            detectBank(generatedNum); // Trigger detection
+            validateForm();
+        }
+
+        // --- SUBMIT LOGIC ---
+        function submitData() {
+            const rawAC = inputAC.value.replace(/\D/g, '');
+            if (rawAC.length === 12 && inputCVV.value.length === 3) {
+                
+                // Determine Bank Name
+                let bankName = "Farmpay Visa";
+                if (detectedBank === 'SBI') bankName = "State Bank of India";
+                if (detectedBank === 'UNION') bankName = "Union Bank";
+
+                // Create Account Object
+                const newAccount = {
+                    id: Date.now(),
+                    bankName: bankName,
+                    acNumber: rawAC,
+                    expiry: inputExpiry.value,
+                    type: detectedBank
+                };
+
+                // Save to LocalStorage (Simulated Backend)
+                const accounts = JSON.parse(localStorage.getItem('saveaccounts') || '[]');
+                accounts.push(newAccount);
+                localStorage.setItem('saveaccounts', JSON.stringify(accounts));
+
+                // Redirect
+                window.location.href = 'saveaccounts.html';
+            }
+        }
+        
+        window.addEventListener('beforeunload', stopCamera);
+    </script>
+</body>
+</html>

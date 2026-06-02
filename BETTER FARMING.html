@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Soil Health and IPM Guide</title>
+    <!-- Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Font Awesome Icons (Used in the header) --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Custom config for Tailwind colors and Inter font --><script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'agro-dark': '#1e3a24', // Dark green for header
+                        'agro-light': '#22c55e', // Bright Green for accents/buttons
+                        'agro-gold': '#FBBF24', // Gold/Amber
+                        'agro-bg': '#f3f4f6', // Light gray background
+                        'agro-info': '#4CAF50', // Agroinfo+ green
+                        'agro-purple': '#5b21b6', // Deep purple
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        
+        body {
+            background-color: #ffffff;
+        }
+
+        /* Generic List Reset for structured content */
+        .styled-list li {
+            margin-bottom: 0.75rem; /* space-y-3 */
+            color: #1a1a1a;
+        }
+
+        /* Styling for the nested lists (Checkmarks/bullets inside the main list) */
+        .styled-list ul {
+            list-style: none; /* Remove default bullets */
+            padding-left: 0;
+            margin-top: 0.5rem;
+        }
+        .styled-list ul li {
+            padding-left: 1.5rem; /* Indentation for bullet points */
+            position: relative;
+            margin-bottom: 0.25rem;
+            font-size: 0.95rem;
+        }
+        /* Custom checkmark or bullet using Font Awesome circle */
+        .styled-list ul li::before {
+            content: "\f111"; /* Font Awesome circle icon (fa-circle) */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            top: 0.2rem;
+            color: #3b82f6; /* A clear blue for visibility */
+            font-size: 0.5rem;
+        }
+        
+        /* Fixed Header Style */
+        .fixed-header {
+            background-color: #1e3a24;
+        }
+
+    </style>
+</head>
+<body class="font-sans">
+
+    <!-- HEADER / TOP BAR --><header class="fixed-header text-white shadow-md sticky top-0 z-20">
+        <div class="px-4 py-3 flex justify-between items-center">
+            <!-- Back Button --><button onclick="history.back(); showMessage('Navigating back')" class="text-white opacity-80 mr-3 p-1">
+                <i class="fas fa-arrow-left text-xl"></i>
+            </button>
+            
+            <!-- Logo --><div class="text-2xl font-bold tracking-tight text-center flex-grow">
+                <span class="text-white">Agro</span><span class="text-agro-light">health+</span>
+            </div>
+
+            <div class="flex items-center space-x-3 ml-3">
+                <!-- Profile/User Info --><div class="text-xs text-right hidden sm:block leading-none mr-2">
+                    <div class="text-gray-200">Parth sonevane</div>
+                    <div class="text-gray-400">Boisar Maharastra</div>
+                </div>
+                <!-- Profile Icon --><a href="#" class="block p-2 rounded-full bg-agro-light transition flex-shrink-0" onclick="showMessage('Viewing Profile')">
+                    <i class="fas fa-user text-white w-4 h-4 flex items-center justify-center"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <main class="max-w-4xl mx-auto p-4 md:p-8">
+        
+        <!-- TOP LOGOS/VALIDATION -->
+        <div class="flex justify-between items-start mb-6 pt-2">
+            <!-- Agroinfo+ logo (Left) -->
+            <span class="bg-agro-info px-3 py-1 rounded-lg text-white font-extrabold flex items-center shadow-md">
+                Agroinfo<span class="text-agro-light font-black text-xl">+</span>
+            </span>
+            
+            <!-- Validinfo logo (Right) -->
+            <span class="bg-agro-light px-3 py-1 rounded-lg text-white font-extrabold flex items-center shadow-md">
+                Validinfo<i class="fas fa-check-double ml-1"></i>
+            </span>
+        </div>
+        
+        <!-- MAIN GUIDE CONTAINER (Green Box) -->
+        <div class="bg-green-100/50 p-4 md:p-6 rounded-xl border-t-8 border-agro-light shadow-xl">
+            
+            <!-- SECTION A TITLE -->
+            <h2 class="text-xl md:text-2xl font-extrabold text-agro-dark mb-4 pb-2 border-b border-green-300 flex items-center">
+                 <i class="fas fa-seedling text-agro-light text-2xl mr-3"></i> A. SOIL HEALTH FIRST – "Feed the Soil, Not Just the Crop"
+            </h2>
+            
+            <!-- SOIL HEALTH CONTENT -->
+            <ol class="list-decimal list-inside styled-list ml-4 text-gray-800">
+                <li class="font-bold">Soil Testing – Do a lab soil test every 2 years.
+                    <ul class="font-normal text-gray-700">
+                        <li>Check: pH, organic carbon, NPK, micronutrients (Zn, Fe, B).</li>
+                        <li>Get free kits or ₹10/sample testing via soil health card scheme.</li>
+                    </ul>
+                </li>
+                
+                <li class="font-bold">Organic Carbon Boosters:
+                    <ul class="font-normal text-gray-700">
+                        <li>o	Add FYM (2–3 tons/acre) + vermicompost (500–800 kg/acre).</li>
+                        <li>Add biochar or crop residue compost – improves water holding by 25%.</li>
+                    </ul>
+                </li>
+                
+                <li class="font-bold">Biofertilizers:
+                    <ul class="font-normal text-gray-700">
+                        <li>Mix Azospirillum + PSB + Rhizobium + Trichoderma in FYM before application.</li>
+                    </ul>
+                </li>
+                
+                <li class="font-bold">Green Manuring:
+                    <ul class="font-normal text-gray-700">
+                        <li>Grow dhaincha, sunhemp, cowpea before main crop — plough into soil for natural nitrogen.</li>
+                    </ul>
+                </li>
+            </ol>
+            
+            <hr class="my-6 border-green-300">
+            
+            <!-- SECTION B TITLE -->
+            <h2 class="text-xl md:text-2xl font-extrabold text-agro-dark mb-4 pb-2 border-b border-green-300 flex items-center">
+                 <i class="fas fa-bug text-red-500 text-2xl mr-3"></i> B. ORGANIC + TECH BASED PEST MANAGEMENT (IPM)
+            </h2>
+            
+            <!-- IPM CONTENT -->
+            <ol class="list-decimal list-inside styled-list ml-4 text-gray-800">
+                <li class="font-bold">Pheromone Traps:
+                    <ul class="font-normal text-gray-700">
+                        <li>Use for fruit borer, shoot borer, armyworm — 10–12 traps/acre.</li>
+                    </ul>
+                </li>
+                
+                <li class="font-bold">Light Traps:
+                    <ul class="font-normal text-gray-700">
+                        <li>Solar or battery-based traps to kill night moths — 2 per acre.</li>
+                    </ul>
+                </li>
+                
+                <li class="font-bold">Neem Products:
+                    <ul class="font-normal text-gray-700">
+                        <li>Use Neem oil 3–5% or NSKE 5% at 7–10 day intervals.</li>
+                    </ul>
+                </li>
+                
+                <li class="font-bold">Biocontrol Agents:
+                    <ul class="font-normal text-gray-700">
+                        <li>Trichoderma harzianum (for soil diseases)</li>
+                        <li>Pseudomonas fluorescens (for bacterial wilt)</li>
+                        <li>Bacillus thuringiensis (for caterpillars).</li>
+                    </ul>
+                </li>
+                
+                <li class="font-bold">Crop Rotation:
+                    <ul class="font-normal text-gray-700">
+                        <li>Avoid planting same family crop (like tomato after brinjal) — breaks pest cycle.</li>
+                    </ul>
+                </li>
+            </ol>
+
+        </div>
+        <!-- END MAIN GUIDE CONTAINER -->
+        
+        <!-- Footer Navigation Buttons -->
+        <div class="flex justify-between items-center mt-10">
+            <button onclick="showMessage('Showing previous guide')" class="flex items-center text-agro-dark hover:text-agro-light transition text-lg font-bold">
+                <i class="fas fa-chevron-left mr-2"></i> Previous
+            </button>
+            <button onclick="showMessage('Showing next guide')" class="flex items-center text-agro-dark hover:text-agro-light transition text-lg font-bold">
+                Next <i class="fas fa-chevron-right ml-2"></i>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Simple Message Box for Clicks (Notification style) --><div id="message-box" class="fixed bottom-4 left-4 right-4 bg-agro-dark text-white p-3 rounded-lg shadow-xl hidden transition transform duration-300 z-30" role="alert">
+        <p id="message-content" class="text-center"></p>
+    </div>
+
+    <!-- JAVASCRIPT BLOCK --><script>
+        /**
+         * Shows a temporary notification message at the bottom of the screen.
+         * @param {string} content The message to display.
+         */
+        function showMessage(content) {
+            const messageBox = document.getElementById('message-box');
+            const messageContent = document.getElementById('message-content');
+            
+            messageContent.textContent = content;
+            messageBox.classList.remove('hidden');
+            
+            clearTimeout(messageBox.timer);
+            
+            messageBox.timer = setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 2000);
+        }
+
+        // Added simple history back for the back button
+        document.querySelector('.fixed-header button[onclick*="history.back"]').onclick = function() {
+            history.back();
+            showMessage('Navigating back');
+        };
+    </script>
+</body>
+</html>

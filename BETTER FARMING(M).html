@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>मृदा आरोग्य आणि IPM मार्गदर्शक</title>
+    <!-- Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Font Awesome Icons (Used in the header) --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;500;600;700;800&family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Custom config for Tailwind colors and Inter font --><script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'agro-dark': '#1e3a24', // Dark green for header
+                        'agro-light': '#22c55e', // Bright Green for accents/buttons
+                        'agro-gold': '#FBBF24', // Gold/Amber
+                        'agro-bg': '#f3f4f6', // Light gray background
+                        'agro-info': '#4CAF50', // Agroinfo+ green
+                        'agro-purple': '#5b21b6', // Deep purple
+                    },
+                    fontFamily: {
+                        sans: ['Noto Sans Devanagari', 'Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #ffffff;
+        }
+
+        /* Generic List Reset for structured content */
+        .styled-list li {
+            margin-bottom: 0.75rem; /* space-y-3 */
+            color: #1a1a1a;
+        }
+
+        /* Styling for the nested lists (Checkmarks/bullets inside the main list) */
+        .styled-list ul {
+            list-style: none; /* Remove default bullets */
+            padding-left: 0;
+            margin-top: 0.5rem;
+        }
+        .styled-list ul li {
+            padding-left: 1.5rem; /* Indentation for bullet points */
+            position: relative;
+            margin-bottom: 0.25rem;
+            font-size: 0.95rem;
+        }
+        /* Custom checkmark or bullet using Font Awesome circle */
+        .styled-list ul li::before {
+            content: "\f111"; /* Font Awesome circle icon (fa-circle) */
+            font-family: 'Font Awesome 6 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            top: 0.2rem;
+            color: #3b82f6; /* A clear blue for visibility */
+            font-size: 0.5rem;
+        }
+        
+        /* Fixed Header Style */
+        .fixed-header {
+            background-color: #1e3a24;
+        }
+
+    </style>
+</head>
+<body class="font-sans">
+
+    <!-- HEADER / TOP BAR --><header class="fixed-header text-white shadow-md sticky top-0 z-20">
+        <div class="px-4 py-3 flex justify-between items-center">
+            <!-- Back Button --><button onclick="history.back(); showMessage('मागे जात आहे')" class="text-white opacity-80 mr-3 p-1">
+                <a href="home page(M).html"><i class="fas fa-arrow-left text-xl"></i></a>
+            </button>
+            
+            <!-- Logo --><div class="text-2xl font-bold tracking-tight text-center flex-grow">
+                <span class="text-white">ॲग्रो</span><span class="text-agro-light">हेल्थ+</span>
+            </div>
+
+            <div class="flex items-center space-x-3 ml-3">
+                <!-- Profile/User Info --><div class="text-xs text-right hidden sm:block leading-none mr-2">
+                    <div class="text-gray-200">पार्थ सोनवणे</div>
+                    <div class="text-gray-400">बोईसर, महाराष्ट्र</div>
+                </div>
+                <!-- Profile Icon --><a href="#" class="block p-2 rounded-full bg-agro-light transition flex-shrink-0" onclick="showMessage('प्रोफाइल पाहत आहे')">
+                   <a href="home page(M).html"><i class="fas fa-user text-white w-4 h-4 flex items-center justify-center"></i></a> 
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <main class="max-w-4xl mx-auto p-4 md:p-8">
+        
+        <!-- TOP LOGOS/VALIDATION -->
+        <div class="flex justify-between items-start mb-6 pt-2">
+            <!-- Agroinfo+ logo (Left) -->
+            <span class="bg-agro-info px-3 py-1 rounded-lg text-white font-extrabold flex items-center shadow-md">
+                ॲग्रोइन्फो<span class="text-agro-light font-black text-xl">+</span>
+            </span>
+            
+            <!-- Validinfo logo (Right) -->
+            <span class="bg-agro-light px-3 py-1 rounded-lg text-white font-extrabold flex items-center shadow-md">
+                व्हॅलिडइन्फो<i class="fas fa-check-double ml-1"></i>
+            </span>
+        </div>
+        
+        <!-- MAIN GUIDE CONTAINER (Green Box) -->
+        <div class="bg-green-100/50 p-4 md:p-6 rounded-xl border-t-8 border-agro-light shadow-xl">
+            
+            <!-- SECTION A TITLE -->
+            <h2 class="text-xl md:text-2xl font-extrabold text-agro-dark mb-4 pb-2 border-b border-green-300 flex items-center">
+                 <i class="fas fa-seedling text-agro-light text-2xl mr-3"></i> अ. मृदा आरोग्य प्रथम – "केवळ पिकाला नव्हे, तर मातीला खत द्या"
+            </h2>
+            
+            <!-- SOIL HEALTH CONTENT -->
+            <ol class="list-decimal list-inside styled-list ml-4 text-gray-800">
+                <li class="font-bold">माती परीक्षण – दर २ वर्षांनी प्रयोगशाळेत माती परीक्षण करा.
+                    <ul class="font-normal text-gray-700">
+                        <li>तपासा: pH, सेंद्रिय कार्बन, NPK, सूक्ष्म अन्नद्रव्ये (Zn, Fe, B).</li>
+                        <li>मृदा आरोग्य पत्रिका योजनेद्वारे मोफत किट किंवा ₹१०/नमुना तपासणी मिळवा.</li>
+                    </ul>
+                </li>
+                
+                <li class="font-bold">सेंद्रिय कार्बन वाढवणारे घटक:
+                    <ul class="font-normal text-gray-700">
+                        <li>शेणखत (२-३ टन/एकर) + गांडूळ खत (५००-८०० किलो/एकर) टाका.</li>
+                        <li>बायोचार किंवा पिकांच्या अवशेषांचे खत टाका – पाणी धरून ठेवण्याची क्षमता २५% ने सुधारते.</li>
+                    </ul>
+                </li>
+                
+                <li class="font-bold">जैविक खते:
+                    <ul class="font-normal text-gray-700">
+                        <li>वापरण्यापूर्वी शेणखतात ॲझोस्पिरिलम + पीएसबी + रायझोबियम + ट्रायकोडर्मा मिसळा.</li>
+                    </ul>
+                </li>
+                
+                <li class="font-bold">हिरवळीचे खत:
+                    <ul class="font-normal text-gray-700">
+                        <li>मुख्य पिकापूर्वी धैंचा, ताग, चवळी लावा — नैसर्गिक नायट्रोजनसाठी जमिनीत गाडा.</li>
+                    </ul>
+                </li>
+            </ol>
+            
+            <hr class="my-6 border-green-300">
+            
+            <!-- SECTION B TITLE -->
+            <h2 class="text-xl md:text-2xl font-extrabold text-agro-dark mb-4 pb-2 border-b border-green-300 flex items-center">
+                 <i class="fas fa-bug text-red-500 text-2xl mr-3"></i> ब. सेंद्रिय + तंत्रज्ञान आधारित कीड व्यवस्थापन (IPM)
+            </h2>
+            
+            <!-- IPM CONTENT -->
+            <ol class="list-decimal list-inside styled-list ml-4 text-gray-800">
+                <li class="font-bold">फेरोमोन सापळे (कामगंध सापळे):
+                    <ul class="font-normal text-gray-700">
+                        <li>फळ पोखरणारी अळी, शेंडा पोखरणारी अळी, लष्करी अळीसाठी वापरा — १०-१२ सापळे/एकर.</li>
+                    </ul>
+                </li>
+                
+                <li class="font-bold">प्रकाश सापळे:
+                    <ul class="font-normal text-gray-700">
+                        <li>निशाचर पतंग मारण्यासाठी सौर किंवा बॅटरीवर चालणारे सापळे — २ प्रति एकर.</li>
+                    </ul>
+                </li>
+                
+                <li class="font-bold">कडुनिंब उत्पादने:
+                    <ul class="font-normal text-gray-700">
+                        <li>७-१० दिवसांच्या अंतराने निंबोळी तेल ३-५% किंवा NSKE ५% वापरा.</li>
+                    </ul>
+                </li>
+                
+                <li class="font-bold">जैविक नियंत्रण घटक:
+                    <ul class="font-normal text-gray-700">
+                        <li>ट्रायकोडर्मा हरझियानम (मातीतील रोगांसाठी)</li>
+                        <li>सुडोमोनास फ्लोरेसेन्स (बॅक्टेरियल विल्टसाठी)</li>
+                        <li>बॅसिलस थुरिंजिएन्सिस (अळ्यांसाठी).</li>
+                    </ul>
+                </li>
+                
+                <li class="font-bold">पीक फेरपालट:
+                    <ul class="font-normal text-gray-700">
+                        <li>एकाच कुळातील पिके (जसे वांग्यानंतर टोमॅटो) लावणे टाळा — यामुळे कीडीचे जीवनचक्र तुटते.</li>
+                    </ul>
+                </li>
+            </ol>
+
+        </div>
+        <!-- END MAIN GUIDE CONTAINER -->
+        
+        <!-- Footer Navigation Buttons -->
+        <div class="flex justify-between items-center mt-10">
+            <button onclick="showMessage('मागील मार्गदर्शक पाहत आहे')" class="flex items-center text-agro-dark hover:text-agro-light transition text-lg font-bold">
+                <i class="fas fa-chevron-left mr-2"></i> मागील
+            </button>
+            <button onclick="showMessage('पुढील मार्गदर्शक पाहत आहे')" class="flex items-center text-agro-dark hover:text-agro-light transition text-lg font-bold">
+                पुढील <i class="fas fa-chevron-right ml-2"></i>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Simple Message Box for Clicks (Notification style) --><div id="message-box" class="fixed bottom-4 left-4 right-4 bg-agro-dark text-white p-3 rounded-lg shadow-xl hidden transition transform duration-300 z-30" role="alert">
+        <p id="message-content" class="text-center"></p>
+    </div>
+
+    <!-- JAVASCRIPT BLOCK --><script>
+        /**
+         * Shows a temporary notification message at the bottom of the screen.
+         * @param {string} content The message to display.
+         */
+        function showMessage(content) {
+            const messageBox = document.getElementById('message-box');
+            const messageContent = document.getElementById('message-content');
+            
+            messageContent.textContent = content;
+            messageBox.classList.remove('hidden');
+            
+            clearTimeout(messageBox.timer);
+            
+            messageBox.timer = setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 2000);
+        }
+
+        // Added simple history back for the back button
+        document.querySelector('.fixed-header button[onclick*="history.back"]').onclick = function() {
+            history.back();
+            showMessage('मागे जात आहे');
+        };
+    </script>
+</body>
+</html>

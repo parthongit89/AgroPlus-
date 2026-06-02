@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Mobile Checkout Interface</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        
+        /* Mobile App Container */
+        #app-root {
+            width: 100%;
+            max-width: 480px;
+            background-color: #ffffff;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+        }
+
+        @media (min-width: 480px) {
+            #app-root {
+                min-height: auto;
+                height: 90vh;
+                margin-top: 5vh;
+                border-radius: 24px;
+                overflow: hidden;
+            }
+        }
+
+        /* Timeline Styles */
+        .step-circle {
+            transition: all 0.3s ease;
+        }
+        .step-line {
+            transition: all 0.3s ease;
+        }
+
+        /* Animations */
+        .fade-in {
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Hide scrollbar for clean UI */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-root">
+    <!-- Top Navigation / Header -->
+    <div class="bg-white px-6 py-4 border-b border-gray-100 flex items-center justify-between sticky top-0 z-10">
+        <button id="back-btn" class="text-gray-500 hover:text-gray-800 transition-colors hidden">
+            <i class="fas fa-arrow-left text-lg"></i>
+        </button>
+        <h1 class="text-lg font-semibold text-gray-800" id="header-title">Checkout</h1>
+        <div class="w-6"></div> <!-- Spacer for centering -->
+    </div>
+
+    <!-- Timeline Stepper -->
+    <div id="timeline-container" class="px-6 py-4 bg-white mb-2">
+        <div class="flex items-center justify-between relative">
+            <!-- Line Background -->
+            <div class="absolute left-0 top-1/2 transform -translate-y-1/2 w-full h-1 bg-gray-200 -z-0"></div>
+            <!-- Progress Line -->
+            <div id="progress-bar" class="absolute left-0 top-1/2 transform -translate-y-1/2 h-1 bg-blue-600 -z-0 transition-all duration-500" style="width: 0%;"></div>
+
+            <!-- Steps -->
+            <div class="step-wrapper relative z-10 flex flex-col items-center" data-step="1">
+                <div class="step-circle w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-md ring-4 ring-white">1</div>
+                <span class="text-[10px] mt-1 font-medium text-blue-600">Address</span>
+            </div>
+            
+            <div class="step-wrapper relative z-10 flex flex-col items-center" data-step="2">
+                <div class="step-circle w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-xs font-bold shadow-sm ring-4 ring-white">2</div>
+                <span class="text-[10px] mt-1 font-medium text-gray-400">Pay</span>
+            </div>
+
+            <div class="step-wrapper relative z-10 flex flex-col items-center" data-step="3">
+                <div class="step-circle w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-xs font-bold shadow-sm ring-4 ring-white">3</div>
+                <span class="text-[10px] mt-1 font-medium text-gray-400">Invoice</span>
+            </div>
+
+            <div class="step-wrapper relative z-10 flex flex-col items-center" data-step="4">
+                <div class="step-circle w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-xs font-bold shadow-sm ring-4 ring-white">4</div>
+                <span class="text-[10px] mt-1 font-medium text-gray-400">Done</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div id="main-content" class="flex-1 overflow-y-auto no-scrollbar bg-gray-50 pb-24 relative">
+        <!-- Content injected via JS -->
+    </div>
+</div>
+
+<script>
+    // --- State Management ---
+    const state = {
+        currentStep: 1, // 1: Address, 2: Payment, 3: Invoice, 4: Thank You
+        address: null,
+        paymentMethod: 'credit_card',
+        invoice: {
+            subtotal: 4599.00,
+            discount: 150.00,
+            delivery: 7.00,
+            cgst: 8.00,
+            sgst: 8.00
+        },
+        issue: null,
+        otherIssueText: ''
+    };
+
+    const issuesList = [
+        "Incorrect Item Price",
+        "Tax Calculation Error",
+        "Discount Coupon Not Applied",
+        "Wrong Delivery Address Shown",
+        "Double Charge Warning",
+        "Payment Gateway Timeout",
+        "Estimated Delivery Date Missing",
+        "GSTIN Missing on Invoice",
+        "Subscription Item Missing",
+        "Promotional Credits Not Used"
+    ];
+
+    // --- DOM Elements ---
+    const mainContent = document.getElementById('main-content');
+    const headerTitle = document.getElementById('header-title');
+    const backBtn = document.getElementById('back-btn');
+    const progressBar = document.getElementById('progress-bar');
+    const timelineContainer = document.getElementById('timeline-container');
+
+    // --- Initialization ---
+    function init() {
+        renderStep();
+        backBtn.addEventListener('click', goBack);
+    }
+
+    // --- Navigation Logic ---
+    function goBack() {
+        if (state.currentStep > 1 && state.currentStep < 4) {
+            state.currentStep--;
+            renderStep();
+        }
+    }
+
+    function nextStep() {
+        if (state.currentStep < 4) {
+            state.currentStep++;
+            renderStep();
+        }
+    }
+
+    // --- Render Logic ---
+    function renderStep() {
+        updateTimeline();
+        
+        // Reset Scroll
+        mainContent.scrollTop = 0;
+        
+        // Show/Hide Back Button
+        if (state.currentStep === 1 || state.currentStep === 4) {
+            backBtn.classList.add('hidden');
+        } else {
+            backBtn.classList.remove('hidden');
+        }
+
+        switch (state.currentStep) {
+            case 1:
+                if (!state.address) {
+                    renderEmptyAddress();
+                } else {
+                    // Logic to show list if we were supporting multiple, 
+                    // but for this flow, if address exists we assume it's selected 
+                    // and technically the prompt implies auto-select -> next. 
+                    // However, if user hits "Back", show the address card.
+                    renderAddressList();
+                }
+                headerTitle.textContent = "Select Address";
+                break;
+            case 2:
+                renderPayment();
+                headerTitle.textContent = "Payment Mode";
+                break;
+            case 3:
+                renderInvoice();
+                headerTitle.textContent = "Review Invoice";
+                break;
+            case 4:
+                renderThankYou();
+                headerTitle.textContent = "Order Placed";
+                timelineContainer.classList.add('hidden'); // Hide timeline on success
+                break;
+        }
+    }
+
+    function updateTimeline() {
+        // Show timeline if not step 4 (handled in render, but safety check)
+        if(state.currentStep !== 4) timelineContainer.classList.remove('hidden');
+
+        const steps = document.querySelectorAll('.step-wrapper');
+        const progressPercentage = ((state.currentStep - 1) / (steps.length - 1)) * 100;
+        
+        progressBar.style.width = `${progressPercentage}%`;
+
+        steps.forEach((step, index) => {
+            const stepNum = index + 1;
+            const circle = step.querySelector('.step-circle');
+            const label = step.querySelector('span');
+
+            if (stepNum < state.currentStep) {
+                // Completed
+                circle.className = 'step-circle w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-md ring-4 ring-white';
+                circle.innerHTML = '<i class="fas fa-check"></i>';
+                label.classList.add('text-blue-600');
+                label.classList.remove('text-gray-400');
+            } else if (stepNum === state.currentStep) {
+                // Active
+                circle.className = 'step-circle w-8 h-8 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-md ring-4 ring-white scale-110';
+                circle.innerHTML = stepNum;
+                label.classList.add('text-blue-600', 'font-bold');
+                label.classList.remove('text-gray-400');
+            } else {
+                // Inactive
+                circle.className = 'step-circle w-8 h-8 rounded-full bg-gray-200 text-gray-500 flex items-center justify-center text-xs font-bold shadow-sm ring-4 ring-white';
+                circle.innerHTML = stepNum;
+                label.classList.remove('text-blue-600');
+                label.classList.add('text-gray-400');
+            }
+        });
+    }
+
+    // --- Screen 1: Empty Address ---
+    function renderEmptyAddress() {
+        mainContent.innerHTML = `
+            <div class="h-full flex flex-col items-center justify-center p-6 fade-in text-center">
+                <div class="w-32 h-32 bg-blue-50 rounded-full flex items-center justify-center mb-6">
+                    <i class="fas fa-map-marker-alt text-4xl text-blue-300"></i>
+                </div>
+                <h2 class="text-xl font-bold text-gray-800 mb-2">No Address Added</h2>
+                <p class="text-gray-500 mb-8">Please add a delivery address to proceed with your order.</p>
+                
+                <button onclick="renderAddAddressForm()" class="w-16 h-16 rounded-full bg-blue-600 text-white shadow-lg flex items-center justify-center hover:bg-blue-700 hover:scale-105 transition-all focus:outline-none focus:ring-4 focus:ring-blue-300">
+                    <i class="fas fa-plus text-2xl"></i>
+                </button>
+                <span class="mt-4 text-sm text-gray-400 font-medium">Add New Address</span>
+            </div>
+        `;
+    }
+
+    // --- Screen 1.5: Add Address Form ---
+    function renderAddAddressForm() {
+        // Technically still step 1 visually
+        headerTitle.textContent = "Add Details";
+        backBtn.classList.remove('hidden');
+        backBtn.onclick = () => renderEmptyAddress(); // Local override for back button
+
+        mainContent.innerHTML = `
+            <div class="p-6 fade-in">
+                <form id="address-form" onsubmit="handleAddressSubmit(event)">
+                    <div class="space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                            <input type="text" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="Enter full name">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Mobile Number</label>
+                            <input type="tel" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="+91 1234567890">
+                        </div>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">Pincode</label>
+                                <input type="number" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="400500">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-1">City</label>
+                                <input type="text" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="Boisar">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Street Address</label>
+                            <textarea rows="3" required class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none transition-all" placeholder="Nearby.,,"></textarea>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="w-full mt-8 bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+                        <span>Save & Proceed</span>
+                        <i class="fas fa-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+        `;
+    }
+
+    function handleAddressSubmit(e) {
+        e.preventDefault();
+        // Simulate data capture
+        state.address = {
+            name: "John Doe",
+            street: "123 Main St, Apt 4B",
+            city: "New York, 10001"
+        };
+        // Auto-select and move to next step as requested
+        nextStep();
+    }
+
+    // --- Fallback Address List (if user goes back) ---
+    function renderAddressList() {
+        mainContent.innerHTML = `
+            <div class="p-6 fade-in space-y-4">
+                <div class="border-2 border-blue-500 bg-blue-50 p-4 rounded-xl relative cursor-pointer shadow-sm">
+                    <div class="absolute top-4 right-4 text-blue-600">
+                        <i class="fas fa-check-circle text-xl"></i>
+                    </div>
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded font-bold">HOME</span>
+                        <h3 class="font-bold text-gray-800">${state.address.name}</h3>
+                    </div>
+                    <p class="text-gray-600 text-sm leading-relaxed">${state.address.street}<br>${state.address.city}</p>
+                </div>
+                
+                <button onclick="renderAddAddressForm()" class="w-full py-3 border border-dashed border-gray-300 rounded-xl text-gray-500 font-medium hover:border-blue-400 hover:text-blue-500 transition-colors">
+                    <i class="fas fa-plus mr-2"></i> Add Another Address
+                </button>
+
+                 <button onclick="nextStep()" class="w-full mt-6 bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 transition-colors">
+                    Proceed to Payment
+                </button>
+            </div>
+        `;
+    }
+
+    // --- Screen 3: Payment Options ---
+    function renderPayment() {
+        mainContent.innerHTML = `
+            <div class="p-6 fade-in pb-24">
+                <h2 class="text-lg font-bold text-gray-800 mb-4">Select Payment Method</h2>
+                
+                <div class="space-y-3">
+                    <!-- Option 1 -->
+                    <label class="flex items-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors group has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
+                        <input type="radio" name="payment" value="credit_card" checked class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300" onchange="state.paymentMethod = this.value">
+                        <div class="ml-4 flex-1">
+                            <div class="flex items-center justify-between">
+                                <span class="font-semibold text-gray-800">Credit / Debit Card</span>
+                                <div class="flex space-x-2 text-gray-400">
+                                    <i class="fab fa-cc-visa text-xl"></i>
+                                    <i class="fab fa-cc-mastercard text-xl"></i>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Pay securely with your bank card</p>
+                        </div>
+                    </label>
+
+                    <!-- Option 2 -->
+                    <label class="flex items-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors group has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
+                        <input type="radio" name="payment" value="upi" class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300" onchange="state.paymentMethod = this.value">
+                        <div class="ml-4 flex-1">
+                            <div class="flex items-center justify-between">
+                                <span class="font-semibold text-gray-800">UPI</span>
+                                <i class="fas fa-mobile-alt text-gray-400"></i>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Google Pay, PhonePe, Paytm</p>
+                        </div>
+                    </label>
+
+                    <!-- Option 3 -->
+                    <label class="flex items-center p-4 border border-gray-200 rounded-xl cursor-pointer hover:bg-gray-50 transition-colors group has-[:checked]:border-blue-500 has-[:checked]:bg-blue-50">
+                        <input type="radio" name="payment" value="cod" class="w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300" onchange="state.paymentMethod = this.value">
+                        <div class="ml-4 flex-1">
+                            <div class="flex items-center justify-between">
+                                <span class="font-semibold text-gray-800">Cash on Delivery</span>
+                                <i class="fas fa-money-bill-wave text-gray-400"></i>
+                            </div>
+                            <p class="text-xs text-gray-500 mt-1">Pay with cash upon arrival</p>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Fixed Bottom Action -->
+            <div class="absolute bottom-0 left-0 w-full p-6 bg-white border-t border-gray-100 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+                <button onclick="nextStep()" class="w-full bg-blue-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2">
+                    <span>Confirm Payment Mode</span>
+                    <i class="fas fa-arrow-right"></i>
+                </button>
+            </div>
+        `;
+    }
+
+    // --- Screen 4: Invoice ---
+    function renderInvoice() {
+        const total = state.invoice.subtotal + state.invoice.delivery + state.invoice.cgst + state.invoice.sgst - state.invoice.discount;
+
+        mainContent.innerHTML = `
+            <div class="p-6 fade-in pb-32">
+                <!-- Address Summary -->
+                <div class="bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-6">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-2">Delivering To</h3>
+                    <div class="flex items-start gap-3">
+                        <i class="fas fa-map-pin text-blue-500 mt-1"></i>
+                        <div>
+                            <p class="font-semibold text-gray-800">${state.address.name}</p>
+                            <p class="text-sm text-gray-500">${state.address.street}, ${state.address.city}</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bill Details -->
+                <div class="bg-white p-5 rounded-xl shadow-sm border border-gray-100 mb-6">
+                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wide mb-4">Payment Summary</h3>
+                    
+                    <div class="space-y-3 text-sm">
+                        <div class="flex justify-between text-gray-600">
+                            <span>Purchase Amount</span>
+                            <span>₹${state.invoice.subtotal.toFixed(2)}</span>
+                        </div>
+                        <div class="flex justify-between text-gray-600">
+                            <span>Delivery Fee</span>
+                            <span>₹${state.invoice.delivery.toFixed(2)}</span>
+                        </div>
+                        <div class="flex justify-between text-gray-600">
+                            <span>CGST (2.5%)</span>
+                            <span>₹${state.invoice.cgst.toFixed(2)}</span>
+                        </div>
+                        <div class="flex justify-between text-gray-600">
+                            <span>SGST (2.5%)</span>
+                            <span>₹${state.invoice.sgst.toFixed(2)}</span>
+                        </div>
+                        <div class="flex justify-between text-green-600 font-medium">
+                            <span>Discount</span>
+                            <span>-₹${state.invoice.discount.toFixed(2)}</span>
+                        </div>
+                        <div class="border-t border-gray-100 pt-3 mt-3 flex justify-between items-center">
+                            <span class="font-bold text-gray-800 text-lg">Total Amount</span>
+                            <span class="font-bold text-blue-600 text-lg">₹${total.toFixed(2)}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Issues Section -->
+                <div class="mb-4">
+                    <button onclick="toggleIssues()" class="text-blue-600 text-sm font-medium hover:text-blue-700 flex items-center gap-2">
+                        <i class="far fa-question-circle"></i> Have an issue with this invoice?
+                    </button>
+                    
+                    <div id="issues-container" class="hidden mt-4 bg-white p-4 rounded-xl border border-red-100 shadow-sm">
+                        <h4 class="font-semibold text-gray-800 mb-3">Report an Issue</h4>
+                        <div class="space-y-2">
+                            ${issuesList.map((issue, idx) => `
+                                <label class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                    <input type="radio" name="issue" value="${issue}" onchange="handleIssueChange(this)" class="text-red-500 focus:ring-red-200">
+                                    <span class="text-sm text-gray-600">${issue}</span>
+                                </label>
+                            `).join('')}
+                             <label class="flex items-center gap-3 p-2 hover:bg-gray-50 rounded cursor-pointer">
+                                <input type="radio" name="issue" value="Other" onchange="handleIssueChange(this)" class="text-red-500 focus:ring-red-200">
+                                <span class="text-sm text-gray-600">Other</span>
+                            </label>
+                        </div>
+                        
+                        <div id="other-issue-box" class="hidden mt-3">
+                            <textarea oninput="state.otherIssueText = this.value" class="w-full p-3 border border-gray-200 rounded-lg text-sm focus:border-red-300 focus:ring-2 focus:ring-red-100 outline-none" placeholder="Describe your issue here..." rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Place Order Button -->
+            <div class="absolute bottom-0 left-0 w-full p-6 bg-white border-t border-gray-100 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] z-20">
+                <button onclick="nextStep()" class="w-full bg-green-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-green-700 transition-colors flex items-center justify-center gap-2">
+                    <span>Place Order</span>
+                    <i class="fas fa-check"></i>
+                </button>
+            </div>
+        `;
+    }
+
+    function toggleIssues() {
+        const container = document.getElementById('issues-container');
+        container.classList.toggle('hidden');
+    }
+
+    function handleIssueChange(radio) {
+        state.issue = radio.value;
+        const otherBox = document.getElementById('other-issue-box');
+        if (radio.value === 'Other') {
+            otherBox.classList.remove('hidden');
+        } else {
+            otherBox.classList.add('hidden');
+        }
+    }
+
+    // --- Screen 5: Thank You ---
+    function renderThankYou() {
+        // Calculate Delivery Date (Today + 10 days)
+        const today = new Date();
+        const deliveryDate = new Date(today);
+        deliveryDate.setDate(today.getDate() + 10);
+        
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        const dateString = deliveryDate.toLocaleDateString('en-US', options);
+
+        mainContent.innerHTML = `
+            <div class="h-full flex flex-col items-center justify-center p-8 fade-in text-center pb-20">
+                <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6 animate-bounce">
+                    <i class="fas fa-check text-4xl text-green-600"></i>
+                </div>
+                
+                <h1 class="text-3xl font-bold text-gray-800 mb-2">Thank You!</h1>
+                <p class="text-gray-500 mb-8">Your order has been placed successfully.</p>
+                
+                <div class="bg-blue-50 w-full p-6 rounded-2xl mb-8 border border-blue-100">
+                    <p class="text-blue-600 text-xs font-bold uppercase tracking-wide mb-1">Estimated Delivery</p>
+                    <p class="text-gray-800 font-bold text-lg">${dateString}</p>
+                </div>
+
+                <div class="w-full space-y-3">
+                    <button class="w-full bg-gray-900 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-gray-800 transition-colors flex items-center justify-center gap-2">
+                        <i class="fas fa-box-open"></i>
+                        <span>Track Order</span>
+                    </button>
+                    
+<a href="home page.html" class="w-full">
+    <button class="w-full bg-white text-gray-700 font-bold py-4 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors">
+        Go Home
+    </button>
+</a>
+
+                </div>
+            </div>
+        `;
+    }
+
+    // Start App
+    init();
+
+</script>
+</body>
+</html>
