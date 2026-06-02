@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Downy Mildew</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Font Awesome Icons (Used in the header) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Custom config for Tailwind colors and Inter font -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'agro-dark': '#1e3a24', // Dark green for header
+                        'agro-light': '#22c55e', // Bright Green for accents/buttons
+                        'agro-gold': '#FBBF24', // Gold/Amber for gradient mix (carried over from index.html)
+                        'agro-bg': '#f3f4f6', // Light gray background
+                        'agro-info': '#4CAF50', // Agroinfo+ green
+                        'agro-purple': '#5b21b6', // Deep purple (carried over from index.html)
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        
+        body {
+            background-color: #ffffff; /* White background for the content area */
+        }
+
+        /* --- New Styling for the Content Grid --- */
+        .content-sections-grid {
+            /* * FIX: Default to 1 column on mobile (small screens).
+             * On screens larger than 'md' (768px), switch to 2 columns.
+             */
+            display: grid;
+            grid-template-columns: 1fr; /* Default single column */
+            gap: 1.5rem 0; /* Vertical gap only */
+            padding-bottom: 0.5rem;
+        }
+
+        /* Apply 2 columns for wider screens */
+        @media (min-width: 768px) {
+            .content-sections-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 2rem 2.5rem; /* Restore desktop gap */
+            }
+        }
+        
+        /* Fixed Header Style (Updated to match index.html's sticky header appearance) */
+        .fixed-header {
+            background-color: #1e3a24; /* agro-dark */
+        }
+    </style>
+</head>
+<body class="font-sans">
+
+    <!-- HEADER / TOP BAR (MATCHING index.html) -->
+    <header class="fixed-header text-white shadow-md sticky top-0 z-20">
+        <div class="px-4 py-3 flex justify-between items-center">
+            <!-- Back Button -->
+            <button onclick="history.back(); showMessage('Navigating back')" class="text-white opacity-80 mr-3 p-1">
+                <i class="fas fa-arrow-left text-xl"></i>
+            </button>
+            
+            <!-- Logo -->
+            <div class="text-2xl font-bold tracking-tight text-center flex-grow">
+                <span class="text-white">Agro</span><span class="text-agro-light">health+</span>
+            </div>
+
+            <div class="flex items-center space-x-3 ml-3">
+                <!-- Profile/User Info -->
+                <div class="text-xs text-right hidden sm:block leading-none mr-2">
+                    <div class="text-gray-200">Parth sonevane</div>
+                    <div class="text-gray-400">Boisar Maharastra</div>
+                </div>
+                <!-- Profile Icon -->
+                <a href="#" class="block p-2 rounded-full bg-agro-light transition flex-shrink-0" onclick="showMessage('Viewing Profile')">
+                   <a href="profile.html"><i class="fas fa-user text-white w-4 h-4 flex items-center justify-center"></i></a> 
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <main class="max-w-4xl mx-auto p-4 md:p-8">
+        
+        <!-- TITLE & POWERED BY -->
+        <div class="flex justify-between items-start mb-6 border-b border-gray-200 pb-3 pt-2">
+            <h1 class="text-2xl md:text-3xl font-extrabold text-gray-800">
+                 Downy Mildew
+            </h1>
+            <div class="text-sm text-gray-500 flex items-center mt-1">
+                <span class="hidden sm:inline">Powered by...</span>
+                <!-- Agroinfo+ logo styling -->
+                <span class="bg-agro-info px-2 py-1 rounded-lg text-white font-extrabold ml-2 flex items-center shadow">
+                    Agroinfo<span class="text-agro-light font-black text-xl">+</span>
+                </span>
+            </div>
+        </div>
+        
+        <!-- CONTENT CONTAINER (Displaying the Treatment methods content) -->
+        <div id="content-container">
+
+            <!-- 1. ORGANIC TREATMENT SUBSECTION -->
+            <section class="mb-8 p-4 rounded-xl border border-agro-light/30 shadow-lg">
+                <h3 class="text-lg font-bold text-agro-dark mb-4 flex items-center">
+                    <i class="fas fa-leaf text-agro-light text-xl mr-2"></i> Organic (India-Friendly) – Dose per Acre
+                </h3>
+                
+                <!-- Header Row - Use Tailwind responsive classes for grid structure -->
+                <div class="grid grid-cols-2 text-gray-600 font-extrabold pb-2 border-b border-gray-300 px-1 mb-3 hidden md:grid">
+                    <div class="text-left">Method</div>
+                    <div class="text-right">Dose per Acre</div>
+                </div>
+
+                <div class="content-sections-grid px-1">
+                    
+                     <!-- Item 1 --><div class="treatment-item">
+                        <span class="font-bold">1. NSKE 5% (Neem Seed Kernel Extract)</span> <br>
+                        <span class="dosage"> 5kg seeds to make 200 litres</span>
+                    </div>
+                    
+                    <!-- Item 2 --><div class="treatment-item">
+                        <span class="font-bold">2. Neem oil 3%</span> <span class="dosage"> 1.5–2 litres/acre</span>
+                    </div>
+                    
+                    <!-- Item 3 --><div class="treatment-item">
+                        <span class="font-bold">3. Trichoderma</span> <span class="dosage"> 2–3 kg/acre</span>
+                    </div>
+                    
+                    <!-- Item 4 --><div class="treatment-item">
+                        <span class="font-bold">4. Buttermilk (chaas) 1:3</span> <span class="dosage"> 10–15 litres buttermilk + water to 200 litres</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. SYNTHETIC TREATMENT SUBSECTION -->
+            <section class="mb-8 p-4 rounded-xl border border-gray-400/30 shadow-lg">
+                <h3 class="text-lg font-bold text-agro-dark mb-4 flex items-center">
+                    <i class="fas fa-flask text-gray-600 text-xl mr-2"></i> Synthetic (Allowed in India)
+                </h3>
+                
+                <!-- Header Row - Use Tailwind responsive classes for grid structure -->
+                <div class="grid grid-cols-2 text-gray-600 font-extrabold pb-2 border-b border-gray-300 px-1 mb-3 hidden md:grid">
+                    <div class="text-left">Fungicide</div>
+                    <div class="text-right">Dose</div>
+                </div>
+
+                 <div class="content-sections-grid px-1">
+                    
+                    <!-- Item 1 --><div class="treatment-item">
+                        <span class="font-bold">1. Metalaxyl 8% + Mancozeb 64%</span> <span class="dosage"> 600–800 g/acre</span>
+                    </div>
+                    
+                    <!-- Item 2 --><div class="treatment-item">
+                        <span class="font-bold">2. Copper oxychloride (COC 50%)</span> <br>
+                         <span class="dosage"> 1–1.2 kg/acre</span>
+                    </div>
+                    
+                    <!-- Item 3 --><div class="treatment-item">
+                        <span class="font-bold">3. Cymoxanil + Mancozeb</span><br>
+                         <span class="dosage"> 700 g/acre</span>
+                    </div>
+                </div>
+                </div>
+                
+                <p class="mt-6 text-xs text-gray-500 font-medium px-1">
+                    * All these fungicides are commonly sold in India.*
+                </p>
+            </section>
+            
+        </div>
+        <!-- END CONTENT CONTAINER -->
+        
+        <!-- Navigation Buttons at the Bottom -->
+        <div class="flex justify-between items-center mt-10">
+            <button onclick="showMessage('Showing previous disease')" class="flex items-center text-agro-dark hover:text-agro-light transition text-lg font-bold">
+                <i class="fas fa-chevron-left mr-2"></i> Previous
+            </button>
+            <button onclick="showMessage('Showing next disease')" class="flex items-center text-agro-dark hover:text-agro-light transition text-lg font-bold">
+                Next <i class="fas fa-chevron-right ml-2"></i>
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Simple Message Box for Clicks (Notification style) -->
+    <div id="message-box" class="fixed bottom-4 left-4 right-4 bg-agro-dark text-white p-3 rounded-lg shadow-xl hidden transition transform duration-300 z-30" role="alert">
+        <p id="message-content" class="text-center"></p>
+    </div>
+
+    <!-- JAVASCRIPT BLOCK -->
+    <script>
+        /**
+         * Shows a temporary notification message at the bottom of the screen.
+         * @param {string} content The message to display.
+         */
+        function showMessage(content) {
+            const messageBox = document.getElementById('message-box');
+            const messageContent = document.getElementById('message-content');
+            
+            messageContent.textContent = content;
+            messageBox.classList.remove('hidden');
+            
+            clearTimeout(messageBox.timer);
+            
+            messageBox.timer = setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 2000);
+        }
+
+        // Added simple history back for the back button
+        document.querySelector('.fixed-header button[onclick*="history.back"]').onclick = function() {
+            history.back();
+            showMessage('Navigating back');
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en" class="dark"> <!-- Default to Dark Mode for premium feel -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Farmpay+ Unified</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'fp-dark': '#0f172a',      /* Slate-950 */
+                        'fp-surface': '#1e293b',   /* Slate-800 */
+                        'fp-gold': '#fbbf24',      /* Amber-400 */
+                        'fp-gold-dark': '#d97706', /* Amber-600 */
+                        'fp-green': '#10b981',     /* Emerald-500 */
+                        'fp-red': '#ef4444',       /* Red-500 */
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['Space Grotesk', 'monospace'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Base Styles */
+        body {
+            transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Hide Scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Ambient Background Orbs */
+        .bg-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+        .orb-1 { top: -10%; left: -10%; width: 300px; height: 300px; background: #fbbf24; }
+        .orb-2 { bottom: 10%; right: -10%; width: 250px; height: 250px; background: #10b981; }
+        
+        html.light .bg-orb { opacity: 0.3; }
+        html.dark .bg-orb { opacity: 0.15; }
+
+        /* Glassmorphism */
+        .glass-panel {
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: all 0.3s ease;
+        }
+        html.dark .glass-panel {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        html.light .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        /* Premium Card Design */
+        .digital-card {
+            background: linear-gradient(135deg, #334155 0%, #0f172a 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 24px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.6);
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        html.light .digital-card {
+            background: linear-gradient(135deg, #475569 0%, #1e293b 100%);
+            box-shadow: 0 20px 40px -10px rgba(71, 85, 105, 0.4);
+        }
+        .digital-card:active { transform: scale(0.98); }
+        .digital-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 100% 0%, rgba(251, 191, 36, 0.15) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        /* Action Grid Buttons */
+        .grid-btn {
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 16px;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        html.dark .grid-btn {
+            background: rgba(30, 41, 59, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        html.light .grid-btn {
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+        }
+        .grid-btn:active { transform: scale(0.95); }
+
+        /* Nav Bar */
+        .bottom-nav {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+        }
+        html.dark .bottom-nav {
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        html.light .bottom-nav {
+            background: rgba(255, 255, 255, 0.95);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+        }
+
+        /* Scan FAB */
+        .scan-fab {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 20px rgba(251, 191, 36, 0.4);
+            transform: translateY(-24px);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 51;
+        }
+        html.dark .scan-fab { border: 6px solid #0f172a; }
+        html.light .scan-fab { border: 6px solid #f8fafc; }
+        .scan-fab:active { transform: translateY(-24px) scale(0.9); }
+
+        /* Page Transitions */
+        .view-section {
+            display: none;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .view-section.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Security Pulse */
+        @keyframes pulse-ring {
+            0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(16, 185, 129, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+        }
+        .secure-badge { animation: pulse-ring 3s infinite; }
+    </style>
+</head>
+<body class="h-screen w-full flex flex-col relative bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 overflow-hidden">
+
+    <!-- Ambient Background -->
+    <div class="bg-orb orb-1 animate-pulse-slow"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <!-- Top Navigation -->
+    <header class="px-6 pt-12 pb-4 flex items-center justify-between z-30 relative">
+        <!-- User Profile -->
+        <div class="flex items-center gap-3">
+             <a href="card.html"><div class="w-10 h-10 rounded-full bg-white dark:bg-fp-surface border border-slate-200 dark:border-white/10 flex items-center justify-center text-fp-gold overflow-hidden shadow-sm">
+                <i class="fas fa-user-astronaut text-lg"></i>
+            </div></a>
+            <div class="flex flex-col">
+                <h1 class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-fp-gold to-orange-500">
+                Farmpay<span class="text-slate-700 dark:text-white">+</span>
+            </h1>
+            </div>
+        </div>
+
+        <!-- Center Brand (Absolute) -->
+        <div class="absolute left-1/2 transform -translate-x-1/2 opacity-0 md:opacity-100 transition-opacity">
+            <h1 class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-fp-gold to-orange-500">
+                Farmpay<span class="text-slate-700 dark:text-white">+</span>
+            </h1>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-3">
+            <button onclick="toggleTheme()" class="w-10 h-10 rounded-full bg-white/50 dark:bg-fp-surface/50 border border-slate-200 dark:border-white/5 flex items-center justify-center text-slate-600 dark:text-white hover:bg-white dark:hover:bg-white/10 transition backdrop-blur-sm">
+                <i class="fas fa-moon dark:hidden"></i>
+                <i class="fas fa-sun hidden dark:inline text-fp-gold"></i>
+            </button>
+            <div class="relative">
+                <button class="w-10 h-10 rounded-full bg-white/50 dark:bg-fp-surface/50 border border-slate-200 dark:border-white/5 flex items-center justify-center text-slate-600 dark:text-white hover:bg-white dark:hover:bg-white/10 transition backdrop-blur-sm">
+                    <i class="far fa-bell"></i>
+                </button>
+                <div class="absolute top-0 right-0 w-3 h-3 bg-fp-red rounded-full border-2 border-white dark:border-fp-dark"></div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow relative w-full h-full px-6 z-20 overflow-y-auto no-scrollbar pb-32" id="main-container">
+        
+        <!-- VIEW: DASHBOARD (Home) -->
+        <section id="view-home" class="view-section active">
+            <!-- Header & Badge -->
+            <div class="flex justify-between items-center mb-4 px-1">
+                <h2 class="text-lg font-bold text-slate-800 dark:text-white">Overview</h2>
+                <div class="secure-badge flex items-center gap-2 bg-emerald-500/10 px-3 py-1.5 rounded-full border border-emerald-500/20 backdrop-blur-md">
+                    <div class="w-1.5 h-1.5 rounded-full bg-fp-green"></div>
+                    <span class="text-[10px] font-mono text-fp-green uppercase tracking-wider font-bold">Secure</span>
+                </div>
+            </div>
+
+            <!-- Main Balance Card -->
+            <div class="digital-card p-6 mb-8 text-white relative group">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <p class="text-xs text-slate-300 font-mono mb-1 opacity-80 tracking-widest">TOTAL BALANCE</p>
+                        <div class="flex items-center gap-3">
+                            <h2 class="text-3xl font-bold font-mono tracking-tight text-white">₹ <span id="balance-display">...</span></h2>
+                            <button class="text-slate-300 hover:text-white transition w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/10" onclick="toggleBalance()">
+                                <i class="fas fa-eye" id="balance-icon"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center backdrop-blur-sm border border-white/10">
+                        <i class="fas fa-wifi text-white/80 text-xs"></i>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between items-end relative z-10">
+                    <div>
+                        <p class="text-[10px] text-slate-300 font-mono mb-1 opacity-80">ACCOUNT HOLDER</p>
+                        <p class="text-sm font-medium tracking-wide text-white">JOHN DOE</p>
+                    </div>
+                    <div class="text-right">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" alt="Card Logo" class="h-6 opacity-90">
+                    </div>
+                </div>
+
+                <!-- Shine Effect -->
+                <div class="absolute top-0 right-0 w-40 h-40 bg-white/5 rounded-full blur-3xl transform translate-x-10 -translate-y-10 group-hover:bg-white/10 transition duration-500"></div>
+            </div>
+
+            <!-- Quick Actions Grid -->
+            <div class="grid grid-cols-4 gap-3 mb-8">
+                <button class="grid-btn group" onclick="switchView('pay')">
+                    <div class="w-12 h-12 rounded-2xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 group-hover:scale-110 transition-transform duration-300">
+                      <a href="saveandpay.html">  <i class="fas fa-paper-plane text-lg"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400">Pay</span></a>
+                </button>
+                <button class="grid-btn group" onclick="switchView('cards')">
+                    <div class="w-12 h-12 rounded-2xl bg-fp-gold/10 flex items-center justify-center text-fp-gold group-hover:scale-110 transition-transform duration-300">
+                       <a href="saveaccounts.html"> <i class="fas fa-credit-card text-lg"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400">Cards</span></a>
+                </button>
+                <button class="grid-btn group" onclick="scanQR()">
+                    <div class="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center text-fp-green group-hover:scale-110 transition-transform duration-300">
+                        <a href="scanqrpay.html"><i class="fas fa-qrcode text-lg"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400">Scan</span></a>
+                </button>
+                <button class="grid-btn group">
+                    <div class="w-12 h-12 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-500 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-chart-pie text-lg"></i>
+                    </div>
+                    <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400">Stats</span>
+                </button>
+            </div>
+
+            <!-- Recent Activity -->
+            <div class="mb-6">
+                <div class="flex justify-between items-center mb-4 px-1">
+                    <h3 class="text-base font-bold text-slate-800 dark:text-white">Recent Activity</h3>
+                    <button class="text-xs text-fp-gold font-bold hover:text-white transition">View All</button>
+                </div>
+
+                <div class="space-y-3">
+                    <!-- Transaction 1 -->
+                    <div class="glass-panel p-4 rounded-2xl flex items-center justify-between border-l-4 border-l-transparent hover:border-l-fp-gold transition-all">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-fp-gold">
+                                <i class="fas fa-tractor"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-800 dark:text-white">Agro Machinery</h4>
+                                <p class="text-[10px] text-slate-500 font-mono">Today, 10:23 AM</p>
+                            </div>
+                        </div>
+                        <span class="text-sm font-bold text-slate-800 dark:text-white font-mono">- ₹4,500</span>
+                    </div>
+
+                    <!-- Transaction 2 -->
+                    <div class="glass-panel p-4 rounded-2xl flex items-center justify-between border-l-4 border-l-transparent hover:border-l-fp-green transition-all">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-fp-green">
+                                <i class="fas fa-arrow-down"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-800 dark:text-white">Crop Payment</h4>
+                                <p class="text-[10px] text-slate-500 font-mono">Yesterday, 02:15 PM</p>
+                            </div>
+                        </div>
+                        <span class="text-sm font-bold text-fp-green font-mono">+ ₹12,000</span>
+                    </div>
+                     <!-- Transaction 3 -->
+                     <div class="glass-panel p-4 rounded-2xl flex items-center justify-between border-l-4 border-l-transparent hover:border-l-fp-red transition-all">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-white/5 flex items-center justify-center text-fp-red">
+                                <i class="fas fa-bolt"></i>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-800 dark:text-white">Electricity Bill</h4>
+                                <p class="text-[10px] text-slate-500 font-mono">Oct 24, 09:00 AM</p>
+                            </div>
+                        </div>
+                        <span class="text-sm font-bold text-slate-800 dark:text-white font-mono">- ₹850</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- VIEW: CARDS (Saved Accounts) -->
+        <section id="view-cards" class="view-section">
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-1">My Cards</h2>
+                <p class="text-xs text-slate-500">Manage your payment methods</p>
+            </div>
+
+            <!-- Card Stack -->
+            <div class="space-y-4">
+                <!-- Card 1 (Active) -->
+                <div class="digital-card p-6 opacity-100 transform translate-y-0 hover:-translate-y-1 transition-transform">
+                    <div class="flex justify-between items-start mb-8">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/2a/Mastercard-logo.svg/1280px-Mastercard-logo.svg.png" class="h-6">
+                        <span class="text-xs text-white/60 font-mono border border-white/20 px-2 py-1 rounded">Primary</span>
+                    </div>
+                    <div class="mb-4">
+                        <div class="text-xl font-mono text-white tracking-widest">**** **** **** 4829</div>
+                    </div>
+                    <div class="flex justify-between text-white/80 text-xs font-mono">
+                        <span>JOHN DOE</span>
+                        <span>EXP 12/26</span>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="bg-gradient-to-r from-emerald-800 to-teal-900 rounded-2xl p-6 relative overflow-hidden border border-white/10 shadow-lg hover:-translate-y-1 transition-transform">
+                    <div class="absolute right-0 top-0 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+                    <div class="flex justify-between items-start mb-8 relative z-10">
+                        <i class="fab fa-cc-visa text-3xl text-white"></i>
+                        <i class="fas fa-check-circle text-emerald-400"></i>
+                    </div>
+                    <div class="mb-4 relative z-10">
+                        <div class="text-xl font-mono text-white tracking-widest">**** **** **** 9921</div>
+                    </div>
+                    <div class="flex justify-between text-white/80 text-xs font-mono relative z-10">
+                        <span>JOHN DOE</span>
+                        <span>EXP 09/25</span>
+                    </div>
+                </div>
+
+                <!-- Add New -->
+                <button class="w-full py-4 rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 text-slate-400 hover:text-fp-gold hover:border-fp-gold transition flex items-center justify-center gap-2">
+                    <i class="fas fa-plus"></i>
+                    <span class="text-sm font-bold">Add New Card</span>
+                </button>
+            </div>
+        </section>
+
+        <!-- VIEW: PAY (Payments) -->
+        <section id="view-pay" class="view-section">
+            <div class="mb-6">
+                <h2 class="text-xl font-bold text-slate-800 dark:text-white mb-1">Send Money</h2>
+                <p class="text-xs text-slate-500">Secure instant transfers</p>
+            </div>
+
+            <!-- Recipient Input -->
+            <div class="glass-panel p-5 rounded-2xl mb-4">
+                <label class="text-xs text-slate-500 font-bold uppercase mb-2 block">To Recipient</label>
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-full bg-fp-gold/20 flex items-center justify-center text-fp-gold">
+                        <i class="fas fa-user"></i>
+                    </div>
+                    <input type="text" placeholder="Enter Name or UPI ID" class="bg-transparent border-none outline-none text-slate-800 dark:text-white placeholder-slate-400 flex-grow font-medium">
+                    <button class="text-fp-gold"><i class="fas fa-address-book"></i></button>
+                </div>
+            </div>
+
+            <!-- Amount Input -->
+            <div class="glass-panel p-8 rounded-2xl mb-4 text-center">
+                <label class="text-xs text-slate-500 font-bold uppercase mb-4 block">Enter Amount</label>
+                <div class="flex items-center justify-center gap-2 mb-2">
+                    <span class="text-3xl text-slate-400">₹</span>
+                    <input type="number" value="1500" class="bg-transparent border-none outline-none text-5xl font-bold text-slate-800 dark:text-white w-48 text-center font-mono">
+                </div>
+                <div class="text-xs text-emerald-500 font-medium bg-emerald-500/10 inline-block px-3 py-1 rounded-full">
+                    Available: ₹2,45,000
+                </div>
+            </div>
+
+            <button class="w-full bg-gradient-to-r from-fp-gold to-orange-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-orange-500/20 active:scale-95 transition-transform" onclick="switchView('home')">
+                Pay Now
+            </button>
+        </section>
+
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav fixed bottom-0 left-0 right-0 h-24 px-6 pb-2 flex justify-between items-center z-50">
+        <!-- Home Tab -->
+        <button class="nav-item flex flex-col items-center gap-1.5 text-fp-gold w-16" onclick="switchView('home')" id="nav-home">
+            <i class="fas fa-home text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">Home</span>
+            <div class="w-1 h-1 rounded-full bg-fp-gold nav-dot"></div>
+        </button>
+        
+        <!-- Cards Tab -->
+        <a href="saveaccounts.html"><button class="nav-item flex flex-col items-center gap-1.5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition w-16" onclick="switchView('cards')" id="nav-cards">
+            <i class="fas fa-wallet text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">Cards</span>
+            <div class="w-1 h-1 rounded-full bg-transparent nav-dot"></div>
+        </button></a>
+
+        <!-- Floating Scan Button -->
+         <a href="scanqrpay.html"><div class="relative w-16 flex justify-center">
+            <button class="scan-fab animate-float" onclick="scanQR()">
+                <i class="fas fa-qrcode text-white text-2xl"></i>
+            </button></a>
+        </div>
+
+        <!-- Pay Tab -->
+        <a href="card.html"><button class="nav-item flex flex-col items-center gap-1.5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition w-16" onclick="switchView('pay')" id="nav-pay">
+            <i class="fas fa-paper-plane text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">A/c</span>
+            <div class="w-1 h-1 rounded-full bg-transparent nav-dot"></div>
+        </button></a> 
+        
+        <!-- Settings Tab -->
+        <button class="nav-item flex flex-col items-center gap-1.5 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 transition w-16">
+            <i class="fas fa-cog text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">Menu</span>
+            <div class="w-1 h-1 rounded-full bg-transparent nav-dot"></div>
+        </button>
+    </nav>
+
+    <!-- Overlay for Scan -->
+    <div id="scan-overlay" class="fixed inset-0 bg-black/90 z-[60] hidden flex-col items-center justify-center backdrop-blur-md">
+        <div class="w-64 h-64 border-4 border-fp-gold rounded-3xl relative flex items-center justify-center">
+            <div class="absolute inset-0 border-t-4 border-fp-gold animate-pulse"></div>
+            <p class="text-white font-mono text-sm animate-pulse">Align QR Code</p>
+        </div>
+        <button onclick="closeScan()" class="mt-8 px-6 py-2 bg-white/10 rounded-full text-white border border-white/20">Cancel</button>
+    </div>
+
+    <!-- Initialization Logic -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if balance exists, if not set default 2,45,000
+            if (!localStorage.getItem('farmpay_balance')) {
+                localStorage.setItem('farmpay_balance', '245000');
+            }
+            updateDisplay();
+
+            // Load saved theme
+            const savedTheme = localStorage.getItem('fp_theme');
+            if (savedTheme === 'light') {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
+            }
+        });
+
+        function updateDisplay() {
+            const balance = parseFloat(localStorage.getItem('farmpay_balance'));
+            // Format to Indian Currency
+            const el = document.getElementById('balance-display');
+            if(el) el.innerText = balance.toLocaleString('en-IN');
+            
+            // Icon check
+            const icon = document.getElementById('balance-icon');
+            if(icon) icon.classList.replace('fa-eye-slash', 'fa-eye');
+        }
+
+        function toggleBalance() {
+            const el = document.getElementById('balance-display');
+            const icon = document.getElementById('balance-icon');
+            
+            if (el.innerText.includes('*')) {
+                updateDisplay();
+                if(icon) icon.classList.replace('fa-eye-slash', 'fa-eye');
+            } else {
+                el.innerText = '****.**';
+                if(icon) icon.classList.replace('fa-eye', 'fa-eye-slash');
+            }
+        }
+
+        /* --- UI Helper Functions for Tabs & Theme --- */
+
+        function switchView(viewName) {
+            // 1. Hide all views
+            const views = document.querySelectorAll('.view-section');
+            views.forEach(v => v.classList.remove('active'));
+
+            // 2. Show target view
+            const target = document.getElementById('view-' + viewName);
+            if(target) {
+                setTimeout(() => target.classList.add('active'), 50);
+            }
+
+            // 3. Update Bottom Nav
+            const navs = document.querySelectorAll('.nav-item');
+            navs.forEach(n => {
+                n.classList.remove('text-fp-gold');
+                n.classList.add('text-slate-400', 'dark:text-slate-500');
+                const dot = n.querySelector('.nav-dot');
+                if(dot) {
+                    dot.classList.remove('bg-fp-gold');
+                    dot.classList.add('bg-transparent');
+                }
+            });
+
+            const activeNav = document.getElementById('nav-' + viewName);
+            if(activeNav) {
+                activeNav.classList.remove('text-slate-400', 'dark:text-slate-500');
+                activeNav.classList.add('text-fp-gold');
+                const dot = activeNav.querySelector('.nav-dot');
+                if(dot) {
+                    dot.classList.remove('bg-transparent');
+                    dot.classList.add('bg-fp-gold');
+                }
+            }
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.replace('dark', 'light');
+                localStorage.setItem('fp_theme', 'light');
+            } else {
+                html.classList.replace('light', 'dark');
+                localStorage.setItem('fp_theme', 'dark');
+            }
+        }
+
+        function scanQR() {
+            document.getElementById('scan-overlay').classList.remove('hidden');
+            document.getElementById('scan-overlay').classList.add('flex');
+        }
+
+        function closeScan() {
+            document.getElementById('scan-overlay').classList.add('hidden');
+            document.getElementById('scan-overlay').classList.remove('flex');
+        }
+    </script>
+</body>
+</html>

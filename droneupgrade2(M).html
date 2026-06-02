@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>प्रति एकर खर्चाचे विवरण</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Custom config for Tailwind colors and Inter font -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'agro-dark-violet': '#3A1E63', // Darker violet for header
+                        'agro-violet': '#5b21b6', // Primary violet for accents/buttons
+                        'agro-lavender': '#9C77E5', // Lighter violet for subtle accents
+                        'agro-accent-orange': '#f97316', // Orange for highlight/toggle
+                        'agro-light-gray': '#f0f0f5', // Very light gray for background
+                        'agro-text-dark': '#1a1a1a', // Dark text for readability
+                    },
+                    fontFamily: {
+                        sans: ['Mukta', 'Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 12px rgba(0, 0, 0, 0.1)',
+                        'medium': '0 8px 20px rgba(0, 0, 0, 0.15)',
+                        'lg-violet': '0 10px 25px -5px rgba(91, 33, 182, 0.3), 0 4px 10px -4px rgba(91, 33, 182, 0.2)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Mukta:wght@400;500;600;700;800&display=swap');
+        
+        body {
+            background-color: #ffffff;
+            color: #1a1a1a;
+            font-family: 'Mukta', 'Inter', sans-serif;
+        }
+
+        .fixed-header {
+            background-color: #3A1E63;
+        }
+        
+        /* Hero/Banner section matching the reference image */
+        .hero-background {
+            /* Using the image provided in the previous step's context */
+            background-image: url('https://placehold.co/1200x350/9C77E5/5b21b6?text=Agricultural+Drone+Over+Field');
+            background-size: cover;
+            background-position: center;
+            height: 200px; 
+            /* Added a simple gradient overlay instead for a softer look */
+            background-image: linear-gradient(to bottom, rgba(156,119,229,0.5), rgba(91,33,182,0.5)), url('https://placehold.co/1200x350/9C77E5/5b21b6?text=Agricultural+Drone+Over+Field');
+        }
+        
+        @media (min-width: 768px) {
+            .hero-background {
+                height: 350px;
+            }
+        }
+
+        /* New Table Styling */
+        .data-table-container {
+            border: 1px solid #ddd;
+            border-radius: 1rem;
+            overflow: hidden; 
+            box-shadow: 0 10px 25px -5px rgba(91, 33, 182, 0.1), 0 4px 10px -4px rgba(91, 33, 182, 0.1);
+        }
+
+        .table-header-row {
+            background-color: #5b21b6;
+            color: white;
+            font-weight: 700;
+        }
+
+        .table-row-odd {
+            background-color: #f7f3ff; /* Very light lavender */
+        }
+
+        .table-row-even {
+            background-color: #ffffff; /* White */
+        }
+        
+        .row-category {
+            font-weight: 600;
+            color: #3A1E63;
+        }
+
+        /* Responsive Table adjustments for small screens (CLEANED UP LABELS) */
+        @media (max-width: 767px) {
+            .data-table-container table {
+                display: block;
+                width: 100%;
+            }
+            .data-table-container thead {
+                display: none; /* Hide header row on mobile */
+            }
+            .data-table-container tbody, .data-table-container tr {
+                display: block;
+            }
+            /* Each TR becomes a distinct vertical card */
+            .data-table-container tr {
+                margin-bottom: 1.5rem; /* Increased vertical space between sections */
+                border-radius: 0.75rem;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+                border: 1px solid #eee; 
+                padding: 0; /* Remove internal padding from TR */
+            }
+            
+            /* Hide the default mobile labels that cause clutter */
+            .data-table-container td::before {
+                content: none; 
+            }
+            
+            /* Style the Component / Service header for mobile */
+            .data-table-container td[data-label="Component / Service"] {
+                display: block;
+                text-align: center;
+                font-size: 1.1rem;
+                font-weight: 800;
+                padding: 0.75rem;
+                background-color: #f0f0f5; /* Light background for category bar */
+                color: #5b21b6;
+                border-bottom: 2px solid #D8C7FF;
+            }
+            
+            /* Style for Cost (₹) and Remarks */
+            .data-table-container td[data-label="Cost (₹)"],
+            .data-table-container td[data-label="Remarks"] {
+                display: block;
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+                border-bottom: 1px solid #f7f7f7;
+                background-color: white;
+                text-align: right; /* Default alignment for content */
+                
+                /* Use flex to align custom label and value */
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+            
+            /* Manually insert clean labels for content rows in Marathi */
+            .data-table-container td[data-label="Cost (₹)"]::before {
+                content: 'किंमत (₹):';
+                font-weight: 600;
+                color: #3A1E63;
+                display: inline;
+                float: none;
+            }
+            
+            .data-table-container td[data-label="Remarks"]::before {
+                content: 'शेरा:';
+                font-weight: 600;
+                color: #3A1E63;
+                display: inline;
+                float: none;
+            }
+
+            /* Apply background coloring on content rows */
+            .data-table-container tr:nth-child(odd) td {
+                background-color: #f7f3ff;
+            }
+            .data-table-container tr:nth-child(even) td {
+                background-color: #ffffff;
+            }
+
+            /* Ensure the header row is the only one without the custom styling */
+            .data-table-container tr:first-child td {
+                /* We already hide the first tr in thead on mobile, so this is fine. */
+            }
+        }
+    </style>
+</head>
+<body class="font-sans">
+
+    <!-- HEADER / TOP BAR -->
+    <header class="fixed-header text-white shadow-lg sticky top-0 z-20">
+        <div class="px-4 py-3 flex justify-between items-center max-w-7xl mx-auto w-full">
+            
+            <!-- Back Button and Logo Container -->
+            <div class="flex items-center">
+                <!-- Back Button -->
+                <button onclick="history.back(); showMessage('मागे जात आहे')" class="text-white opacity-80 p-1 mr-4">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                
+                <!-- Logo -->
+                <div class="text-2xl font-extrabold tracking-tight">
+                    <span class="text-white">ॲग्रो</span><span class="text-agro-lavender">टेक</span><span class="text-white">+</span>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3 ml-3 flex-shrink-0">
+                <!-- Profile/User Info -->
+                <div class="text-xs text-right hidden sm:block leading-none mr-2">
+                    <div class="text-gray-200">पार्थ सोनवणे</div>
+                    <div class="text-gray-400">बोईसर, महाराष्ट्र</div>
+                </div>
+                <!-- Profile Icon -->
+                <a href="#" class="block p-2 rounded-full bg-agro-violet transition flex-shrink-0 hover:bg-agro-lavender" onclick="showMessage('प्रोफाइल पाहत आहे')">
+                    <a href="profile.html"><i class="fas fa-user text-white w-4 h-4 flex items-center justify-center"></i></a>
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <!-- HERO/BANNER SECTION -->
+    <div class="hero-background w-full">
+        <!-- The background image and gradient from CSS fill this space. -->
+    </div>
+    
+    <main class="max-w-4xl mx-auto p-4 md:p-8 pb-12">
+        
+        <!-- MAIN TITLE CARD -->
+        <div class="bg-agro-violet text-white p-4 rounded-xl shadow-lg-violet -mt-8 mb-8 text-center">
+            <h1 class="text-2xl md:text-3xl font-extrabold">प्रति एकर खर्चाचे विवरण</h1>
+        </div>
+
+        <!-- DETAILED COST TABLE -->
+        <section class="data-table-container">
+            <table class="w-full text-left text-gray-700 border-collapse">
+                <thead class="hidden md:table-header-group">
+                    <tr class="table-header-row">
+                        <th class="p-3 w-1/3">घटक / सेवा</th>
+                        <th class="p-3 w-1/4">किंमत (₹)</th>
+                        <th class="p-3 w-auto">शेरा</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Row 1: Drone Rental Charge -->
+                    <tr class="table-row-odd">
+                        <td data-label="Component / Service" class="row-category p-3 md:w-1/3">ड्रोन भाडे शुल्क</td>
+                        <td data-label="Cost (₹)" class="p-3 md:w-1/4">₹५००–₹८००</td>
+                        <td data-label="Remarks" class="p-3 md:w-auto">प्रति एकर मॉडेल</td>
+                    </tr>
+                    <!-- Row 2: Operator Charge -->
+                    <tr class="table-row-even">
+                        <td data-label="Component / Service" class="row-category p-3 md:w-1/3">ऑपरेटर शुल्क</td>
+                        <td data-label="Cost (₹)" class="p-3 md:w-1/4">₹२००</td>
+                        <td data-label="Remarks" class="p-3 md:w-auto">मालक स्वतः चालवत नसल्यास</td>
+                    </tr>
+                    <!-- Row 3: Battery & Charger Use -->
+                    <tr class="table-row-odd">
+                        <td data-label="Component / Service" class="row-category p-3 md:w-1/3">बॅटरी आणि चार्जर वापर</td>
+                        <td data-label="Cost (₹)" class="p-3 md:w-1/4">₹१००</td>
+                        <td data-label="Remarks" class="p-3 md:w-auto">एक सायकल प्रति एकर</td>
+                    </tr>
+                    <!-- Row 4: Maintenance / Cleaning -->
+                    <tr class="table-row-even">
+                        <td data-label="Component / Service" class="row-category p-3 md:w-1/3">देखभाल / साफसफाई</td>
+                        <td data-label="Cost (₹)" class="p-3 md:w-1/4">₹५०</td>
+                        <td data-label="Remarks" class="p-3 md:w-auto">प्रत्येक वापरानंतर</td>
+                    </tr>
+                    <!-- Row 5: Total Operational Cost (per use) -->
+                    <tr class="table-row-odd">
+                        <td data-label="Component / Service" class="row-category p-3 md:w-1/3">एकूण ऑपरेशनल खर्च (प्रति वापर)</td>
+                        <td data-label="Cost (₹)" class="p-3 md:w-1/4">₹८५०–₹१,१५०</td>
+                        <td data-label="Remarks" class="p-3 md:w-auto">फवारणी किंवा पेरणीसाठी</td>
+                    </tr>
+                    <!-- Row 6: Government Subsidy (if owned) -->
+                    <tr class="table-row-even">
+                        <td data-label="Component / Service" class="row-category p-3 md:w-1/3">सरकारी अनुदान (मालकी असल्यास)</td>
+                        <td data-label="Cost (₹)" class="p-3 md:w-1/4">४०–५०%</td>
+                        <td data-label="Remarks" class="p-3 md:w-auto">भांडवली खर्च कमी होतो</td>
+                    </tr>
+                    <!-- Row 7: Drone Ownership Cost (if bought) -->
+                    <tr class="table-row-odd">
+                        <td data-label="Component / Service" class="row-category p-3 md:w-1/3">ड्रोन मालकी खर्च (खरेदी केल्यास)</td>
+                        <td data-label="Cost (₹)" class="p-3 md:w-1/4">₹३,००,०००–₹४,५०,०००</td>
+                        <td data-label="Remarks" class="p-3 md:w-auto">ड्रोन + बॅटरी + प्रशिक्षण समाविष्ट</td>
+                    </tr>
+                    <!-- Row 8: Annual Maintenance Cost -->
+                    <tr class="table-row-even">
+                        <td data-label="Component / Service" class="row-category p-3 md:w-1/3">वार्षिक देखभाल खर्च</td>
+                        <td data-label="Cost (₹)" class="p-3 md:w-1/4">₹१०,०००–₹१५,०००</td>
+                        <td data-label="Remarks" class="p-3 md:w-auto">सुटे भाग + सर्व्हिस समाविष्ट</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+    </main>
+
+    <!-- Simple Message Box for Clicks (Notification style) -->
+    <div id="message-box" class="fixed bottom-4 left-4 right-4 bg-agro-dark-violet text-white p-3 rounded-xl shadow-xl hidden transition transform duration-300 z-40" role="alert">
+        <p id="message-content" class="text-center"></p>
+    </div>
+
+    <!-- JAVASCRIPT BLOCK -->
+    <script>
+        /**
+         * Shows a temporary notification message at the bottom of the screen.
+         * @param {string} content The message to display.
+         */
+        function showMessage(content) {
+            const messageBox = document.getElementById('message-box');
+            const messageContent = document.getElementById('message-content');
+            
+            messageContent.textContent = content;
+            messageBox.classList.remove('hidden');
+            
+            clearTimeout(messageBox.timer);
+            
+            messageBox.timer = setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 2000);
+        }
+        
+        // Ensure back button functions if history is available
+        document.querySelector('.fixed-header button[onclick*="history.back"]').onclick = function() {
+            history.back();
+            showMessage('मागे जात आहे');
+        };
+    </script>
+</body>
+</html>

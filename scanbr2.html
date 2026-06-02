@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agrorecords+ | Real Scanner</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Barcode Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Libre+Barcode+39+Text&display=swap" rel="stylesheet">
+    
+    <!-- Real Barcode Scanning Library -->
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'agro-purple': '#9333ea', 
+                        'agro-purple-dark': '#7e22ce',
+                        'agro-fuchsia': '#c026d3',
+                        'agro-gold': '#f59e0b',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                        barcode: ['"Libre Barcode 39 Text"', 'cursive'],
+                    },
+                    animation: {
+                        'scan-laser': 'scan 2s linear infinite',
+                    },
+                    keyframes: {
+                        scan: {
+                            '0%': { top: '0%' },
+                            '50%': { top: '100%' },
+                            '100%': { top: '0%' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body { background-color: #f8fafc; -webkit-tap-highlight-color: transparent; }
+        .control-btn {
+            width: 64px; height: 64px; border-radius: 20px;
+            background: linear-gradient(135deg, #a855f7, #c026d3);
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.5rem;
+            box-shadow: 0 8px 15px -3px rgba(192, 38, 211, 0.4);
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .control-btn:active { transform: scale(0.95); }
+        .premium-card {
+            background: linear-gradient(135deg, #1e1b4b, #312e81);
+            color: #fbbf24;
+        }
+        /* Custom Scrollbar for history */
+        .history-scroll::-webkit-scrollbar { width: 4px; }
+        .history-scroll::-webkit-scrollbar-track { background: transparent; }
+        .history-scroll::-webkit-scrollbar-thumb { background: #e9d5ff; border-radius: 10px; }
+
+        /* Ensure the scanner video fills the container */
+        #reader {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 1.5rem; /* matches rounded-3xl */
+        }
+        #reader video {
+            object-fit: cover;
+            width: 100% !important;
+            height: 100% !important;
+            border-radius: 1.5rem;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-body text-slate-800 flex flex-col h-screen overflow-hidden relative">
+
+    <!-- Header -->
+    <header class="bg-gradient-to-br from-purple-700 via-purple-600 to-fuchsia-600 pt-10 pb-6 px-6 rounded-b-[2.5rem] shadow-xl relative z-20 shrink-0">
+        <div class="flex items-center justify-between">
+            <button onclick="history.back()" class="bg-white/20 backdrop-blur-md p-2 rounded-xl text-white transition active:scale-95">
+                 <i class="fas fa-arrow-left text-lg"></i>
+            </button>
+            <div class="text-center">
+                <h1 class="text-white text-xl font-bold tracking-wide">AgroScanner</h1>
+                <div class="flex items-center justify-center gap-2 mt-1">
+                    <span id="limit-badge" class="bg-black/30 text-white text-[10px] px-2 py-0.5 rounded-full backdrop-blur-md border border-white/10">
+                        Free Plan: <span id="usage-count">0</span>/15
+                    </span>
+                </div>
+            </div>
+            <button onclick="location.reload()" class="bg-white/20 backdrop-blur-md p-2 rounded-xl text-white transition active:scale-95 relative" >
+                <i class="fas fa-history text-lg"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow flex flex-col px-6 pt-6 relative z-10 pb-20 overflow-hidden">
+
+        <!-- Camera Frame -->
+        <div class="w-full aspect-[4/3] bg-black rounded-3xl relative overflow-hidden mb-6 shadow-2xl border-4 border-white ring-1 ring-slate-200 group shrink-0">
+            <!-- Library Reader Container -->
+            <div id="reader" class="bg-black"></div>
+            
+            <!-- Fallback Message -->
+            <div id="camera-fallback" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-slate-900 text-white pointer-events-none z-20">
+                <i class="fas fa-camera-slash text-4xl mb-2 text-slate-500"></i>
+                <p class="text-xs text-slate-400">Camera Unavailable</p>
+                <button onclick="startScanner()" class="mt-2 text-[10px] bg-white/10 px-3 py-1 rounded">Retry</button>
+            </div>
+
+            <!-- Laser Overlay -->
+            <div id="scan-laser" class="hidden absolute left-0 w-full h-1 bg-fuchsia-400 shadow-[0_0_15px_#c026d3] animate-scan-laser z-10 pointer-events-none"></div>
+            
+            <!-- Corner UI -->
+            <div class="absolute top-4 left-4 w-8 h-8 border-t-4 border-l-4 border-white/50 rounded-tl-xl pointer-events-none z-10"></div>
+            <div class="absolute top-4 right-4 w-8 h-8 border-t-4 border-r-4 border-white/50 rounded-tr-xl pointer-events-none z-10"></div>
+            <div class="absolute bottom-4 left-4 w-8 h-8 border-b-4 border-l-4 border-white/50 rounded-bl-xl pointer-events-none z-10"></div>
+            <div class="absolute bottom-4 right-4 w-8 h-8 border-b-4 border-r-4 border-white/50 rounded-br-xl pointer-events-none z-10"></div>
+        </div>
+
+        <!-- Controls -->
+        <div class="flex justify-center gap-8 mb-6 shrink-0">
+            <!-- Hidden Native Input for File Upload Fallback -->
+            <input type="file" id="native-camera-input" accept="image/*" class="hidden" onchange="handleNativeCapture(this)">
+
+            <!-- Main Capture/Upload Button -->
+            <button id="capture-btn" onclick="handleManualTrigger()" class="control-btn ring-4 ring-purple-100 hover:ring-purple-200 scale-110">
+                <i class="fas fa-camera"></i>
+            </button>
+        </div>
+
+        <!-- Premium Banner (Visible if Free) -->
+        <div id="premium-banner" class="premium-card p-4 rounded-2xl shadow-lg mb-4 shrink-0 flex items-center justify-between cursor-pointer transform hover:scale-[1.02] transition" onclick="buyPremium()">
+            <div>
+                <h3 class="font-bold text-yellow-400 text-sm"><i class="fas fa-crown mr-1"></i> Upgrade to Premium</h3>
+                <p class="text-[10px] text-indigo-200">Increase limit to 75 BR Codes</p>
+            </div>
+            <div class="bg-yellow-400 text-indigo-900 text-xs font-bold px-3 py-1.5 rounded-full shadow-lg">
+                ₹75
+            </div>
+        </div>
+
+        <!-- Recent History List -->
+        <div class="flex-grow overflow-hidden flex flex-col">
+            <div class="flex items-center justify-between mb-2">
+                <h3 class="text-sm font-bold text-slate-700">Recent Scans</h3>
+                <button onclick="clearHistory()" class="text-[10px] text-slate-400 font-bold hover:text-red-500">CLEAR</button>
+            </div>
+            <div id="history-list" class="history-scroll overflow-y-auto space-y-3 pb-20 pr-1">
+                <div class="text-center py-8 text-slate-400 text-xs" id="empty-msg">
+                    Point camera at a code to scan.
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- MODAL: Premium Success -->
+    <div id="premium-modal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-6 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-sm text-center relative overflow-hidden">
+            <div class="absolute inset-0 bg-gradient-to-br from-yellow-100/50 to-transparent pointer-events-none"></div>
+            <div class="w-16 h-16 bg-yellow-100 rounded-full flex items-center justify-center mx-auto mb-4 text-yellow-600 text-3xl animate-bounce">
+                <i class="fas fa-crown"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-slate-800 mb-2">Premium Unlocked!</h2>
+            <p class="text-slate-500 text-sm mb-6">You can now generate up to <b>75 BR Codes</b>.</p>
+            <button onclick="closeModal('premium-modal')" class="w-full bg-slate-900 text-white py-3 rounded-xl font-bold hover:bg-slate-800 transition">Awesome!</button>
+        </div>
+    </div>
+
+    <!-- MODAL: Limit Reached -->
+    <div id="limit-modal" class="fixed inset-0 bg-black/80 z-50 hidden flex items-center justify-center p-6 backdrop-blur-sm">
+        <div class="bg-white rounded-3xl p-6 w-full max-w-sm text-center">
+            <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4 text-red-500 text-2xl">
+                <i class="fas fa-lock"></i>
+            </div>
+            <h2 class="text-xl font-bold text-slate-800 mb-2">Limit Reached</h2>
+            <p class="text-slate-500 text-sm mb-6">You have reached the free limit of 15 codes. Upgrade to continue.</p>
+            <button onclick="buyPremium(); closeModal('limit-modal')" class="w-full bg-gradient-to-r from-yellow-400 to-orange-500 text-white py-3 rounded-xl font-bold shadow-lg shadow-orange-500/30 mb-3">
+                Upgrade for ₹75
+            </button>
+            <button onclick="closeModal('limit-modal')" class="text-slate-400 text-xs font-bold">Maybe Later</button>
+        </div>
+    </div>
+
+    <script>
+        // --- Opera Browser Redirect Logic ---
+        function handleOperaRedirect(event) {
+            if (navigator.userAgent.includes("Opera") || navigator.userAgent.includes("OPR")) {
+                if(event) event.preventDefault();
+                window.location.href = "scanbr.html";
+            }
+        }
+        // Run on load just in case (optional, mostly for links)
+        if (navigator.userAgent.includes("Opera") || navigator.userAgent.includes("OPR")) {
+             // Logic if you want to redirect immediately
+        }
+
+        // --- Configuration ---
+        const FREE_LIMIT = 15;
+        const PREMIUM_LIMIT = 75;
+        
+        // --- State ---
+        let state = {
+            isPremium: localStorage.getItem('agro_isPremium') === 'true',
+            history: JSON.parse(localStorage.getItem('agro_history')) || [],
+            scanner: null,
+            lastScanTime: 0
+        };
+
+        // --- Hardware Init (Real Scanner) ---
+        function startScanner() {
+            const onScanSuccess = (decodedText, decodedResult) => {
+                const now = Date.now();
+                // Prevent rapid-fire double scans (2 second cooldown)
+                if (now - state.lastScanTime < 2000) return;
+                state.lastScanTime = now;
+                
+                processNewRecord(decodedText);
+            };
+
+            const onScanFailure = (error) => {
+                // Ignore errors (scanning empty space)
+            };
+
+            // Initialize Html5Qrcode
+            state.scanner = new Html5Qrcode("reader");
+            
+            const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+            
+            // Prefer back camera
+            state.scanner.start({ facingMode: "environment" }, config, onScanSuccess, onScanFailure)
+            .then(() => {
+                // Scanner started - Show Laser
+                document.getElementById('scan-laser').classList.remove('hidden');
+                document.getElementById('camera-fallback').classList.add('hidden');
+            })
+            .catch(err => {
+                console.error("Error starting scanner", err);
+                document.getElementById('camera-fallback').classList.remove('hidden');
+            });
+        }
+
+        window.addEventListener('load', () => {
+            startScanner();
+            updateUI();
+            renderHistory();
+        });
+
+        // --- Capture Handling ---
+        function handleManualTrigger() {
+            // If scanner is running, user wants to force capture current frame?
+            // Actually, usually users tap button to "Upload Image" if live scan fails
+            document.getElementById('native-camera-input').click();
+        }
+
+        function handleNativeCapture(input) {
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                
+                // Use library to scan the file
+                const html5QrCode = new Html5Qrcode("reader");
+                html5QrCode.scanFile(file, true)
+                .then(decodedText => {
+                    processNewRecord(decodedText);
+                })
+                .catch(err => {
+                    alert("SAVING DATA TO BR CODE");
+                });
+            }
+        }
+
+        function processNewRecord(text) {
+            const limit = state.isPremium ? PREMIUM_LIMIT : FREE_LIMIT;
+            
+            // 1. Check Limit
+            if (state.history.length >= limit) {
+                document.getElementById('limit-modal').classList.remove('hidden');
+                return;
+            }
+
+            // 2. Play Sound (Beep)
+            playBeep();
+
+            // 3. Generate Data
+            const timestamp = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            // Add to history
+            const newItem = {
+                id: text, // The actual scanned text
+                time: timestamp,
+                color: getRandomColor()
+            };
+
+            state.history.unshift(newItem); // Add to top
+            saveState();
+            renderHistory();
+            
+            // Scroll to top
+            const list = document.getElementById('history-list');
+            list.scrollTop = 0;
+            
+            // Flash effect
+            if(list.firstElementChild) {
+                list.firstElementChild.classList.add('bg-green-50');
+                setTimeout(() => list.firstElementChild.classList.remove('bg-green-50'), 500);
+            }
+        }
+
+        function playBeep() {
+            const audio = new AudioContext();
+            const osc = audio.createOscillator();
+            const gain = audio.createGain();
+            osc.connect(gain);
+            gain.connect(audio.destination);
+            osc.frequency.value = 1000;
+            gain.gain.value = 0.1;
+            osc.start();
+            setTimeout(() => osc.stop(), 100);
+        }
+
+        // --- Premium Logic ---
+        function buyPremium() {
+            if(confirm("Confirm purchase for ₹75?")) {
+                state.isPremium = true;
+                saveState();
+                updateUI();
+                document.getElementById('premium-modal').classList.remove('hidden');
+            }
+        }
+
+        // --- UI Updates ---
+        function updateUI() {
+            const count = state.history.length;
+            const limit = state.isPremium ? PREMIUM_LIMIT : FREE_LIMIT;
+            
+            document.getElementById('usage-count').innerText = count;
+            document.getElementById('limit-badge').innerHTML = state.isPremium 
+                ? `<i class="fas fa-crown text-yellow-400 mr-1"></i> Premium: ${count}/${limit}`
+                : `Free Plan: ${count}/${limit}`;
+                
+            if (state.isPremium) {
+                document.getElementById('limit-badge').classList.replace('bg-black/30', 'bg-indigo-900');
+                document.getElementById('premium-banner').classList.add('hidden');
+            }
+        }
+
+        function renderHistory() {
+            const list = document.getElementById('history-list');
+            const emptyMsg = document.getElementById('empty-msg');
+            
+            if (state.history.length === 0) {
+                list.innerHTML = '';
+                list.appendChild(emptyMsg);
+                emptyMsg.style.display = 'block';
+                return;
+            }
+            
+            emptyMsg.style.display = 'none';
+            list.innerHTML = ''; 
+
+            state.history.forEach(item => {
+                const row = document.createElement('div');
+                row.className = "bg-white p-3 rounded-xl shadow-sm border border-slate-100 flex items-center justify-between transition-colors duration-300";
+                
+                row.innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-lg flex items-center justify-center text-white font-bold text-xs shadow-inner" style="background-color: ${item.color}">
+                            BR
+                        </div>
+                        <div class="min-w-0">
+                            <div class="font-barcode text-2xl leading-none text-slate-800 tracking-wider truncate max-w-[150px]">${item.id}</div>
+                            <div class="text-[10px] text-slate-400 font-sans font-bold mt-1">
+                                Scanned at ${item.time}
+                            </div>
+                        </div>
+                    </div>
+                    <button class="w-8 h-8 rounded-full bg-slate-50 text-slate-400 hover:text-purple-600 hover:bg-purple-50 flex items-center justify-center transition flex-shrink-0" onclick="copyToClipboard('${item.id}')">
+                        <i class="fas fa-copy text-xs"></i>
+                    </button>
+                `;
+                list.appendChild(row);
+            });
+        }
+
+        function copyToClipboard(text) {
+             const input = document.createElement('textarea');
+             input.value = text;
+             document.body.appendChild(input);
+             input.select();
+             document.execCommand('copy');
+             document.body.removeChild(input);
+             alert("Copied: " + text);
+        }
+
+        function saveState() {
+            localStorage.setItem('agro_isPremium', state.isPremium);
+            localStorage.setItem('agro_history', JSON.stringify(state.history));
+            updateUI();
+        }
+
+        function clearHistory() {
+            if(confirm("Clear all scan history?")) {
+                state.history = [];
+                saveState();
+                renderHistory();
+            }
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function getRandomColor() {
+            const colors = ['#f87171', '#fb923c', '#fbbf24', '#a3e635', '#34d399', '#22d3ee', '#818cf8', '#c084fc', '#f472b6'];
+            return colors[Math.floor(Math.random() * colors.length)];
+        }
+    </script>
+</body>
+</html>

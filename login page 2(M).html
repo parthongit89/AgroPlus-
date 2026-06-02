@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>लॉगिन पृष्ठ २</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Mukta:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Configure Tailwind to use Inter and Mukta font -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Mukta', 'Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        'accent-green': '#10b981', // A supportive green tone
+                        'text-dark': '#1f2937',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom CSS for the background image and overlay */
+        .farm-bg {
+            /* Replace this placeholder URL with the public URL of your background image */
+            background-image: url('https://i.supaimg.com/b6d80324-adfa-4c5e-b282-fd505adb0be2.jpg');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+
+        /* Subtle vertical gradient overlay to improve text contrast on the top and bottom */
+        .farm-bg::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            /* Fading the background slightly darker */
+            background-color: rgba(0, 0, 0, 0.2); 
+            z-index: 0;
+        }
+
+        /* Class for the clickable role cards */
+        .role-card {
+            transition: all 0.3s ease;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .role-card:hover, .role-card.selected {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(16, 185, 129, 0.5), 0 4px 6px -2px rgba(16, 185, 129, 0.1); /* Green glow */
+        }
+    </style>
+</head>
+<body class="farm-bg font-sans min-h-screen flex items-center justify-center p-4">
+
+    <!-- Role Selection Container (z-index 10 to be above the overlay) -->
+    <div class="z-10 w-full max-w-xs sm:max-w-md mx-auto text-center py-8">
+        
+        <h1 class="text-2xl font-bold text-white mb-8 drop-shadow-lg">तुमची भूमिका निवडा</h1>
+
+        <!-- Grid for roles, ensuring vertical stacking on mobile -->
+        <div id="roleGrid" class="flex flex-col items-center space-y-8">
+
+            <!-- Role 1: Farmer -->
+            <div id="role-farmer" data-role="शेतकरी" class="role-card rounded-xl text-center p-4">
+               <a href="home page(M).html"> <img 
+                    src="https://i.supaimg.com/e3708554-6ea6-4f7b-b70b-a85c9b123c58.png" 
+                    alt="Farmer Avatar" 
+                    class="mx-auto rounded-full w-28 h-28 object-cover shadow-2xl border-4 border-white/90 mb-3"
+                    onerror="this.onerror=null;this.src='https://i.supaimg.com/e3708554-6ea6-4f7b-b70b-a85c9b123c58.png';"
+                />
+                <p class="text-white font-semibold text-lg drop-shadow-md">शेतकरी</p></a>
+            </div>
+
+            <!-- Role 2: Consumer -->
+            <div id="role-consumer" data-role="ग्राहक" class="role-card rounded-xl text-center p-4">
+                <img 
+                    src="https://i.supaimg.com/b6283c1d-a384-43e7-9e90-3443303b48c5.png" 
+                    alt="Consumer Avatar" 
+                    class="mx-auto rounded-full w-28 h-28 object-cover shadow-2xl border-4 border-white/90 mb-3"
+                    onerror="this.onerror=null;this.src='https://i.supaimg.com/b6283c1d-a384-43e7-9e90-3443303b48c5.png';"
+                />
+                <p class="text-white font-semibold text-lg drop-shadow-md">ग्राहक</p>
+            </div>
+
+            <!-- Role 3: Student -->
+            <div id="role-student" data-role="विद्यार्थी" class="role-card rounded-xl text-center p-4">
+                <img 
+                    src="https://i.supaimg.com/ed9d9cf2-d74a-44c4-a431-5de3a2127db2.png" 
+                    alt="Student Avatar" 
+                    class="mx-auto rounded-full w-28 h-28 object-cover shadow-2xl border-4 border-white/90 mb-3"
+                    onerror="this.onerror=null;this.src='https://i.supaimg.com/ed9d9cf2-d74a-44c4-a431-5de3a2127db2.png';"
+                />
+                <p class="text-white font-semibold text-lg drop-shadow-md">विद्यार्थी</p>
+            </div>
+
+        </div>
+
+        <!-- Dynamic Message Box -->
+        <div id="messageBox" class="text-center text-sm mt-12 py-3 rounded-lg hidden bg-white/90 text-text-dark font-medium shadow-xl">
+            <!-- Messages appear here -->
+        </div>
+
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const roleCards = document.querySelectorAll('.role-card');
+            const messageBox = document.getElementById('messageBox');
+
+            // Function to display messages in the custom box
+            function showMessage(message) {
+                messageBox.textContent = message;
+                messageBox.classList.remove('hidden');
+                setTimeout(() => {
+                    messageBox.classList.add('hidden');
+                }, 4000);
+            }
+
+            roleCards.forEach(card => {
+                card.addEventListener('click', () => {
+                    const role = card.getAttribute('data-role');
+                    
+                    // 1. Remove 'selected' class and styles from all cards
+                    roleCards.forEach(c => {
+                        c.classList.remove('selected', 'bg-accent-green/30', 'ring-4', 'ring-accent-green');
+                    });
+
+                    // 2. Add 'selected' class and styles to the clicked card
+                    card.classList.add('selected', 'bg-accent-green/30', 'ring-4', 'ring-accent-green');
+
+                    // 3. Display message
+                    showMessage(`तुम्ही '${role}' भूमिका निवडली आहे. पुनर्निर्देशित करत आहे...`);
+                    
+                    // In a real app, you would use window.location.href or an API call here.
+                    // Example: setTimeout(() => { window.location.href = `/${role.toLowerCase()}/dashboard`; }, 1500);
+                });
+            });
+        });
+        
+    </script>
+</body>
+</html>

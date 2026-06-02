@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Agromarket Mobile Dashboard</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+        header {
+            background: #2d8f44;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+        }
+        .container {
+            padding: 15px;
+        }
+        .card {
+            background: white;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .card h3 {
+            margin: 0 0 10px;
+            font-size: 1.2rem;
+            color: #333;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+        }
+        .veg-item {
+            background: #e8ffe8;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        .veg-item span {
+            font-weight: bold;
+            color: #2d8f44;
+        }
+        footer {
+            background: #2d8f44;
+            padding: 10px;
+            text-align: center;
+            color: white;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            font-size: 0.9rem;
+        }
+        @media (max-width: 480px) {
+            header {
+                font-size: 1.1rem;
+            }
+            .veg-item {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<header>Agromarket Mobile Dashboard</header>
+
+<div class="container">
+
+    <div class="card">
+        <h3>Today's Overview</h3>
+        <p>Location: <strong>Boisar - Palghar</strong></p>
+        <p>Date: <strong>November</strong></p>
+    </div>
+
+    <div class="card">
+        <h3>Winter Vegetables (Top Items)</h3>
+        <div class="grid">
+            <div class="veg-item">Potato<br><span>₹28/kg</span></div>
+            <div class="veg-item">Tomato<br><span>₹32/kg</span></div>
+            <div class="veg-item">Onion<br><span>₹30/kg</span></div>
+            <div class="veg-item">Carrot<br><span>₹40/kg</span></div>
+            <div class="veg-item">Peas<br><span>₹90/kg</span></div>
+            <div class="veg-item">Spinach<br><span>₹18/bunch</span></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Market Insights</h3>
+        <p>✔ Prices updated daily (Zepto + JioMart + Instamart + Blinkit avg)</p>
+        <p>✔ 50+ winter vegetables included</p>
+        <p>✔ Region: Boisar–Palghar (401501)</p>
+    </div>
+
+</div>
+
+<footer>Agromarket Dashboard © 2025</footer>
+
+</body>
+</html>

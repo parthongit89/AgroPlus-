@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="mr" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>फार्मपे+ खाती</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Google Fonts including Marathi 'Mukta' -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Mukta:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'fp-dark': '#0f172a',      /* Slate-950 */
+                        'fp-surface': '#1e293b',   /* Slate-800 */
+                        'fp-gold': '#fbbf24',      /* Amber-400 */
+                        'fp-gold-dark': '#d97706', /* Amber-600 */
+                        'fp-green': '#10b981',     /* Emerald-500 */
+                        'fp-red': '#ef4444',       /* Red-500 */
+                    },
+                    fontFamily: {
+                        sans: ['Mukta', 'Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['Space Grotesk', 'monospace'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                        'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' },
+                        },
+                        fadeInUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Base Styles */
+        body {
+            transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Mukta', sans-serif;
+        }
+
+        /* Hide Scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Ambient Background Orbs */
+        .bg-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+        .orb-1 { top: -10%; left: -10%; width: 300px; height: 300px; background: #fbbf24; }
+        .orb-2 { bottom: 10%; right: -10%; width: 250px; height: 250px; background: #10b981; }
+        
+        html.light .bg-orb { opacity: 0.3; }
+        html.dark .bg-orb { opacity: 0.15; }
+
+        /* Glassmorphism */
+        .glass-panel {
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(30, 41, 59, 0.6);
+        }
+
+        /* Nav Bar */
+        .bottom-nav {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Scan FAB */
+        .scan-fab {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 20px rgba(251, 191, 36, 0.4);
+            transform: translateY(-24px);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 51;
+            border: 6px solid #0f172a;
+        }
+        .scan-fab:active { transform: translateY(-24px) scale(0.9); }
+
+        /* Card Gradients */
+        .bg-sbi { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }
+        .bg-union { background: linear-gradient(135deg, #7f1d1d 0%, #ef4444 100%); }
+        .bg-hdfc { background: linear-gradient(135deg, #172554 0%, #1e40af 100%); }
+        .bg-default { background: linear-gradient(135deg, #334155 0%, #475569 100%); }
+
+        .bank-card {
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.3);
+            transition: transform 0.2s;
+        }
+        .bank-card:active { transform: scale(0.98); }
+
+        /* Add Button */
+        .add-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px dashed rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+        }
+        .add-btn:active { background: rgba(255, 255, 255, 0.1); }
+        
+        /* Modal Styles */
+        .modal-enter { animation: modalUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes modalUp {
+            from { transform: translateY(100%); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        
+        /* Custom Select Styling */
+        select {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%23fbbf24' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 0.5rem center;
+            background-repeat: no-repeat;
+            background-size: 1.5em 1.5em;
+            padding-right: 2.5rem;
+            -webkit-print-color-adjust: exact;
+        }
+    </style>
+</head>
+<body class="h-screen w-full flex flex-col relative bg-fp-dark text-slate-200 overflow-hidden font-sans">
+
+    <!-- Ambient Background -->
+    <div class="bg-orb orb-1 animate-pulse-slow"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <!-- Header -->
+    <header class="px-6 pt-12 pb-4 flex items-center justify-between z-30 relative">
+        <button onclick="window.history.back()" class="w-10 h-10 rounded-full bg-fp-surface/50 border border-white/5 flex items-center justify-center text-white hover:bg-white/10 transition backdrop-blur-sm">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+        <h1 class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-fp-gold to-orange-500">
+            माझे कार्ड्स
+        </h1>
+        <div class="w-10 h-10 rounded-full bg-fp-surface/50 border border-white/5 flex items-center justify-center text-white/50">
+            <i class="fas fa-ellipsis-v"></i>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow relative w-full h-full px-6 z-20 overflow-y-auto no-scrollbar pb-32">
+        
+        <div class="mb-6">
+            <p class="text-sm text-slate-400 font-light">तुमची लिंक केलेली बँक खाती आणि पेमेंट पद्धती व्यवस्थापित करा.</p>
+        </div>
+
+        <!-- Account List -->
+        <div id="accountList" class="flex flex-col gap-4 w-full">
+            <!-- Items injected by JS -->
+        </div>
+
+        <!-- Add New Button (Inline) -->
+        <button onclick="openModal()" class="w-full mt-4 py-4 rounded-2xl add-btn flex items-center justify-center gap-2 text-slate-400 hover:text-fp-gold hover:border-fp-gold/50 hover:bg-fp-gold/5 transition-all group">
+            <div class="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-fp-gold group-hover:text-fp-dark transition-colors">
+                <i class="fas fa-plus text-xs"></i>
+            </div>
+            <span class="font-bold text-sm">नवीन खाते लिंक करा</span>
+        </button>
+
+    </main>
+
+    <!-- Modal for Adding Account -->
+    <div id="addModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <!-- Backdrop -->
+        <div class="fixed inset-0 bg-black/80 backdrop-blur-sm transition-opacity" onclick="closeModal()"></div>
+        
+        <div class="fixed inset-x-0 bottom-0 z-50 overflow-hidden">
+            <div class="relative transform rounded-t-3xl bg-fp-surface border-t border-white/10 shadow-2xl transition-all w-full max-w-md mx-auto modal-enter">
+                
+                <!-- Modal Header -->
+                <div class="px-6 py-5 border-b border-white/5 flex justify-between items-center bg-white/5">
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fas fa-link text-fp-gold"></i> बँक लिंक करा
+                    </h3>
+                    <button onclick="closeModal()" class="text-slate-400 hover:text-white">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                
+                <div class="px-6 py-8 space-y-6">
+                    <div>
+                        <label class="block text-xs font-bold text-fp-gold uppercase tracking-widest mb-2">बँक निवडा</label>
+                        <div class="relative">
+                            <select id="newBankName" class="w-full appearance-none rounded-xl border border-white/10 bg-black/20 p-4 text-white focus:border-fp-gold outline-none transition-all font-medium">
+                                <option value="SBI" class="bg-fp-surface text-white">स्टेट बँक ऑफ इंडिया (SBI)</option>
+                                <option value="HDFC" class="bg-fp-surface text-white">एचडीएफसी बँक</option>
+                                <option value="UNION" class="bg-fp-surface text-white">युनियन बँक</option>
+                                <option value="OTHER" class="bg-fp-surface text-white">इतर बँक</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-xs font-bold text-fp-gold uppercase tracking-widest mb-2">खाते क्रमांक</label>
+                        <div class="relative group">
+                            <i class="fas fa-hashtag absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 group-focus-within:text-fp-gold transition-colors"></i>
+                            <input type="number" id="newAcNumber" placeholder="XXXX XXXX XXXX 1234" class="w-full rounded-xl border border-white/10 bg-black/20 p-4 pl-10 text-white focus:border-fp-gold outline-none transition-all placeholder:text-slate-600 font-mono tracking-wide">
+                        </div>
+                    </div>
+
+                    <button type="button" onclick="saveAccount()" class="w-full rounded-xl bg-gradient-to-r from-fp-gold to-orange-500 px-4 py-4 text-sm font-bold text-white shadow-lg shadow-orange-500/20 hover:scale-[1.02] active:scale-95 transition-all">
+                        खाते लिंक करा
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Nav -->
+    <nav class="bottom-nav fixed bottom-0 left-0 right-0 h-24 px-6 pb-2 flex justify-between items-center z-40">
+         <a href="frampay(M).html"><button class="flex flex-col items-center gap-1.5 text-slate-500 w-16" onclick="window.location.href='farmpay(M).html'">
+          <i class="fas fa-home text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">होम</span> 
+        </button></a>
+        <button class="flex flex-col items-center gap-1.5 text-fp-gold w-16">
+            <i class="fas fa-wallet text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">कार्ड्स</span>
+            <div class="w-1 h-1 rounded-full bg-fp-gold"></div>
+        </button>
+        <div class="relative w-16 flex justify-center">
+            <button class="scan-fab animate-float" onclick="window.location.href='scanqrpay(M).html'">
+                <i class="fas fa-qrcode text-white text-2xl"></i>
+            </button>
+        </div>
+        <button class="flex flex-col items-center gap-1.5 text-slate-500 w-16" onclick="window.location.href='saveandpay(M).html'">
+            <i class="fas fa-paper-plane text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">पे</span>
+        </button>
+        <button class="flex flex-col items-center gap-1.5 text-slate-500 w-16">
+            <i class="fas fa-cog text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">मेनू</span>
+        </button>
+    </nav>
+
+    <script>
+        // Load Accounts
+        document.addEventListener('DOMContentLoaded', loadAccounts);
+
+        function loadAccounts() {
+            const accounts = JSON.parse(localStorage.getItem('saveaccounts(M)') || '[]');
+            const list = document.getElementById('accountList');
+            list.innerHTML = '';
+
+            if (accounts.length === 0) {
+                list.innerHTML = `
+                    <div class="flex flex-col items-center justify-center py-12 text-center animate-fade-in-up">
+                        <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center mb-4 border border-white/5">
+                            <i class="fas fa-wallet text-slate-500 text-3xl"></i>
+                        </div>
+                        <p class="text-white font-bold text-lg">कोणतेही कार्ड लिंक केलेले नाही</p>
+                        <p class="text-slate-400 text-sm mt-1 max-w-[200px]">पेमेंट सुरू करण्यासाठी तुमचे प्राथमिक बँक खाते जोडा.</p>
+                    </div>`;
+                return;
+            }
+
+            accounts.forEach((acc, index) => {
+                let bg = 'bg-default';
+                let logo = 'fas fa-university';
+                
+                if(acc.type === 'SBI') { bg = 'bg-sbi'; }
+                if(acc.type === 'HDFC') { bg = 'bg-hdfc'; }
+                if(acc.type === 'UNION') { bg = 'bg-union'; }
+
+                const last4 = acc.acNumber.length >= 4 ? acc.acNumber.slice(-4) : acc.acNumber;
+
+                const card = document.createElement('div');
+                card.style.animationDelay = `${index * 100}ms`;
+                card.className = `bank-card ${bg} text-white p-6 rounded-2xl relative overflow-hidden animate-fade-in-up`;
+                
+                card.innerHTML = `
+                    <!-- Decorative Noise/Texture overlay -->
+                    <div class="absolute inset-0 opacity-10" style="background-image: url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noise%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noise)%22 opacity=%221%22/%3E%3C/svg%3E');"></div>
+                    
+                    <div class="absolute top-0 right-0 w-40 h-40 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+                    
+                    <div class="relative z-10">
+                        <div class="flex justify-between items-start mb-8">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-lg bg-white/10 flex items-center justify-center backdrop-blur-md">
+                                    <i class="${logo} text-white text-sm"></i>
+                                </div>
+                                <span class="font-bold tracking-wide text-sm font-sans">${acc.bankName}</span>
+                            </div>
+                            <i class="fas fa-wifi opacity-50 text-sm rotate-90"></i>
+                        </div>
+                        <div class="font-mono text-xl md:text-2xl tracking-widest mb-6 drop-shadow-md flex items-center gap-2">
+                            <span class="text-xs align-middle opacity-50">**** **** ****</span> ${last4}
+                        </div>
+                        <div class="flex justify-between items-end">
+                            <div>
+                                <p class="text-[8px] uppercase tracking-wider mb-1 opacity-70 font-sans">कार्ड धारक</p>
+                                <p class="font-bold tracking-wide text-sm font-sans">शेतकरी</p>
+                            </div>
+                            <button onclick="removeAccount(${acc.id})" class="w-8 h-8 rounded-full bg-black/20 flex items-center justify-center hover:bg-red-500 hover:text-white transition-colors backdrop-blur-sm border border-white/10">
+                                <i class="fas fa-trash-alt text-xs"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                list.appendChild(card);
+            });
+        }
+
+        // Modal Logic
+        const modal = document.getElementById('addModal');
+        function openModal() { modal.classList.remove('hidden'); }
+        function closeModal() { modal.classList.add('hidden'); }
+
+        // Save Logic
+        function saveAccount() {
+            const bankSelect = document.getElementById('newBankName');
+            const bank = bankSelect.value;
+            const bankNameText = bankSelect.options[bankSelect.selectedIndex].text;
+            const acNum = document.getElementById('newAcNumber').value;
+
+            if (acNum.length < 4) {
+                alert("खाते क्रमांक किमान ४ अंकी असणे आवश्यक आहे.");
+                return;
+            }
+
+            const newAcc = {
+                id: Date.now(),
+                bankName: bankNameText, 
+                type: bank, 
+                acNumber: acNum
+            };
+
+            const accounts = JSON.parse(localStorage.getItem('saveaccounts(M)') || '[]');
+            accounts.push(newAcc);
+            localStorage.setItem('saveaccounts(M)', JSON.stringify(accounts));
+            
+            document.getElementById('newAcNumber').value = '';
+            closeModal();
+            loadAccounts();
+        }
+
+        function removeAccount(id) {
+            if(confirm("हे खाते काढून टाकायचे?")) {
+                const accounts = JSON.parse(localStorage.getItem('saveaccounts(M)') || '[]');
+                const updated = accounts.filter(a => a.id !== id);
+                localStorage.setItem('saveaccounts(M)', JSON.stringify(updated));
+                loadAccounts();
+            }
+        }
+    </script>
+</body>
+</html>

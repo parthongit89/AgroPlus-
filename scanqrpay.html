@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Farmpay+ - Scan QR</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'brand-dark': '#0f172a',
+                        'brand-primary': '#4338ca',
+                        'brand-accent': '#6366f1',
+                    },
+                    fontFamily: {
+                        sans: ['Outfit', 'sans-serif'],
+                        mono: ['Space Mono', 'monospace'],
+                    },
+                    animation: {
+                        'scan-radar': 'scanRadar 3s linear infinite',
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        scanRadar: {
+                            '0%': { transform: 'translateY(-100%)', opacity: '0' },
+                            '50%': { opacity: '1' },
+                            '100%': { transform: 'translateY(100%)', opacity: '0' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            overflow: hidden; /* Prevent scrolling during scan */
+        }
+
+        /* Full Screen Video Background */
+        .camera-feed {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            z-index: 0;
+            transform: scaleX(-1); /* Mirror effect for selfie mode, standard for back cam usually not needed but good for webcams */
+        }
+
+        /* Overlay to darken non-scannable areas */
+        .overlay-mask {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 10;
+            /* Cutout effect using mask - creating a transparent center */
+            -webkit-mask-image: radial-gradient(rgba(0,0,0,0) 30%, rgba(0,0,0,1) 31%);
+            mask-image: radial-gradient(rgba(0,0,0,0) 30%, rgba(0,0,0,1) 31%);
+        }
+
+        /* The Scan Box HUD */
+        .scan-hud {
+            position: relative;
+            width: 280px;
+            height: 280px;
+            z-index: 20;
+        }
+
+        /* Corner Brackets */
+        .corner {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 4px solid #fff;
+            border-radius: 4px;
+            filter: drop-shadow(0 0 5px rgba(255,255,255,0.5));
+            transition: all 0.3s ease;
+        }
+
+        .c-tl { top: 0; left: 0; border-right: 0; border-bottom: 0; border-top-left-radius: 20px; }
+        .c-tr { top: 0; right: 0; border-left: 0; border-bottom: 0; border-top-right-radius: 20px; }
+        .c-bl { bottom: 0; left: 0; border-right: 0; border-top: 0; border-bottom-left-radius: 20px; }
+        .c-br { bottom: 0; right: 0; border-left: 0; border-top: 0; border-bottom-right-radius: 20px; }
+
+        /* Scanning Animation inside box */
+        .scan-line {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(99, 102, 241, 0.3), transparent);
+            border-bottom: 2px solid #6366f1;
+            animation: scanRadar 2s ease-in-out infinite;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+        }
+
+        /* Success State */
+        .scan-success .corner {
+            border-color: #22c55e; /* Green */
+            box-shadow: 0 0 20px #22c55e;
+        }
+        .scan-success .scan-line {
+            display: none;
+        }
+
+        /* Floating Controls */
+        .glass-pill {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 9999px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center relative">
+
+    <!-- 1. Live Camera Background -->
+    <video id="qr-video" autoplay playsinline muted class="camera-feed hidden"></video>
+    
+    <!-- 2. Dark Overlay with Cutout -->
+    <!-- We use a simpler approach for broad compatibility: separate divs for scrims -->
+    <div class="fixed inset-0 bg-black/50 z-10 flex flex-col">
+        <div class="flex-1 bg-black/20 backdrop-blur-[2px]"></div>
+        <div class="h-[280px] flex">
+            <div class="flex-1 bg-black/20 backdrop-blur-[2px]"></div>
+            <div class="w-[280px] bg-transparent relative">
+                <!-- This is the clear hole -->
+                <div class="absolute inset-0 border border-white/20 rounded-[20px]"></div>
+            </div>
+            <div class="flex-1 bg-black/20 backdrop-blur-[2px]"></div>
+        </div>
+        <div class="flex-1 bg-black/20 backdrop-blur-[2px]"></div>
+    </div>
+
+    <!-- 3. UI Layer -->
+    <div class="fixed inset-0 z-30 flex flex-col justify-between py-12 px-6 pointer-events-none">
+        
+        <!-- Header -->
+        <header class="flex justify-between items-center pointer-events-auto">
+            <button onclick="window.history.back()" class="w-10 h-10 rounded-full glass-pill flex items-center justify-center text-white hover:bg-white/10 transition">
+                <i class="fas fa-arrow-left"></i>
+            </button>
+            <div class="glass-pill px-4 py-2 flex items-center gap-2">
+                <i class="fas fa-bolt text-yellow-400 text-xs"></i>
+                <span class="text-xs font-medium tracking-wide">AUTO</span>
+            </div>
+        </header>
+
+        <!-- Center Scan Target (Aligned via Flex parent) -->
+        <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[280px]">
+            <!-- Corners -->
+            <div class="corner c-tl"></div>
+            <div class="corner c-tr"></div>
+            <div class="corner c-bl"></div>
+            <div class="corner c-br"></div>
+            
+            <!-- Laser -->
+            <div class="scan-line rounded-[16px] overflow-hidden"></div>
+            
+            <!-- Fallback Icon -->
+            <div id="placeholder-icon" class="absolute inset-0 flex items-center justify-center opacity-30">
+                <i class="fas fa-qrcode text-6xl"></i>
+            </div>
+        </div>
+
+        <!-- Footer Text -->
+        <div class="text-center space-y-4 pointer-events-auto">
+            <div id="status-msg" class="glass-pill inline-block px-6 py-3 text-sm font-mono tracking-widest text-indigo-200">
+                ALIGN QR CODE
+            </div>
+            
+            <div class="flex justify-center gap-6 mt-4">
+                <button class="w-12 h-12 rounded-full glass-pill flex items-center justify-center hover:bg-white/10 active:scale-95 transition">
+                    <i class="fas fa-image text-white"></i>
+                </button>
+                <button onclick="toggleFlash()" class="w-12 h-12 rounded-full glass-pill flex items-center justify-center hover:bg-white/10 active:scale-95 transition">
+                    <i class="fas fa-flashlight text-white"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', startScanner);
+        const statusMsg = document.getElementById('status-msg');
+        const hud = document.querySelector('.absolute.top-1\\/2'); // The HUD container
+
+        async function startScanner() {
+            const video = document.getElementById('qr-video');
+            const placeholder = document.getElementById('placeholder-icon');
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { facingMode: "environment" } 
+                });
+                video.srcObject = stream;
+                video.classList.remove('hidden');
+                placeholder.style.display = 'none';
+                
+                // Simulate detecting code after delay
+                setTimeout(() => {
+                    handleScanSuccess(stream);
+                }, 3500);
+
+            } catch (err) {
+                console.error("Camera error", err);
+                statusMsg.innerText = "SIMULATING CAMERA...";
+                // Fallback for simulation
+                setTimeout(() => {
+                    handleScanSuccess(null);
+                }, 3000);
+            }
+        }
+
+        function handleScanSuccess(stream) {
+            // Visual Updates
+            statusMsg.innerHTML = '<i class="fas fa-check-circle text-green-400 mr-2"></i>QR FOUND';
+            statusMsg.classList.add('text-white', 'font-bold');
+            
+            // Add success class to corners
+            document.querySelectorAll('.corner').forEach(c => {
+                c.style.borderColor = '#22c55e';
+                c.style.boxShadow = '0 0 20px #22c55e';
+            });
+            
+            // Hide laser
+            document.querySelector('.scan-line').style.display = 'none';
+
+            // Haptics
+            if(navigator.vibrate) navigator.vibrate([50, 50, 50]);
+
+            // Stop Stream
+            if(stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+
+            // Redirect
+            setTimeout(() => {
+                window.location.href = 'payments.html';
+            }, 1000);
+        }
+
+        function toggleFlash() {
+            // Visual simulation of flash toggle
+            const btn = event.currentTarget;
+            btn.classList.toggle('bg-white/30');
+            // Note: Actual flash control requires advanced ImageCapture API support which varies by browser
+        }
+    </script>
+</body>
+</html>

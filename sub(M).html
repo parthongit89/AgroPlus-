@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ॲग्रोप्लस+ सदस्यता</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Google Fonts including Marathi 'Mukta' -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&family=Mukta:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Custom config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'agro-orange': '#FF8C00', // Deep Orange
+                        'agro-orange-light': '#FFA500', // Lighter border orange
+                        'agro-green': '#16a34a', // For Pro Plan accents
+                        'agro-bg': '#fcfcfc',
+                    },
+                    fontFamily: {
+                        sans: ['Mukta', 'Plus Jakarta Sans', 'sans-serif'],
+                        body: ['Mukta', 'Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(0,0,0,0.08)',
+                        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Mukta', 'Inter', sans-serif;
+        }
+
+        /* Card Hover Effect */
+        .plan-card {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        .feature-list li {
+            display: flex;
+            align-items: start;
+            gap: 0.5rem;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem; /* text-sm */
+            color: #4b5563; /* text-gray-600 */
+        }
+        .feature-list i {
+            margin-top: 0.25rem;
+        }
+
+        /* Recommended Badge */
+        .recommended-badge {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: #16a34a;
+            color: white;
+            padding: 0.25rem 1rem;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            box-shadow: 0 4px 6px rgba(22, 163, 74, 0.3);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 font-body text-slate-800 pb-24">
+
+    <!-- ORANGE LEAF HEADER -->
+    <header class="bg-agro-orange pt-8 pb-20 px-6 rounded-br-[5rem] shadow-lg relative z-20">
+        <div class="flex justify-between items-center">
+            <!-- Back Button -->
+            <button onclick="history.back()" class="text-white hover:text-orange-100 transition transform hover:-translate-x-1">
+                <a href="home page(M).html"><i class="fas fa-arrow-left text-2xl"></i></a> 
+            </button>
+            
+            <!-- Center Title -->
+            <div class="text-center">
+                <h1 class="text-slate-900 text-2xl font-sans font-extrabold tracking-tight uppercase">सबस्क्रि<span class="text-white">प्शन्स</span> <span class="text-white text-3xl align-middle">+</span></h1>
+            </div>
+
+            <!-- Profile Icon -->
+            <a href="profile(M).html" class="bg-white/90 backdrop-blur-md p-2 rounded-full text-slate-700 hover:bg-white transition shadow-sm border border-orange-200">
+                <i class="fas fa-user text-lg w-6 h-6 flex items-center justify-center"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="px-4 -mt-10 relative z-30 space-y-8 max-w-6xl mx-auto">
+
+        <!-- Intro Text -->
+        <div class="text-center bg-white/90 backdrop-blur rounded-2xl p-4 shadow-sm border border-orange-100 mx-2">
+            <h2 class="text-lg font-bold text-gray-800">तुमचा शेतीसाठीचा जोडीदार निवडा</h2>
+            <p class="text-xs text-gray-500 mt-1">अपग्रेड करा आणि AI माती स्कॅन, तज्ञांचा सल्ला आणि उत्पादन अंदाज मिळवा.</p>
+        </div>
+
+        <!-- PRICING GRID -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
+
+            <!-- PLAN 1: FREE -->
+            <div class="plan-card bg-white rounded-3xl p-6 shadow-card border border-gray-100 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-20 h-20 bg-gray-100 rounded-bl-full -mr-10 -mt-10 z-0"></div>
+                
+                <div class="relative z-10">
+                    <h3 class="text-gray-500 font-bold uppercase tracking-wider text-xs mb-1">प्रवेश स्तर</h3>
+                    <h2 class="text-2xl font-extrabold text-gray-800">मोफत योजना</h2>
+                    <div class="flex items-baseline mt-2 mb-4">
+                        <span class="text-4xl font-extrabold text-gray-800">₹०</span>
+                        <span class="text-gray-500 ml-1 text-sm">/ महिना</span>
+                    </div>
+                    
+                    <p class="text-xs text-gray-500 mb-6 bg-gray-50 p-2 rounded-lg">नवीन शेतकरी आणि मूलभूत प्रवेशाची गरज असलेल्या विद्यार्थ्यांसाठी सर्वोत्तम.</p>
+
+                    <button class="w-full py-3 px-4 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition mb-6">सध्याची योजना</button>
+
+                    <ul class="feature-list space-y-3">
+                        <li><i class="fas fa-check text-gray-400"></i> मूलभूत माती स्कॅन (लाइट विश्लेषण)</li>
+                        <li><i class="fas fa-check text-gray-400"></i> दररोज १ माती स्कॅन</li>
+                        <li><i class="fas fa-check text-gray-400"></i> सामान्य पीक सल्ला</li>
+                        <li><i class="fas fa-check text-gray-400"></i> दैनिक बाजार भाव</li>
+                        <li><i class="fas fa-check text-gray-400"></i> मूलभूत समुदाय मंच</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- PLAN 2: SMART FARMER (Featured) -->
+            <div class="plan-card bg-white rounded-3xl p-6 shadow-xl border-2 border-agro-orange relative transform scale-105 md:scale-110 z-10">
+                <div class="recommended-badge">सर्वाधिक लोकप्रिय</div>
+                <div class="absolute top-0 right-0 w-24 h-24 bg-orange-50 rounded-bl-full -mr-10 -mt-10 z-0"></div>
+
+                <div class="relative z-10">
+                    <h3 class="text-agro-orange font-bold uppercase tracking-wider text-xs mb-1">प्रमाणित</h3>
+                    <h2 class="text-2xl font-extrabold text-gray-800">स्मार्ट शेतकरी</h2>
+                    <div class="flex items-baseline mt-2 mb-4">
+                        <span class="text-5xl font-extrabold text-agro-orange">₹५०</span>
+                        <span class="text-gray-500 ml-1 text-sm">/ महिना</span>
+                    </div>
+
+                    <p class="text-xs text-gray-500 mb-6 bg-orange-50 p-2 rounded-lg">लहान शेतकऱ्यांसाठी ज्यांना अधिक अचूकता आणि माहिती हवी आहे.</p>
+
+                    <button onclick="selectPlan('स्मार्ट शेतकरी', 50)" class="w-full py-3 px-4 bg-agro-orange hover:bg-orange-600 text-white font-bold rounded-xl shadow-lg shadow-orange-200 transition mb-6">आता अपग्रेड करा</button>
+
+                    <div class="space-y-4">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wide">मोफत मधील सर्व काही +</p>
+                        <ul class="feature-list space-y-3">
+                            <li><i class="fas fa-check-circle text-agro-orange"></i> <strong>स्मार्ट माती स्कॅन</strong> (स्टँडर्ड)</li>
+                            <li><i class="fas fa-check-circle text-agro-orange"></i> <strong>दररोज १० स्कॅन</strong></li>
+                            <li><i class="fas fa-check-circle text-agro-orange"></i> कीटक आणि रोग AI ओळख</li>
+                            <li><i class="fas fa-check-circle text-agro-orange"></i> थेट बाजार माहिती आणि सूचना</li>
+                            <li><i class="fas fa-check-circle text-agro-orange"></i> शेती दिनदर्शिका आठवणी</li>
+                            <li><i class="fas fa-check-circle text-agro-orange"></i> प्राधान्य समुदाय समर्थन</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PLAN 3: PRO FARMER -->
+            <div class="plan-card bg-white rounded-3xl p-6 shadow-card border border-gray-100 relative overflow-hidden">
+                <div class="absolute top-0 right-0 w-20 h-20 bg-green-50 rounded-bl-full -mr-10 -mt-10 z-0"></div>
+
+                <div class="relative z-10">
+                    <h3 class="text-agro-green font-bold uppercase tracking-wider text-xs mb-1">प्रिमियम</h3>
+                    <h2 class="text-2xl font-extrabold text-gray-800">कुशल शेतकरी</h2>
+                    <div class="flex items-baseline mt-2 mb-4">
+                        <span class="text-4xl font-extrabold text-gray-800">₹७५</span>
+                        <span class="text-gray-500 ml-1 text-sm">/ महिना</span>
+                    </div>
+
+                    <p class="text-xs text-gray-500 mb-6 bg-green-50 p-2 rounded-lg">गंभीर शेतकऱ्यांसाठी ज्यांना पूर्ण AI समर्थनाची आवश्यकता आहे.</p>
+
+                    <button onclick="selectPlan('कुशल शेतकरी', 75)" class="w-full py-3 px-4 bg-gray-800 hover:bg-gray-900 text-white font-bold rounded-xl shadow-md transition mb-6 border border-gray-700">प्रो बना</button>
+
+                    <div class="space-y-4">
+                        <p class="text-xs font-bold text-gray-400 uppercase tracking-wide">स्मार्ट मधील सर्व काही +</p>
+                        <ul class="feature-list space-y-3">
+                            <li><i class="fas fa-star text-agro-green"></i> <strong>प्रगत AI माती स्कॅन</strong></li>
+                            <li><i class="fas fa-star text-agro-green"></i> <strong>अमर्यादित</strong> वापर</li>
+                            <li><i class="fas fa-star text-agro-green"></i> स्मार्ट उत्पादन अंदाज</li>
+                            <li><i class="fas fa-star text-agro-green"></i> प्रगत बाजार डॅशबोर्ड</li>
+                            <li><i class="fas fa-star text-agro-green"></i> तज्ञांशी थेट चर्चा</li>
+                            <li><i class="fas fa-star text-agro-green"></i> अहवाल निर्यात करा (PDF/Excel)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        
+        <!-- Comparison Link -->
+        <div class="text-center pb-6">
+            <button class="text-sm font-semibold text-gray-500 hover:text-agro-orange transition flex items-center justify-center gap-2 mx-auto">
+                <i class="fas fa-table"></i> पूर्ण वैशिष्ट्य तुलना पहा
+            </button>
+        </div>
+
+    </main>
+
+    <!-- Payment Modal (Hidden) -->
+    <div id="payment-modal" class="fixed inset-0 bg-black/50 z-50 hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl w-full max-w-sm p-6 relative transform transition-all scale-95" id="modal-content">
+            <button onclick="closeModal()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                <i class="fas fa-times"></i>
+            </button>
+
+            <div class="text-center mb-6">
+                <div class="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto mb-3 text-agro-orange text-2xl">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-800">सबस्क्रिप्शनची पुष्टी करा</h3>
+                <p class="text-sm text-gray-500 mt-1">तुम्ही <span id="modal-plan-name" class="font-bold text-gray-800">योजना</span> मध्ये अपग्रेड करत आहात</p>
+            </div>
+
+            <div class="bg-gray-50 p-4 rounded-xl mb-6 flex justify-between items-center">
+                <span class="text-gray-600 font-medium">एकूण रक्कम</span>
+                <span class="text-xl font-bold text-agro-orange" id="modal-plan-price">₹०</span>
+            </div>
+
+            <button class="w-full py-3 bg-agro-orange text-white font-bold rounded-xl hover:bg-orange-600 shadow-lg transition">
+                पैसे भरण्यासाठी पुढे जा
+            </button>
+            <p class="text-[10px] text-gray-400 text-center mt-3">UPI / कार्डद्वारे सुरक्षित पेमेंट</p>
+        </div>
+    </div>
+
+    <!-- JS for Interaction -->
+    <script>
+        const modal = document.getElementById('payment-modal');
+        const modalContent = document.getElementById('modal-content');
+        const planNameEl = document.getElementById('modal-plan-name');
+        const planPriceEl = document.getElementById('modal-plan-price');
+
+        function selectPlan(name, price) {
+            planNameEl.textContent = name;
+            planPriceEl.textContent = '₹' + price;
+            
+            modal.classList.remove('hidden');
+            // Animation formatting
+            setTimeout(() => {
+                modalContent.classList.remove('scale-95');
+                modalContent.classList.add('scale-100');
+            }, 10);
+        }
+
+        function closeModal() {
+            modalContent.classList.remove('scale-100');
+            modalContent.classList.add('scale-95');
+            setTimeout(() => {
+                modal.classList.add('hidden');
+            }, 200);
+        }
+
+        // Close on outside click
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) closeModal();
+        });
+    </script>
+</body>
+</html>

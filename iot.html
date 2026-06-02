@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agrotech+ Shop</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'tech-blue-start': '#22d3ee', /* Cyan-400 */
+                        'tech-blue-end': '#2563eb',   /* Blue-600 */
+                        'tech-card-bg': '#ffffff',
+                        'tech-text-dense': '#334155',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    fontSize: {
+                        'xxs': '0.6rem',
+                    },
+                    boxShadow: {
+                        'glow': '0 0 15px rgba(34, 211, 238, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Hide scrollbar for Chrome, Safari and Opera */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        /* Hide scrollbar for IE, Edge and Firefox */
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        /* Circuit Board Pattern Background for Cards */
+        .circuit-bg {
+            background-image: radial-gradient(#cbd5e1 1px, transparent 1px), radial-gradient(#cbd5e1 1px, transparent 1px);
+            background-size: 10px 10px;
+            background-position: 0 0, 5px 5px;
+            opacity: 0.3;
+        }
+
+        /* Slider Styles */
+        .slider-container {
+            position: relative;
+            background: linear-gradient(to right, #22d3ee, #2563eb);
+            border-radius: 9999px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+
+        .slider-text {
+            position: absolute;
+            left: 0;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 0.95rem; /* responsive text */
+            pointer-events: none;
+            z-index: 10;
+            transition: opacity 0.3s;
+        }
+
+        .slider-thumb {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            left: 4px;
+            width: 50px; /* Thumb width */
+            background: white;
+            border-radius: 9999px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            z-index: 20;
+            transition: transform 0.1s; /* smooth drag */
+        }
+
+        .slider-thumb i {
+            color: #2563eb;
+            font-size: 1.2rem;
+            animation: bounceRight 1.5s infinite;
+        }
+
+        @keyframes bounceRight {
+            0%, 100% { transform: translateX(0); }
+            50% { transform: translateX(3px); }
+        }
+
+        /* Tech Card Border */
+        .tech-card-border {
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        .tech-card-border:hover {
+            border-color: #22d3ee;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Marquee for News Ticker */
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 25s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 min-h-screen font-sans flex flex-col text-slate-700">
+
+    <!-- Top Info Bar (Busy Text 1) -->
+    <div class="bg-slate-800 text-slate-300 text-xs py-1 px-4 flex justify-between items-center font-mono overflow-hidden">
+        <div class="flex space-x-4">
+            <span><i class="fas fa-phone mr-1"></i> +91 25XXXXXXX</span>
+            <span class="hidden sm:inline"><i class="fas fa-envelope mr-1"></i> support@agrotech.plus</span>
+        </div>
+        <div class="flex space-x-4">
+            <span>STATUS: <span class="text-green-400">ONLINE</span></span>
+            <span>VER: 2.4.1</span>
+        </div>
+    </div>
+
+    <!-- Header (Gradient) -->
+    <header class="bg-gradient-to-r from-tech-blue-start to-tech-blue-end p-4 md:p-5 flex items-center justify-between shadow-lg sticky top-0 z-50">
+        <!-- Logo -->
+
+          <button onclick="showMessage('Navigating back to Home')" class="text-white opacity-80 mr-3 p-1">
+              <a href="home page.html"> <i class="fas fa-arrow-left text-xl"></i></a> 
+            </button>
+            
+        <div class="flex-grow text-center">
+            <h1 class="text-3xl font-semibold text-white tracking-wide">
+                Agro<span class="font-light">tech</span><span class="font-bold">+</span>
+            </h1>
+            
+        </div>
+
+        <!-- Profile Icon -->
+        <div class="absolute right-4 top-1/2 transform -translate-y-1/2">
+            <div class="w-10 h-10 rounded-full border-2 border-white flex items-center justify-center text-white text-xl bg-white/20 backdrop-blur-sm cursor-pointer hover:bg-white/30 transition">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- News Ticker (Busy Text 2) -->
+    <div class="bg-slate-100 border-b border-slate-200 py-2 marquee-container">
+        <div class="marquee-content text-sm font-medium text-slate-600">
+            <span class="mx-4">🌱 NEW: Hydro-Sensor Pro V3 Released!</span> • 
+            <span class="mx-4">📈 Market Update: Solar panel efficiency up by 15% in Q4.</span> • 
+            <span class="mx-4">🚜 Agrotech+ partners with GreenField Dynamics for automated irrigation.</span> • 
+            <span class="mx-4">💡 Tip: Calibrate your soil sensors monthly for optimal yield.</span> • 
+            <span class="mx-4">⚠️ Maintenance Alert: Server upgrade scheduled for Sunday 2 AM UTC.</span>
+        </div>
+    </div>
+
+    <main class="flex-grow p-4 md:p-6 space-y-10 max-w-6xl mx-auto w-full">
+        
+        <!-- Hero Text Block (Busy Text 3) -->
+        <div class="text-center space-y-3 px-2">
+            <h2 class="text-2xl font-bold text-slate-800">Precision Agriculture Solutions</h2>
+            <p class="text-sm md:text-base text-slate-600 max-w-3xl mx-auto leading-relaxed">
+                Empowering modern farmers with IoT-enabled sensor arrays and sustainable energy grids. Our catalogue features enterprise-grade hardware tested in extreme climates, ensuring your data is accurate and your power is consistent. Whether you manage a hydroponic vertical farm or traditional acreage, Agrotech+ provides the granular data points necessary for maximizing crop yield coefficients.
+            </p>
+        </div>
+
+        <!-- SECTION 1: SENSORS -->
+        <section>
+            <div class="flex justify-between items-end mb-4 border-l-4 border-tech-blue-start pl-3">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800 tracking-wide uppercase">Sensors</h2>
+                    <p class="text-xs text-slate-500 mt-1">Real-time telemetry / IP67 Rated / Low Latency</p>
+                </div>
+                <a href="#" class="text-xs text-blue-600 font-semibold hover:underline">View All Specs →</a>
+            </div>
+            
+            <!-- Horizontal Scroll Container -->
+            <div class="flex space-x-4 overflow-x-auto no-scrollbar pb-4 snap-x snap-mandatory">
+                
+                <!-- Sensor Card 1: Water -->
+                <div class="min-w-[200px] snap-center flex flex-col space-y-3 group bg-white p-3 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
+                            <i class="fas fa-droplet text-xl text-blue-500"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-sm">H2O Monitor</h3>
+                            <div class="text-xxs font-mono text-slate-400">MOD: AQ-500</div>
+                        </div>
+                    </div>
+                    <!-- Detailed Specs (Busy Text 4) -->
+                    <ul class="text-xs text-slate-600 space-y-1 font-mono bg-slate-50 p-2 rounded">
+                        <li class="flex justify-between"><span>Range:</span> <span>0-100%</span></li>
+                        <li class="flex justify-between"><span>Acc:</span> <span>±2%</span></li>
+                        <li class="flex justify-between"><span>Inter:</span> <span>500ms</span></li>
+                        <li class="flex justify-between"><span>Proto:</span> <span>MQTT</span></li>
+                    </ul>
+                    <p class="text-xs text-slate-500 leading-tight">
+                        Capacitive measurement for substrate moisture content. Corrosion-resistant probe.
+                    </p>
+                    <a href="deliverysensor2.html"><button class="w-full bg-slate-800 text-white text-xs font-semibold py-2 rounded-lg hover:bg-slate-700 transition" onclick="alert('Added Water Sensor')">
+                        Buy now - ₹2999.00
+                    </button></a>
+                </div>
+
+                <!-- Sensor Card 2: Fire -->
+                <div class="min-w-[200px] snap-center flex flex-col space-y-3 group bg-white p-3 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center shrink-0">
+                            <i class="fas fa-fire text-xl text-orange-500"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-sm">Pyro Detect</h3>
+                            <div class="text-xxs font-mono text-slate-400">MOD: FL-20X</div>
+                        </div>
+                    </div>
+                    <ul class="text-xs text-slate-600 space-y-1 font-mono bg-slate-50 p-2 rounded">
+                        <li class="flex justify-between"><span>Sens:</span> <span>IR/UV</span></li>
+                        <li class="flex justify-between"><span>Resp:</span> <span>&lt;100ms</span></li>
+                        <li class="flex justify-between"><span>FOV:</span> <span>120°</span></li>
+                        <li class="flex justify-between"><span>Temp:</span> <span>-20/80C</span></li>
+                    </ul>
+                    <p class="text-xs text-slate-500 leading-tight">
+                        Dual-spectrum flame detection for greenhouse safety. Auto-trigger relay support.
+                    </p>
+                    <a href="deliverysensor3.html"><button class="w-full bg-slate-800 text-white text-xs font-semibold py-2 rounded-lg hover:bg-slate-700 transition" onclick="alert('Added Fire Sensor')">
+                        Buy now - ₹4599.00 
+                    </button></a>
+                </div>
+
+                <!-- Sensor Card 3: UV/Sun -->
+                <div class="min-w-[200px] snap-center flex flex-col space-y-3 group bg-white p-3 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-xl bg-yellow-50 flex items-center justify-center shrink-0">
+                            <i class="fas fa-certificate text-xl text-yellow-500"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-sm">Solar Flux</h3>
+                            <div class="text-xxs font-mono text-slate-400">MOD: UV-99</div>
+                        </div>
+                    </div>
+                    <ul class="text-xs text-slate-600 space-y-1 font-mono bg-slate-50 p-2 rounded">
+                        <li class="flex justify-between"><span>Spec:</span> <span>280-400nm</span></li>
+                        <li class="flex justify-between"><span>Index:</span> <span>0-11+</span></li>
+                        <li class="flex justify-between"><span>Calib:</span> <span>Auto</span></li>
+                        <li class="flex justify-between"><span>Output:</span> <span>Analog</span></li>
+                    </ul>
+                    <p class="text-xs text-slate-500 leading-tight">
+                        Measures UV Index and solar irradiance. Essential for shade-loving crop management.
+                    </p>
+                    <a href="deliverysensor4.html"><button class="w-full bg-slate-800 text-white text-xs font-semibold py-2 rounded-lg hover:bg-slate-700 transition" onclick="alert('Added UV Sensor')">
+                        Buy now - ₹1,999.00
+                    </button></a>
+                </div>
+                
+                 <!-- Sensor Card 4: Soil -->
+                <div class="min-w-[200px] snap-center flex flex-col space-y-3 group bg-white p-3 rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition">
+                    <div class="flex items-center space-x-3">
+                        <div class="w-12 h-12 rounded-xl bg-green-50 flex items-center justify-center shrink-0">
+                            <i class="fas fa-seedling text-xl text-green-600"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-sm">Nutri-Scan</h3>
+                            <div class="text-xxs font-mono text-slate-400">MOD: NPK-1</div>
+                        </div>
+                    </div>
+                    <ul class="text-xs text-slate-600 space-y-1 font-mono bg-slate-50 p-2 rounded">
+                        <li class="flex justify-between"><span>Param:</span> <span>N-P-K</span></li>
+                        <li class="flex justify-between"><span>Depth:</span> <span>15cm</span></li>
+                        <li class="flex justify-between"><span>Cond:</span> <span>EC/TDS</span></li>
+                        <li class="flex justify-between"><span>Bat:</span> <span>1yr</span></li>
+                    </ul>
+                    <p class="text-xs text-slate-500 leading-tight">
+                        Rapid soil nutrient analysis. Tracks Nitrogen, Phosphorus, and Potassium levels.
+                    </p>
+                    <a href="deliverysensor5.html"><button class="w-full bg-slate-800 text-white text-xs font-semibold py-2 rounded-lg hover:bg-slate-700 transition" onclick="alert('Added Soil Sensor')">
+                        Buy now - ₹6,500.00
+                    </button></a>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Technical Specs Table (Busy Text 5) -->
+        <section class="bg-white p-4 rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+             <h3 class="text-sm font-bold uppercase tracking-wider text-slate-500 mb-3 border-b pb-2">Technical Comparison: Solar Arrays</h3>
+             <div class="overflow-x-auto">
+                 <table class="w-full text-xs text-left text-slate-600 font-mono">
+                     <thead class="text-xs text-slate-700 uppercase bg-slate-50">
+                         <tr>
+                             <th class="px-4 py-2">Model ID</th>
+                             <th class="px-4 py-2">Grid-S</th>
+                             <th class="px-4 py-2">Grid-M</th>
+                             <th class="px-4 py-2">Grid-L</th>
+                         </tr>
+                     </thead>
+                     <tbody class="divide-y divide-slate-100">
+                         <tr>
+                             <td class="px-4 py-2 font-semibold">Output (Peak)</td>
+                             <td class="px-4 py-2">150W</td>
+                             <td class="px-4 py-2">450W</td>
+                             <td class="px-4 py-2">1.2kW</td>
+                         </tr>
+                         <tr>
+                             <td class="px-4 py-2 font-semibold">Efficiency</td>
+                             <td class="px-4 py-2">18.5%</td>
+                             <td class="px-4 py-2">21.2%</td>
+                             <td class="px-4 py-2">22.8%</td>
+                         </tr>
+                         <tr>
+                             <td class="px-4 py-2 font-semibold">Cell Type</td>
+                             <td class="px-4 py-2">Poly</td>
+                             <td class="px-4 py-2">Mono-PERC</td>
+                             <td class="px-4 py-2">Bifacial</td>
+                         </tr>
+                         <tr>
+                             <td class="px-4 py-2 font-semibold">Dimensions</td>
+                             <td class="px-4 py-2">1.2x0.6m</td>
+                             <td class="px-4 py-2">1.6x1.0m</td>
+                             <td class="px-4 py-2">2.2x1.1m</td>
+                         </tr>
+                     </tbody>
+                 </table>
+             </div>
+        </section>
+
+        <!-- SECTION 2: SOLAR GRIDS -->
+        <section>
+            <div class="flex justify-between items-end mb-4 border-l-4 border-tech-blue-end pl-3">
+                <div>
+                    <h2 class="text-xl font-bold text-slate-800 tracking-wide uppercase">Solar Grids</h2>
+                    <p class="text-xs text-slate-500 mt-1">Off-grid solutions / LiFePO4 Compatible / MPPT</p>
+                </div>
+            </div>
+
+            <div class="flex space-x-4 overflow-x-auto no-scrollbar pb-4 snap-x snap-mandatory">
+                
+                <!-- Solar Item 1 -->
+                <div class="min-w-[220px] snap-center bg-white p-4 rounded-xl border border-slate-200 flex flex-col items-center text-center space-y-2 relative overflow-hidden">
+                    <div class="absolute top-0 right-0 bg-blue-600 text-white text-[10px] px-2 py-0.5 rounded-bl-lg font-bold">BEST SELLER</div>
+                    <i class="fas fa-solar-panel text-4xl text-blue-700 mb-2"></i>
+                    <h3 class="font-bold text-slate-800">Grid-S Starter</h3>
+                    <p class="text-xs text-slate-500 text-justify">Compact portable unit ideal for sensor nodes and small irrigation pumps. Includes 10A controller.</p>
+                    <div class="text-lg font-bold text-slate-900">₹14,999.00</div>
+                    <button class="w-full py-1.5 text-xs font-bold text-blue-600 border border-blue-600 rounded hover:bg-blue-50" onclick="alert('Added Solar S')">View Datasheet</button>
+                    <a href="deliverygrid1.html"><button class="text-blue-500 text-xs font-bold py-2  transition transform active:scale-95" onclick="alert('Added Solar S')">Purchase Unit</button>
+                </div></a>
+                <!-- Solar Item 2 -->
+                <div class="min-w-[220px] snap-center bg-white p-4 rounded-xl border border-slate-200 flex flex-col items-center text-center space-y-2">
+                    <i class="fas fa-solar-panel text-4xl text-blue-800 mb-2"></i>
+                    <h3 class="font-bold text-slate-800">Grid-M Farm</h3>
+                    <p class="text-xs text-slate-500 text-justify">Mid-range array for greenhouses. Supports daisy-chaining up to 4 units. Reinforced alum frame.</p>
+                    <div class="text-lg font-bold text-slate-900">₹29,999.00</div>
+                    <button class="w-full py-1.5 text-xs font-bold text-blue-600 border border-blue-600 rounded hover:bg-blue-50" onclick="alert('Added Solar M')">View Datasheet</button>
+                    <a href="deliverygrid2.html"><button class="text-blue-500 text-xs font-bold py-2  transition transform active:scale-95" onclick="alert('Added Solar S')">Purchase Unit</button>
+                </div></a>
+                <!-- Solar Item 3 -->
+                <div class="min-w-[220px] snap-center bg-white p-4 rounded-xl border border-slate-200 flex flex-col items-center text-center space-y-2">
+                    <div class="flex space-x-1 mb-2">
+                        <i class="fas fa-solar-panel text-3xl text-blue-900"></i>
+                        <i class="fas fa-solar-panel text-3xl text-blue-900"></i>
+                    </div>
+                    <h3 class="font-bold text-slate-800">Grid-L Industrial</h3>
+                    <p class="text-xs text-slate-500 text-justify">Heavy-duty commercial grade. Bifacial cells for 30% extra yield. Requires professional install.</p>
+                    <div class="text-lg font-bold text-slate-900">₹89,999.82</div>
+                    <button class="w-full py-1.5 text-xs font-bold text-blue-600 border border-blue-600 rounded hover:bg-blue-50" onclick="alert('Added Solar L')">View Datasheet</button>
+                   <a href="deliverygrid3.html"><button class="text-blue-500 text-xs font-bold py-2  transition transform active:scale-95" onclick="alert('Added Solar S')">Purchase Unit</button>
+                </div></a>
+
+            </div>
+        </section>
+
+        <!-- Customer Reviews (Busy Text 6) -->
+        <section class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                <div class="flex items-center space-x-1 text-yellow-400 text-xs mb-2">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i>
+                </div>
+                <h4 class="font-bold text-sm">"Incredible Data Granularity"</h4>
+                <p class="text-xs text-slate-600 mt-1 italic">
+                    "We deployed the H2O Monitor across 50 hectares. The MQTT integration was seamless with our existing backend. Battery life is exceeding spec by 2 months so far."
+                </p>
+                <div class="text-xs font-bold text-slate-400 mt-2">- J. Doe, Vertical Harvest Inc.</div>
+            </div>
+            <div class="bg-slate-50 p-4 rounded-lg border border-slate-200">
+                <div class="flex items-center space-x-1 text-yellow-400 text-xs mb-2">
+                    <i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star"></i><i class="fas fa-star-half-alt"></i>
+                </div>
+                <h4 class="font-bold text-sm">"Solid Hardware, Great Support"</h4>
+                <p class="text-xs text-slate-600 mt-1 italic">
+                    "The Grid-M panels held up during the recent monsoon season without a hitch. Setup documentation is very technical, but support helped us configure the MPPT."
+                </p>
+                <div class="text-xs font-bold text-slate-400 mt-2">- A. Singh, GreenFields Co.</div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Massive Footer (Busy Text 7) -->
+    <footer class="bg-slate-900 text-slate-400 text-xs mt-10 pt-8 pb-24 px-6">
+        <div class="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+            <div>
+                <h5 class="text-white font-bold mb-3 uppercase tracking-wider">Products</h5>
+                <ul class="space-y-2">
+                    <li><a href="#" class="hover:text-white">Sensors & Telemetry</a></li>
+                    <li><a href="#" class="hover:text-white">Solar Arrays</a></li>
+                    <li><a href="#" class="hover:text-white">Battery Banks</a></li>
+                    <li><a href="#" class="hover:text-white">Irrigation Control</a></li>
+                    <li><a href="#" class="hover:text-white">Drone Mapping</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5 class="text-white font-bold mb-3 uppercase tracking-wider">Resources</h5>
+                <ul class="space-y-2">
+                    <li><a href="#" class="hover:text-white">Documentation / API</a></li>
+                    <li><a href="#" class="hover:text-white">Firmware Updates</a></li>
+                    <li><a href="#" class="hover:text-white">Community Forum</a></li>
+                    <li><a href="#" class="hover:text-white">Case Studies</a></li>
+                    <li><a href="#" class="hover:text-white">ROI Calculator</a></li>
+                </ul>
+            </div>
+            <div>
+                <h5 class="text-white font-bold mb-3 uppercase tracking-wider">Company</h5>
+                <ul class="space-y-2">
+                    <li><a href="#" class="hover:text-white">About Agrotech+</a></li>
+                    <li><a href="#" class="hover:text-white">Sustainability Goals</a></li>
+                    <li><a href="#" class="hover:text-white">Careers (Hiring!)</a></li>
+                    <li><a href="#" class="hover:text-white">Press / Media</a></li>
+                    <li><a href="#" class="hover:text-white">Contact Sales</a></li>
+                </ul>
+            </div>
+             <div>
+                <h5 class="text-white font-bold mb-3 uppercase tracking-wider">Legal</h5>
+                <ul class="space-y-2">
+                    <li><a href="#" class="hover:text-white">Privacy Policy</a></li>
+                    <li><a href="#" class="hover:text-white">Terms of Service</a></li>
+                    <li><a href="#" class="hover:text-white">Warranty Info</a></li>
+                    <li><a href="#" class="hover:text-white">Cookie Settings</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="border-t border-slate-800 pt-6 text-center text-slate-600">
+            <p>&copy; 2024 Agrotech+ Solutions Inc. All rights reserved. Designed for precision.</p>
+        </div>
+    </footer>
+
+    <!-- BOTTOM SLIDER ACTION -->
+    <div class="fixed bottom-0 left-0 right-0 p-4 bg-slate-50/90 backdrop-blur-md border-t border-slate-200 z-50">
+        <div class="slider-container h-12 w-full max-w-md mx-auto cursor-pointer" id="slider-track">
+            <div class="slider-text text-sm" id="slider-label">Move slide to hire tech expert</div>
+            <div class="slider-thumb h-10 w-10 shadow-md" id="slider-thumb">
+                <i class="fas fa-chevron-right text-base"></i>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Slider Logic ---
+        const sliderTrack = document.getElementById('slider-track');
+        const sliderThumb = document.getElementById('slider-thumb');
+        const sliderLabel = document.getElementById('slider-label');
+        
+        let isDragging = false;
+        let startX = 0;
+        let currentX = 0;
+        const padding = 4; // Padding around thumb
+        
+        // Helper to get X position from mouse or touch
+        function getX(e) {
+            return e.type.includes('mouse') ? e.clientX : e.touches[0].clientX;
+        }
+
+        function startDrag(e) {
+            isDragging = true;
+            startX = getX(e);
+            sliderThumb.style.transition = 'none'; // Disable transition for direct follow
+        }
+
+        function moveDrag(e) {
+            if (!isDragging) return;
+            
+            // Prevent scrolling on mobile while dragging
+            if(e.type.includes('touch')) e.preventDefault();
+
+            const trackRect = sliderTrack.getBoundingClientRect();
+            const maxTravel = trackRect.width - sliderThumb.offsetWidth - (padding * 2);
+            
+            let moveX = getX(e) - trackRect.left - padding - (sliderThumb.offsetWidth / 2);
+            
+            // Constrain
+            if (moveX < 0) moveX = 0;
+            if (moveX > maxTravel) moveX = maxTravel;
+            
+            currentX = moveX;
+            sliderThumb.style.transform = `translateX(${currentX}px)`;
+            
+            // Opacity of text fades as you slide
+            const opacity = 1 - (currentX / maxTravel);
+            sliderLabel.style.opacity = Math.max(0, opacity);
+        }
+
+        function endDrag() {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            const trackRect = sliderTrack.getBoundingClientRect();
+            const maxTravel = trackRect.width - sliderThumb.offsetWidth - (padding * 2);
+            
+            // Threshold to trigger (e.g., 80% of the way)
+            if (currentX > maxTravel * 0.8) {
+                // Success!
+                sliderThumb.style.transition = 'transform 0.2s ease-out';
+                sliderThumb.style.transform = `translateX(${maxTravel}px)`;
+                sliderLabel.textContent = "Request Sent!";
+                sliderLabel.style.opacity = 1;
+                
+                // Reset after delay
+                setTimeout(() => {
+                    alert("Tech Expert Request Sent Successfully!");
+                    resetSlider();
+                }, 500);
+            } else {
+                // Snap back
+                resetSlider();
+            }
+        }
+
+        function resetSlider() {
+            sliderThumb.style.transition = 'transform 0.3s ease-out';
+            sliderThumb.style.transform = `translateX(0px)`;
+            sliderLabel.style.opacity = 1;
+            setTimeout(() => {
+                sliderLabel.textContent = "Move slide to hire tech expert";
+            }, 300);
+        }
+
+        // Event Listeners
+        sliderThumb.addEventListener('mousedown', startDrag);
+        sliderThumb.addEventListener('touchstart', startDrag);
+
+        document.addEventListener('mousemove', moveDrag);
+        document.addEventListener('touchmove', moveDrag, { passive: false });
+
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchend', endDrag);
+
+    </script>
+</body>
+</html>

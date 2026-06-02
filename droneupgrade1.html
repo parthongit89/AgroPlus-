@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drone Installations and Data</title>
+    <!-- Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Font Awesome Icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Custom config for Tailwind colors and Inter font --><script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'agro-dark-violet': '#3A1E63', // Darker violet for header
+                        'agro-violet': '#5b21b6', // Primary violet for accents/buttons
+                        'agro-lavender': '#9C77E5', // Lighter violet for subtle accents
+                        'agro-accent-orange': '#f97316', // Orange for highlight/toggle
+                        'agro-light-gray': '#f0f0f5', // Very light gray for background
+                        'agro-text-dark': '#1a1a1a', // Dark text for readability
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 12px rgba(0, 0, 0, 0.1)',
+                        'medium': '0 8px 20px rgba(0, 0, 0, 0.15)',
+                        'lg-violet': '0 10px 25px -5px rgba(91, 33, 182, 0.3), 0 4px 10px -4px rgba(91, 33, 182, 0.2)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        
+        body {
+            background-color: #ffffff;
+            color: #1a1a1a;
+        }
+
+        .fixed-header {
+            background-color: #3A1E63;
+        }
+        
+        /* Updated Hero/Banner section to remove the placeholder text */
+        .hero-background {
+            /* Keep the violet-themed placeholder image */
+            background-image: url('https://placehold.co/1200x350/9C77E5/5b21b6?text=Agricultural+Drone+Over+Field');
+            background-size: cover;
+            background-position: center;
+            height: 200px; 
+            /* Added a simple gradient overlay instead for a softer look */
+            background-image: linear-gradient(to bottom, rgba(156,119,229,0.5), rgba(91,33,182,0.5)), url('https://placehold.co/1200x350/9C77E5/5b21b6?text=Agricultural+Drone+Over+Field');
+        }
+        
+        @media (min-width: 768px) {
+            .hero-background {
+                height: 350px;
+            }
+        }
+
+        /* New Table Styling */
+        .data-table-container {
+            border: 1px solid #ddd;
+            border-radius: 1rem;
+            overflow: hidden; /* Ensures borders/shadows look clean */
+            box-shadow: 0 10px 25px -5px rgba(91, 33, 182, 0.1), 0 4px 10px -4px rgba(91, 33, 182, 0.1);
+        }
+
+        .table-header-row {
+            background-color: #5b21b6;
+            color: white;
+            font-weight: 700;
+        }
+
+        .table-row-odd {
+            background-color: #f7f3ff; /* Very light lavender */
+        }
+
+        .table-row-even {
+            background-color: #ffffff; /* White */
+        }
+        
+        .row-category {
+            font-weight: 600;
+            color: #3A1E63;
+        }
+
+        /* Responsive Table adjustments for small screens (CLEANED UP LABELS) */
+        @media (max-width: 767px) {
+            .data-table-container table {
+                display: block;
+                width: 100%;
+            }
+            .data-table-container thead {
+                display: none; /* Hide header row on mobile */
+            }
+            .data-table-container tbody, .data-table-container tr {
+                display: block;
+            }
+            /* Each TR becomes a distinct vertical card */
+            .data-table-container tr {
+                margin-bottom: 1.5rem; /* Increased vertical space between sections */
+                border-radius: 0.75rem;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+                border: 1px solid #eee; 
+                padding: 0; /* Remove internal padding from TR */
+            }
+            
+            /* Hide the details/value labels and only show the Category label once */
+            .data-table-container td[data-label="Details"],
+            .data-table-container td[data-label="Value"] {
+                display: none; 
+            }
+            
+            /* Style the main Category header for mobile */
+            .data-table-container td[data-label="Category"] {
+                display: block;
+                text-align: center;
+                font-size: 1.1rem;
+                font-weight: 800;
+                padding: 0.75rem;
+                background-color: #f0f0f5; /* Light background for category bar */
+                color: #5b21b6;
+                border-bottom: 2px solid #D8C7FF;
+            }
+            
+            /* Display the content fields (details and example) as single blocks */
+            .data-table-container td:not([data-label="Category"]) {
+                display: block;
+                text-align: left;
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+                border-bottom: 1px solid #f7f7f7;
+                background-color: white;
+            }
+
+            /* Display the custom labels (Category, Details, Example) ONLY inside the TD content */
+            .data-table-container td::before {
+                 /* Hide the automatically generated label */
+                content: none; 
+            }
+            
+            /* Manually insert labels for content rows using hardcoded text and flex */
+            .data-table-container td[data-label="Details"]::before {
+                /* --- FIX 1: Removed "/ Description" and "/" --- */
+                content: 'Details:';
+                font-weight: 600;
+                color: #3A1E63;
+                margin-right: 0.5rem;
+                display: inline;
+                float: none;
+            }
+            
+            .data-table-container td[data-label="Value"]::before {
+                /* --- FIX 2: Removed "Example / " and "/" --- */
+                content: 'Value:';
+                font-weight: 600;
+                color: #3A1E63;
+                margin-right: 0.5rem;
+                display: inline;
+                float: none;
+            }
+
+            /* --- RENDER FIX: Display the content TDs on Mobile --- */
+            .data-table-container td:nth-child(2), 
+            .data-table-container td:nth-child(3) {
+                display: block; /* Show the blocks */
+                text-align: right; /* Align value content to the right */
+                display: flex; /* Use flex to align label and value */
+                justify-content: space-between;
+            }
+
+            .data-table-container td:nth-child(1) {
+                /* Special handling for category row to ensure full width */
+                display: block;
+            }
+            
+            /* Apply background coloring on content rows */
+            .data-table-container tr:nth-child(odd) td {
+                background-color: #f7f3ff;
+            }
+            .data-table-container tr:nth-child(even) td {
+                background-color: #ffffff;
+            }
+        }
+    </style>
+</head>
+<body class="font-sans">
+
+    <!-- HEADER / TOP BAR (Matching agrotech_drone_info.html) --><header class="fixed-header text-white shadow-lg sticky top-0 z-20">
+        <div class="px-4 py-3 flex justify-between items-center max-w-7xl mx-auto w-full">
+            
+            <!-- Back Button and Logo Container --><div class="flex items-center">
+                <!-- Back Button --><button onclick="history.back(); showMessage('Navigating back')" class="text-white opacity-80 p-1 mr-4">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                
+                <!-- Logo --><div class="text-2xl font-extrabold tracking-tight">
+                    <span class="text-white">Agro</span><span class="text-agro-lavender">tech</span><span class="text-white">+</span>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3 ml-3 flex-shrink-0">
+                <!-- Profile/User Info --><div class="text-xs text-right hidden sm:block leading-none mr-2">
+                    <div class="text-gray-200">Parth sonevane</div>
+                    <div class="text-gray-400">Boisar Maharastra</div>
+                </div>
+                <!-- Profile Icon --><a href="#" class="block p-2 rounded-full bg-agro-violet transition flex-shrink-0 hover:bg-agro-lavender" onclick="showMessage('Viewing Profile')">
+                    <a href="profile.html"><i class="fas fa-user text-white w-4 h-4 flex items-center justify-center"></i></a>
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <!-- HERO/BANNER SECTION --><div class="hero-background w-full">
+        <!-- The content of this div is now empty, removing the placeholder text. --><!-- The background image and gradient from CSS will fill this space. --></div>
+    
+    <main class="max-w-4xl mx-auto p-4 md:p-8 pb-12">
+        
+        <!-- MAIN TITLE CARD --><div class="bg-agro-violet text-white p-4 rounded-xl shadow-lg-violet -mt-8 mb-8 text-center">
+            <h1 class="text-2xl md:text-3xl font-extrabold">Drone installations and data</h1>
+        </div>
+
+        <!-- DETAILED SPECIFICATION TABLE --><section class="data-table-container">
+            <table class="w-full text-left text-gray-700 border-collapse">
+                <thead class="hidden md:table-header-group">
+                    <tr class="table-header-row">
+                        <th class="p-3 w-1/4">Category</th>
+                        <th class="p-3 w-1/3">Details</th>
+                        <th class="p-3 w-auto"> Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Row 1: Purpose --><tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">Purpose</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">Agricultural Drone-as-a-Service (DaaS) for spraying, seeding, and mapping</td>
+                        <td data-label="Value" class="p-3 md:w-auto">Smart Farming Automation</td>
+                    </tr>
+                    <!-- Row 2: Drone Type --><tr class="table-row-even">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">Drone Type</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">Multi-rotor agriculture drone</td>
+                        <td data-label="Value" class="p-3 md:w-auto">10L– 20L Payload Drone</td>
+                    </tr>
+                    <!-- Row 3: Coverage Area --><tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">Coverage Area</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">1 Acre per flight</td>
+                        <td data-label="Value" class="p-3 md:w-auto">20 Acres/day</td>
+                    </tr>
+                    <!-- Row 4: Operating Range --><tr class="table-row-even">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">Operating Range</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">1–5 km</td>
+                        <td data-label="Value" class="p-3 md:w-auto">2.5 km typical</td>
+                    </tr>
+                    <!-- Row 5: Flight Duration --><tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">Flight Duration</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">15-25 minutes per battery</td>
+                        <td data-label="Value" class="p-3 md:w-auto">Swappable battery system</td>
+                    </tr>
+                    <!-- Row 6: Battery Capacity --><tr class="table-row-even">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">Battery Capacity</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">12,000–22,000 mAh LiPo</td>
+                        <td data-label="Value" class="p-3 md:w-auto">22.2V(6S)</td>
+                    </tr>
+                    <!-- Row 7: Charging Time --><tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">Charging Time</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">45-60 minutes</td>
+                        <td data-label="Value" class="p-3 md:w-auto">Fast charger used</td>
+                    </tr>
+                    <!-- Row 8: Sensors Installed --><tr class="table-row-even">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">Sensors Installed</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">GPS+IMU+Altimeter+Spraying Nozzle Sensor</td>
+                        <td data-label="Value" class="p-3 md:w-auto">Optional: NDVI camera</td>
+                    </tr>
+                    <!-- Row 9: Spray Capacity --><tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">Spray Capacity</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">10L tank covers 1-1.5 acres</td>
+                        <td data-label="Value" class="p-3 md:w-auto">1 acre per 10 mins avg</td>
+                    </tr>
+                    <!-- Row 10: No. of Motors --><tr class="table-row-even">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">No. of Motors</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">4 and 6</td>
+                        <td data-label="Value" class="p-3 md:w-auto">4 preferred for small fields</td>
+                    </tr>
+                    <!-- Row 11: Spray Width --><tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">Spray Width</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">4-6 meters</td>
+                        <td data-label="Value" class="p-3 md:w-auto">Adjustable</td>
+                    </tr>
+                    <!-- Row 12: Seed Spreading Capacity --><tr class="table-row-even">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">Seed Spreading Capacity</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">5-6 kg per load</td>
+                        <td data-label="Value" class="p-3 md:w-auto">Adjustable per mission</td>
+                    </tr>
+                    <!-- Row 13: Mapping Capability --><tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">Mapping Capability</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">Real-time GPS-based imaging</td>
+                        <td data-label="Value" class="p-3 md:w-auto">With mobile app integration</td>
+                    </tr>
+                    <!-- Row 14: Required Manpower --><tr class="table-row-even">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">Required Manpower</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">1 trained operator + 1 helper</td>
+                        <td data-label="Value" class="p-3 md:w-auto">Basic training by platform</td>
+                    </tr>
+                    <!-- Row 15: Installation Time --><tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">Installation Time</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">1 day setup & calibration</td>
+                        <td data-label="Value" class="p-3 md:w-auto">Includes software setup</td>
+                    </tr>
+                    <!-- Row 16: Maintenance Interval --><tr class="table-row-even">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">Maintenance Interval</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">After 50 flight hours</td>
+                        <td data-label="Value" class="p-3 md:w-auto">Cleaning, lubrication, propeller check</td>
+                    </tr>
+                    <!-- Row 17: Subsidy Availability --><tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">Subsidy Availability</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">Yes</td>
+                        <td data-label="Value" class="p-3 md:w-auto">40-50% for farmers</td>
+                    </tr>
+                    <!-- Row 18: Platform Cost Model --><tr class="table-row-even">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">Platform Cost Model</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">Subscription or Pay-per-use</td>
+                        <td data-label="Value" class="p-3 md:w-auto">₹500-₹800 per acre spray charge</td>
+                    </tr>
+                    <!-- Row 19: Drone Kit Cost (Owner) --><tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">Drone Kit Cost (Owner)</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">₹3,00,000 – ₹6,50,000</td>
+                        <td data-label="Value" class="p-3 md:w-auto">Includes drone, batteries, charger, training</td>
+                    </tr>
+                    <!-- Row 20: Annual Maintenance Cost --><tr class="table-row-even">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">Annual Maintenance Cost</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">₹10,000 – ₹20,000</td>
+                        <td data-label="Value" class="p-3 md:w-auto">Minor replacements & updates</td>
+                    </tr>
+                    <!-- Row 21: Mobile App Features --><tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">Mobile App Features</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">Booking, Tracking, Spray Log, Payment</td>
+                        <td data-label="Value" class="p-3 md:w-auto">Multilingual UI</td>
+                    </tr>
+                    <!-- Row 22: Connectivity Required --><tr class="table-row-even">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">Connectivity Required</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">4G/5G or Offline GPS mode</td>
+                        <td data-label="Value" class="p-3 md:w-auto">Auto-sync when network returns</td>
+                    </tr>
+                    <!-- Row 23: Safety Features --><tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">Safety Features</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">Auto return, GPS lock, low-battery warning</td>
+                        <td data-label="Value" class="p-3 md:w-auto">Ensures safe operation</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+    </main>
+
+    <!-- Simple Message Box for Clicks (Notification style) --><div id="message-box" class="fixed bottom-4 left-4 right-4 bg-agro-dark-violet text-white p-3 rounded-xl shadow-xl hidden transition transform duration-300 z-40" role="alert">
+        <p id="message-content" class="text-center"></p>
+    </div>
+
+    <!-- JAVASCRIPT BLOCK --><script>
+        /**
+         * Shows a temporary notification message at the bottom of the screen.
+         * @param {string} content The message to display.
+         */
+        function showMessage(content) {
+            const messageBox = document.getElementById('message-box');
+            const messageContent = document.getElementById('message-content');
+            
+            messageContent.textContent = content;
+            messageBox.classList.remove('hidden');
+            
+            clearTimeout(messageBox.timer);
+            
+            messageBox.timer = setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 2000);
+        }
+        
+        // Ensure back button functions if history is available
+        document.querySelector('.fixed-header button[onclick*="history.back"]').onclick = function() {
+            history.back();
+            showMessage('Navigating back');
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agrorecords+</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Custom config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'agro-purple': '#9333ea', 
+                        'agro-purple-dark': '#7e22ce',
+                        'agro-fuchsia': '#c026d3',
+                        'agro-glass': 'rgba(255, 255, 255, 0.1)',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'scan-laser': 'scan 2s linear infinite',
+                        'blob': 'blob 7s infinite',
+                    },
+                    keyframes: {
+                        scan: {
+                            '0%': { top: '0%' },
+                            '50%': { top: '100%' },
+                            '100%': { top: '0%' },
+                        },
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        }
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(192, 38, 211, 0.4)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Glassmorphism Frame */
+        .glass-frame {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Control Button Style */
+        .control-btn {
+            width: 64px;
+            height: 64px;
+            border-radius: 20px; /* Squircle */
+            background: linear-gradient(135deg, #a855f7, #c026d3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            box-shadow: 0 8px 15px -3px rgba(192, 38, 211, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .control-btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.2), transparent);
+        }
+        .control-btn:active {
+            transform: scale(0.95);
+            box-shadow: 0 4px 6px -1px rgba(192, 38, 211, 0.3);
+        }
+
+        /* Slider Styles */
+        .slider-container {
+            position: relative;
+            background: linear-gradient(to right, #9333ea, #c026d3); 
+            border-radius: 9999px;
+            overflow: hidden;
+            box-shadow: 0 8px 20px -5px rgba(147, 51, 234, 0.5);
+        }
+
+        .slider-thumb {
+            position: absolute;
+            top: 4px;
+            bottom: 4px;
+            left: 4px;
+            width: 48px; 
+            background: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: grab;
+            z-index: 20;
+            color: #9333ea;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+            transition: transform 0.1s;
+        }
+
+        /* Camera Video Style */
+        #camera-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 font-body text-slate-800 flex flex-col h-screen overflow-hidden relative">
+
+    <!-- Ambient Background Blobs -->
+    <div class="fixed inset-0 pointer-events-none -z-10 overflow-hidden">
+        <div class="absolute top-20 left-0 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+        <div class="absolute bottom-20 right-0 w-72 h-72 bg-fuchsia-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob animation-delay-2000"></div>
+    </div>
+
+    <!-- MODERN HEADER -->
+    <header class="bg-gradient-to-br from-purple-700 via-purple-600 to-fuchsia-600 pt-10 pb-20 px-6 rounded-b-[3rem] shadow-2xl relative z-20 shrink-0">
+        <div class="flex items-center justify-between">
+            <button onclick="history.back()" class="bg-white/20 backdrop-blur-md p-2 rounded-xl text-white hover:bg-white/30 transition active:scale-95">
+                 <i class="fas fa-arrow-left text-lg"></i>
+            </button>
+            
+            <div class="text-center">
+                <h1 class="text-white text-2xl font-bold tracking-wide">Agrorecords<span class="font-light opacity-80">+</span></h1>
+                <p class="text-purple-100 text-[10px] font-medium tracking-wider uppercase mt-1">Smart Scanner</p>
+            </div>
+
+            <a href="profile.html" class="bg-white/20 backdrop-blur-md p-2 rounded-xl text-white hover:bg-white/30 transition active:scale-95">
+                <i class="fas fa-user text-lg"></i>
+            </a>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="flex-grow flex flex-col px-6 -mt-8 relative z-30 pb-24 overflow-y-auto">
+
+        <!-- CAMERA FRAME (Modern Glass Look) -->
+        <div class="w-full aspect-[4/3] bg-black rounded-3xl relative overflow-hidden mb-8 shadow-2xl border border-white/20 group">
+            
+            <!-- REAL CAMERA FEED -->
+            <video id="camera-video" autoplay playsinline muted></video>
+
+            <!-- ERROR MESSAGE -->
+            <div id="camera-error" class="absolute inset-0 flex items-center justify-center bg-slate-900 text-white text-center p-4 hidden z-0">
+                <div class="glass-frame p-4 rounded-xl">
+                    <i class="fas fa-video-slash text-3xl text-fuchsia-400 mb-2"></i>
+                    <p class="text-xs text-slate-300">Camera access required</p>
+                    <button onclick="startCamera()" class="mt-3 text-xs bg-fuchsia-600 px-4 py-2 rounded-lg font-bold">Enable Camera</button>
+                </div>
+            </div>
+            
+            <!-- OVERLAY: Corner Brackets (Fuchsia) -->
+            <div class="absolute top-4 left-4 w-8 h-8 border-t-4 border-l-4 border-fuchsia-500 rounded-tl-xl z-10 shadow-glow"></div>
+            <div class="absolute top-4 right-4 w-8 h-8 border-t-4 border-r-4 border-fuchsia-500 rounded-tr-xl z-10 shadow-glow"></div>
+            <div class="absolute bottom-4 left-4 w-8 h-8 border-b-4 border-l-4 border-fuchsia-500 rounded-bl-xl z-10 shadow-glow"></div>
+            <div class="absolute bottom-4 right-4 w-8 h-8 border-b-4 border-r-4 border-fuchsia-500 rounded-br-xl z-10 shadow-glow"></div>
+
+            <!-- OVERLAY: Laser Scan -->
+            <div id="scan-laser" class="absolute left-0 w-full h-0.5 bg-fuchsia-400 shadow-[0_0_15px_#c026d3] animate-scan-laser opacity-90 z-10"></div>
+
+            <!-- Loading Text -->
+            <div id="loading-text" class="absolute inset-0 flex items-center justify-center pointer-events-none z-0 bg-slate-900">
+                <div class="flex flex-col items-center">
+                    <div class="w-8 h-8 border-4 border-purple-500 border-t-transparent rounded-full animate-spin mb-2"></div>
+                    <p class="text-purple-300 font-medium text-xs tracking-widest">STARTING...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CONTROL BUTTONS -->
+        <div class="flex justify-center gap-6 mb-6">
+            <!-- Torch -->
+            <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="toggleFlash()">
+                <div class="control-btn" id="btn-torch">
+                    <i class="fas fa-bolt"></i>
+                </div>
+                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wide group-hover:text-purple-600 transition">Torch</span>
+            </div>
+
+            <!-- Focus -->
+            <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="triggerFocus()">
+                <div class="control-btn" id="btn-focus">
+                    <i class="fas fa-compress"></i> 
+                </div>
+                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wide group-hover:text-purple-600 transition">Focus</span>
+            </div>
+
+            <!-- Scan Action -->
+            <div class="flex flex-col items-center gap-2 cursor-pointer group" onclick="performScan()">
+                <div class="control-btn ring-4 ring-purple-100">
+                    <i class="fas fa-qrcode"></i>
+                </div>
+                <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wide group-hover:text-purple-600 transition">Scan</span>
+            </div>
+        </div>
+
+        <!-- PREVIEW CARD -->
+        <div class="w-full bg-white rounded-2xl p-4 shadow-lg border border-purple-100 relative overflow-hidden">
+            <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-purple-500 to-fuchsia-500"></div>
+            <span class="text-[10px] font-bold text-purple-400 uppercase tracking-wider flex items-center gap-2">
+                <i class="fas fa-terminal"></i> System Output
+            </span>
+            <div id="scan-result" class="mt-2 text-slate-600 text-sm font-mono break-all pl-2">
+                Ready to scan data...
+            </div>
+        </div>
+
+    </main>
+
+    <!-- BOTTOM SLIDER (Violet Gradient) -->
+    <div class="fixed bottom-8 left-0 right-0 px-8 z-30">
+        <div class="slider-container h-14 w-full max-w-sm mx-auto cursor-pointer" id="slider-track">
+            <div class="absolute inset-0 flex items-center justify-center z-10 pointer-events-none">
+                <span class="text-white font-bold text-sm tracking-wide drop-shadow-md" id="slider-label">SLIDE TO CHECK RECORDS</span>
+            </div>
+            <div class="slider-thumb h-12 w-12 shadow-lg" id="slider-thumb">
+                <i class="fas fa-chevron-right text-purple-600 text-lg"></i>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Camera & Hardware Logic ---
+        const videoElement = document.getElementById('camera-video');
+        const loadingText = document.getElementById('loading-text');
+        const errorMsg = document.getElementById('camera-error');
+        let track = null;
+
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        facingMode: "environment",
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    } 
+                });
+                
+                videoElement.srcObject = stream;
+                track = stream.getVideoTracks()[0];
+                
+                videoElement.onloadedmetadata = () => {
+                    loadingText.style.display = 'none';
+                    errorMsg.classList.add('hidden');
+                };
+
+            } catch (err) {
+                console.error("Camera Error:", err);
+                loadingText.style.display = 'none';
+                errorMsg.classList.remove('hidden');
+            }
+        }
+
+        window.addEventListener('load', startCamera);
+
+        // --- Torch Logic ---
+        let isFlashOn = false;
+        async function toggleFlash() {
+            if (!track) return;
+            const capabilities = track.getCapabilities();
+            if (!capabilities.torch) {
+                alert("Flashlight unavailable.");
+                return;
+            }
+            try {
+                isFlashOn = !isFlashOn;
+                await track.applyConstraints({ advanced: [{ torch: isFlashOn }] });
+                const btn = document.getElementById('btn-torch');
+                if (isFlashOn) {
+                    btn.style.background = "#fbbf24"; 
+                    btn.innerHTML = '<i class="fas fa-bolt text-white"></i>';
+                    btn.style.boxShadow = "0 0 20px #fbbf24";
+                } else {
+                    btn.style.background = "linear-gradient(135deg, #a855f7, #c026d3)";
+                    btn.innerHTML = '<i class="fas fa-bolt"></i>';
+                    btn.style.boxShadow = "0 8px 15px -3px rgba(192, 38, 211, 0.4)";
+                }
+            } catch (e) { console.error(e); }
+        }
+
+        // --- Focus Simulation ---
+        function triggerFocus() {
+            const btn = document.getElementById('btn-focus');
+            btn.style.transform = "scale(0.9)";
+            setTimeout(() => btn.style.transform = "scale(1)", 200);
+            videoElement.style.filter = "blur(4px)";
+            setTimeout(() => {
+                videoElement.style.filter = "blur(0px)";
+                document.getElementById('scan-result').innerHTML = "<span class='text-fuchsia-600'>Focus Locked.</span>";
+            }, 400);
+        }
+
+        // --- Scan Simulation ---
+        function performScan() {
+            const laser = document.getElementById('scan-laser');
+            laser.style.background = "#22c55e"; 
+            laser.style.boxShadow = "0 0 20px #22c55e";
+            
+            document.getElementById('scan-result').innerHTML = '<span class="animate-pulse text-purple-600">Analyzing Pattern...</span>';
+
+            setTimeout(() => {
+                const randomId = "REC-" + Math.floor(10000 + Math.random() * 90000);
+                document.getElementById('scan-result').innerHTML = `
+                    <div class="flex items-center gap-3">
+                        <div class="bg-green-100 p-2 rounded-lg text-green-600"><i class="fas fa-check"></i></div>
+                        <div>
+                            <p class="text-xs text-slate-400 font-bold">DATA FOUND</p>
+                            <p class="text-sm font-bold text-slate-800">${randomId}</p>
+                        </div>
+                    </div>`;
+                
+                laser.style.background = "#c026d3";
+                laser.style.boxShadow = "0 0 15px #c026d3";
+            }, 1500);
+        }
+
+        // --- Slider Logic ---
+        const sliderTrack = document.getElementById('slider-track');
+        const sliderThumb = document.getElementById('slider-thumb');
+        const sliderLabel = document.getElementById('slider-label');
+        let isDragging = false;
+        
+        function getX(e) { return e.type.includes('mouse') ? e.clientX : e.touches[0].clientX; }
+
+        function startDrag(e) {
+            isDragging = true;
+            sliderThumb.style.transition = 'none'; 
+        }
+
+        function moveDrag(e) {
+            if (!isDragging) return;
+            if(e.type.includes('touch')) e.preventDefault();
+
+            const trackRect = sliderTrack.getBoundingClientRect();
+            const maxTravel = trackRect.width - sliderThumb.offsetWidth - 8; 
+            
+            let moveX = getX(e) - trackRect.left - 4 - (sliderThumb.offsetWidth / 2);
+            
+            if (moveX < 0) moveX = 0;
+            if (moveX > maxTravel) moveX = maxTravel;
+            
+            sliderThumb.style.transform = `translateX(${moveX}px)`;
+            
+            const opacity = 1 - (moveX / maxTravel);
+            sliderLabel.style.opacity = Math.max(0, opacity);
+
+            if (moveX > maxTravel * 0.9) endDrag(true);
+        }
+
+        function endDrag(success = false) {
+            if (!isDragging && !success) return;
+            isDragging = false;
+            
+            if (success) {
+                sliderThumb.style.transition = 'transform 0.2s ease-out';
+                const trackRect = sliderTrack.getBoundingClientRect();
+                const maxTravel = trackRect.width - sliderThumb.offsetWidth - 8;
+                sliderThumb.style.transform = `translateX(${maxTravel}px)`;
+                
+                sliderLabel.textContent = "VERIFYING...";
+                sliderLabel.style.opacity = 1;
+                
+                setTimeout(() => {
+                    alert("Redirecting to Database...");
+                    resetSlider();
+                }, 800);
+            } else {
+                resetSlider();
+            }
+        }
+
+        function resetSlider() {
+            sliderThumb.style.transition = 'transform 0.3s ease-out';
+            sliderThumb.style.transform = `translateX(0px)`;
+            sliderLabel.style.opacity = 1;
+            setTimeout(() => {
+                sliderLabel.textContent = "SLIDE TO CHECK RECORDS";
+            }, 300);
+        }
+
+        sliderThumb.addEventListener('mousedown', startDrag);
+        sliderThumb.addEventListener('touchstart', startDrag);
+        document.addEventListener('mousemove', moveDrag);
+        document.addEventListener('touchmove', moveDrag, { passive: false });
+        document.addEventListener('mouseup', () => endDrag(false));
+        document.addEventListener('touchend', () => endDrag(false));
+    </script>
+</body>
+</html>

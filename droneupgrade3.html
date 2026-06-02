@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expected Performance</title>
+    <!-- Load Tailwind CSS --><script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Font Awesome Icons --><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Custom config for Tailwind colors and Inter font --><script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'agro-dark-violet': '#3A1E63', // Darker violet for header
+                        'agro-violet': '#5b21b6', // Primary violet for accents/buttons
+                        'agro-lavender': '#9C77E5', // Lighter violet for subtle accents
+                        'agro-accent-orange': '#f97316', // Orange for highlight/toggle
+                        'agro-light-gray': '#f0f0f5', // Very light gray for background
+                        'agro-text-dark': '#1a1a1a', // Dark text for readability
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 12px rgba(0, 0, 0, 0.1)',
+                        'medium': '0 8px 20px rgba(0, 0, 0, 0.15)',
+                        'lg-violet': '0 10px 25px -5px rgba(91, 33, 182, 0.3), 0 4px 10px -4px rgba(91, 33, 182, 0.2)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+        
+        body {
+            background-color: #ffffff;
+            color: #1a1a1a;
+        }
+
+        .fixed-header {
+            background-color: #3A1E63;
+        }
+        
+        /* Hero/Banner section matching the reference image */
+        .hero-background {
+            /* Using the drone image background */
+            background-image: linear-gradient(to bottom, rgba(156,119,229,0.5), rgba(91,33,182,0.5)), url('https://placehold.co/1200x350/9C77E5/5b21b6?text=Agricultural+Drone+Over+Field');
+            background-size: cover;
+            background-position: center;
+            height: 200px; 
+        }
+        
+        @media (min-width: 768px) {
+            .hero-background {
+                height: 350px;
+            }
+        }
+
+        /* New Table Styling */
+        .data-table-container {
+            border: 1px solid #ddd;
+            border-radius: 1rem;
+            overflow: hidden; 
+            box-shadow: 0 10px 25px -5px rgba(91, 33, 182, 0.1), 0 4px 10px -4px rgba(91, 33, 182, 0.1);
+        }
+
+        .table-header-row {
+            background-color: #5b21b6;
+            color: white;
+            font-weight: 700;
+        }
+
+        .table-row-odd {
+            background-color: #f7f3ff; /* Very light lavender */
+        }
+
+        .table-row-even {
+            background-color: #ffffff; /* White */
+        }
+        
+        .row-category {
+            font-weight: 600;
+            color: #3A1E63;
+        }
+
+        /* Responsive Table adjustments for small screens */
+        @media (max-width: 767px) {
+            .data-table-container table {
+                display: block;
+                width: 100%;
+            }
+            .data-table-container thead {
+                display: none; /* Hide header row on mobile */
+            }
+            .data-table-container tbody, .data-table-container tr {
+                display: block;
+            }
+            .data-table-container tr {
+                margin-bottom: 0.5rem;
+                border-radius: 0.75rem;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+            }
+            .data-table-container td {
+                display: block;
+                text-align: right;
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+                border: none;
+                border-bottom: 1px solid #eee;
+            }
+            .data-table-container td:last-child {
+                border-bottom: none;
+            }
+            .data-table-container td::before {
+                /* Display the field name before the value */
+                content: attr(data-label);
+                float: left;
+                font-weight: 600;
+                color: #5b21b6;
+            }
+        }
+    </style>
+</head>
+<body class="font-sans">
+
+    <!-- HEADER / TOP BAR --><header class="fixed-header text-white shadow-lg sticky top-0 z-20">
+        <div class="px-4 py-3 flex justify-between items-center max-w-7xl mx-auto w-full">
+            
+            <!-- Back Button and Logo Container --><div class="flex items-center">
+                <!-- Back Button --><button onclick="history.back(); showMessage('Navigating back')" class="text-white opacity-80 p-1 mr-4">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                
+                <!-- Logo --><div class="text-2xl font-extrabold tracking-tight">
+                    <span class="text-white">Agro</span><span class="text-agro-lavender">tech</span><span class="text-white">+</span>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3 ml-3 flex-shrink-0">
+                <!-- Profile/User Info --><div class="text-xs text-right hidden sm:block leading-none mr-2">
+                    <div class="text-gray-200">Parth sonevane</div>
+                    <div class="text-gray-400">Boisar Maharastra</div>
+                </div>
+                <!-- Profile Icon --><a href="#" class="block p-2 rounded-full bg-agro-violet transition flex-shrink-0 hover:bg-agro-lavender" onclick="showMessage('Viewing Profile')">
+                  <a href="profile.html">  <i class="fas fa-user text-white w-4 h-4 flex items-center justify-center"></i></a>
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <!-- HERO/BANNER SECTION --><div class="hero-background w-full">
+        <!-- The background image and gradient from CSS fill this space. -->
+    </div>
+    
+    <main class="max-w-4xl mx-auto p-4 md:p-8 pb-12">
+        
+        <!-- MAIN TITLE CARD --><div class="bg-agro-violet text-white p-4 rounded-xl shadow-lg-violet -mt-8 mb-8 text-center">
+            <h1 class="text-2xl md:text-3xl font-extrabold">Expected performance</h1>
+        </div>
+
+        <!-- DETAILED PERFORMANCE TABLE --><section class="data-table-container">
+            <table class="w-full text-left text-gray-700 border-collapse">
+                <thead class="hidden md:table-header-group">
+                    <tr class="table-header-row">
+                        <th class="p-3 w-1/3">Parameter</th>
+                        <th class="p-3 w-auto">Value / Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Row 1: Time per Acre -->
+                    <tr class="table-row-odd">
+                        <td data-label="Parameter" class="row-category p-3 md:w-1/3">Time per Acre</td>
+                        <td data-label="Value / Result" class="p-3 md:w-auto">15–20 minutes</td>
+                    </tr>
+                    <!-- Row 2: Chemical Used -->
+                    <tr class="table-row-even">
+                        <td data-label="Parameter" class="row-category p-3 md:w-1/3">Chemical Used</td>
+                        <td data-label="Value / Result" class="p-3 md:w-auto">8–10 L per acre</td>
+                    </tr>
+                    <!-- Row 3: Fuel/Energy Used -->
+                    <tr class="table-row-odd">
+                        <td data-label="Parameter" class="row-category p-3 md:w-1/3">Fuel/Energy Used</td>
+                        <td data-label="Value / Result" class="p-3 md:w-auto">1 battery per flight</td>
+                    </tr>
+                    <!-- Row 4: Coverage Accuracy -->
+                    <tr class="table-row-even">
+                        <td data-label="Parameter" class="row-category p-3 md:w-1/3">Coverage Accuracy</td>
+                        <td data-label="Value / Result" class="p-3 md:w-auto">95–98%</td>
+                    </tr>
+                    <!-- Row 5: Labor Saved -->
+                    <tr class="table-row-odd">
+                        <td data-label="Parameter" class="row-category p-3 md:w-1/3">Labor Saved</td>
+                        <td data-label="Value / Result" class="p-3 md:w-auto">70–80%</td>
+                    </tr>
+                    <!-- Row 6: Water Saved -->
+                    <tr class="table-row-even">
+                        <td data-label="Parameter" class="row-category p-3 md:w-1/3">Water Saved</td>
+                        <td data-label="Value / Result" class="p-3 md:w-auto">50% compared to manual spraying</td>
+                    </tr>
+                    <!-- Row 7: Crop Safety -->
+                    <tr class="table-row-odd">
+                        <td data-label="Parameter" class="row-category p-3 md:w-1/3">Crop Safety</td>
+                        <td data-label="Value / Result" class="p-3 md:w-auto">Improved, no physical crop damage</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+    </main>
+
+    <!-- Simple Message Box for Clicks (Notification style) --><div id="message-box" class="fixed bottom-4 left-4 right-4 bg-agro-dark-violet text-white p-3 rounded-xl shadow-xl hidden transition transform duration-300 z-40" role="alert">
+        <p id="message-content" class="text-center"></p>
+    </div>
+
+    <!-- JAVASCRIPT BLOCK --><script>
+        /**
+         * Shows a temporary notification message at the bottom of the screen.
+         * @param {string} content The message to display.
+         */
+        function showMessage(content) {
+            const messageBox = document.getElementById('message-box');
+            const messageContent = document.getElementById('message-content');
+            
+            messageContent.textContent = content;
+            messageBox.classList.remove('hidden');
+            
+            clearTimeout(messageBox.timer);
+            
+            messageBox.timer = setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 2000);
+        }
+        
+        // Ensure back button functions if history is available
+        document.querySelector('.fixed-header button[onclick*="history.back"]').onclick = function() {
+            history.back();
+            showMessage('Navigating back');
+        };
+    </script>
+</body>
+</html>

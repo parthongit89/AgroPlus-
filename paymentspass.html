@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        .checkmark-circle { stroke-dasharray: 166; stroke-dashoffset: 166; stroke-width: 2; stroke-miterlimit: 10; stroke: #10b981; fill: none; animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards; }
+        .checkmark { width: 56px; height: 56px; border-radius: 50%; display: block; stroke-width: 2; stroke: #fff; stroke-miterlimit: 10; margin: 10% auto; box-shadow: inset 0px 0px 0px #10b981; animation: fill .4s ease-in-out .4s forwards, scale .3s ease-in-out .9s both; }
+        .checkmark__check { transform-origin: 50% 50%; stroke-dasharray: 48; stroke-dashoffset: 48; animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards; }
+        @keyframes stroke { 100% { stroke-dashoffset: 0; } }
+        @keyframes scale { 0%, 100% { transform: none; } 50% { transform: scale3d(1.1, 1.1, 1); } }
+        @keyframes fill { 100% { box-shadow: inset 0px 0px 0px 30px #10b981; } }
+    </style>
+</head>
+<body class="bg-emerald-50 h-screen flex flex-col items-center justify-center text-center px-6">
+
+    <div class="mb-8">
+        <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+            <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+            <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+        </svg>
+    </div>
+
+    <h1 class="text-2xl font-bold text-slate-800 mb-2">Payment Successful!</h1>
+    <p class="text-slate-500 mb-8">Transaction ID: <span class="font-mono text-xs bg-slate-200 px-2 py-1 rounded">TXN882910</span></p>
+
+    <div class="bg-white p-6 rounded-2xl shadow-sm w-full max-w-xs border border-emerald-100 mb-10">
+        <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2">AMOUNT PAID</p>
+        <h2 class="text-4xl font-bold text-slate-800 font-[Manrope]">₹<span id="amountPaid">0</span></h2>
+    </div>
+
+  <a href="frampay.html"></a><button onclick="window.location.href='farmpay.html'" class="bg-slate-900 text-white px-8 py-3 rounded-xl font-semibold shadow-lg shadow-slate-300 hover:bg-slate-800 transition">
+         Back to Home
+    </button></a>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // 1. Get transaction amount
+            const amount = parseFloat(localStorage.getItem('current_transaction_amount') || '0');
+            document.getElementById('amountPaid').innerText = amount;
+
+            // 2. Get Current Balance
+            const currentBal = parseFloat(localStorage.getItem('farmpay_balance'));
+
+            // 3. Deduct Amount
+            const newBal = currentBal - amount;
+
+            // 4. Save New Balance
+            localStorage.setItem('farmpay_balance', newBal);
+        });
+    </script>
+</body>
+</html>

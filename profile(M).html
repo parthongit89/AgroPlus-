@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>वापरकर्ता प्रोफाइल आणि सेटिंग्ज</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Google Fonts including Marathi 'Mukta' -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@400;500;600&family=Mukta:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Custom config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'agro-primary': '#16a34a', // Green-600
+                        'agro-dark': '#14532d',    // Green-900
+                        'agro-light': '#22c55e',   // Green-500
+                        'agro-bg': '#f8fafc',      // Slate-50
+                    },
+                    fontFamily: {
+                        sans: ['Mukta', 'Plus Jakarta Sans', 'sans-serif'],
+                        body: ['Mukta', 'Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(0,0,0,0.08)',
+                        'floating': '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+                    },
+                    keyframes: {
+                        slideUp: {
+                            '0%': { transform: 'translateY(100%)' },
+                            '100%': { transform: 'translateY(0)' },
+                        }
+                    },
+                    animation: {
+                        'slide-up': 'slideUp 0.3s ease-out forwards',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Mukta', 'Inter', sans-serif;
+        }
+
+        /* Profile Image Styles */
+        .profile-ring {
+            background: linear-gradient(135deg, #22c55e, #16a34a);
+            padding: 4px;
+            border-radius: 50%;
+        }
+        
+        /* Input Styles for Edit Mode */
+        .editable-input {
+            background: transparent;
+            border: 1px solid transparent;
+            border-radius: 0.5rem;
+            padding: 0.25rem 0.5rem;
+            transition: all 0.3s ease;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .editable-input:disabled {
+            color: #1f2937; /* slate-800 */
+        }
+
+        .editing .editable-input {
+            background: #f0fdf4; /* green-50 */
+            border-color: #22c55e;
+            box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.2);
+        }
+
+        .edit-overlay {
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .editing .profile-pic-container:hover .edit-overlay {
+            opacity: 1;
+        }
+        
+        /* Toggle Switch */
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #22c55e;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #22c55e;
+        }
+    </style>
+</head>
+<body class="bg-agro-bg font-body text-slate-800 pb-24">
+
+    <!-- LEAF HEADER (Modern Style) -->
+    <header class="bg-gradient-to-r from-green-500 to-emerald-600 pt-8 pb-24 px-6 rounded-br-[5rem] shadow-lg relative z-10">
+        <div class="flex justify-between items-center">
+            <!-- Back Button -->
+            <button onclick="history.back()" class="bg-white/20 backdrop-blur-md p-2 rounded-full text-white hover:bg-white/30 transition">
+               <a href="home page(M).html"><i class="fas fa-arrow-left text-lg w-6 h-6 flex items-center justify-center"></i></a> 
+            </button>
+            
+            <!-- Title -->
+            <h1 class="text-white text-xl font-bold tracking-wide">माझे प्रोफाइल</h1>
+            
+            <!-- Settings/Edit Toggle -->
+            <button id="edit-toggle-btn" onclick="toggleEditMode()" class="bg-white/20 backdrop-blur-md px-4 py-2 rounded-full text-white text-xs font-bold hover:bg-white/30 transition flex items-center gap-2">
+                <i class="fas fa-pen"></i> <span>बदल करा</span>
+            </button>
+        </div>
+    </header>
+
+    <main class="px-6 -mt-16 relative z-20">
+
+        <!-- PROFILE CARD (Floating) -->
+        <div class="bg-white rounded-3xl shadow-floating p-6 flex flex-col items-center text-center relative overflow-hidden" id="profile-card">
+            
+            <!-- Background Decoration -->
+            <div class="absolute top-0 left-0 w-full h-24 bg-gradient-to-b from-green-50 to-transparent z-0"></div>
+
+            <!-- Profile Picture with Edit Overlay -->
+            <div class="relative z-10 mb-4 group profile-pic-container cursor-pointer">
+                <div class="profile-ring">
+                    <div class="w-24 h-24 rounded-full bg-slate-200 border-4 border-white overflow-hidden relative">
+                        <!-- Image -->
+                        <img src="https://ui-avatars.com/api/?name=Parth+Sonavane&background=random&size=200" alt="Profile" class="w-full h-full object-cover">
+                        
+                        <!-- Camera Icon Overlay (Visible in Edit Mode) -->
+                        <div class="edit-overlay absolute inset-0 bg-black/50 flex items-center justify-center text-white cursor-pointer" onclick="document.getElementById('file-upload').click()">
+                            <i class="fas fa-camera text-2xl"></i>
+                        </div>
+                        <input type="file" id="file-upload" class="hidden" accept="image/*">
+                    </div>
+                </div>
+                <!-- Status Dot -->
+                <div class="absolute bottom-2 right-2 w-6 h-6 bg-white rounded-full flex items-center justify-center">
+                    <div class="w-4 h-4 bg-green-500 rounded-full border-2 border-white"></div>
+                </div>
+            </div>
+
+            <!-- Editable Fields -->
+            <div class="w-full max-w-xs space-y-1 relative z-10">
+                <input type="text" id="input-name" value="युजर_ॲग्रो+" disabled 
+                       class="editable-input text-2xl font-bold text-slate-800 font-sans">
+                
+                <input type="email" id="input-email" value="USER_AGRO+@Agroplus.in" disabled 
+                       class="editable-input text-xs text-slate-500 font-medium">
+                
+                <div class="flex justify-center items-center mt-2">
+                    <i class="fas fa-map-marker-alt text-green-500 mr-2 text-sm"></i>
+                    <input type="text" id="input-location" value="बोईसर, पालघर जिल्हा" disabled 
+                           class="editable-input text-sm text-slate-600 font-medium w-auto inline-block">
+                </div>
+            </div>
+
+            <!-- Save Button (Hidden by default) -->
+            <button id="save-btn" onclick="saveChanges()" class="hidden mt-6 bg-green-600 text-white px-8 py-2 rounded-xl shadow-lg shadow-green-200 font-bold active:scale-95 transition-all">
+                बदल जतन करा
+            </button>
+        </div>
+
+        <!-- FARM STATS GRID -->
+        <h3 class="text-slate-800 font-bold text-lg mt-8 mb-4 px-2">शेतीचा आढावा</h3>
+        <div class="grid grid-cols-2 gap-4 mb-8">
+            <!-- Stat 1 -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between h-32">
+                <div class="w-10 h-10 rounded-full bg-green-50 text-green-600 flex items-center justify-center text-lg">
+                    <i class="fas fa-ruler-combined"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">एकूण क्षेत्र</p>
+                    <p class="text-2xl font-bold text-slate-800">-- <span class="text-sm font-medium text-slate-500">एकर</span></p>
+                </div>
+            </div>
+            <!-- Stat 2 -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between h-32">
+                <div class="w-10 h-10 rounded-full bg-yellow-50 text-yellow-600 flex items-center justify-center text-lg">
+                    <i class="fas fa-seedling"></i>
+                </div>
+                <div>
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider">सध्याचे पीक</p>
+                    <p class="text-xl font-bold text-slate-800 truncate">--</p>
+                </div>
+            </div>
+            <!-- Stat 3 -->
+            <div class="bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex flex-col justify-between h-24 col-span-2">
+                <div class="flex justify-between items-center">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-full bg-purple-50 text-purple-600 flex items-center justify-center">
+                            <i class="fas fa-crown"></i>
+                        </div>
+                        <div>
+                            <p class="text-xs text-slate-400 font-bold">प्लॅन स्थिती</p>
+                            <p class="text-lg font-bold text-slate-800">ॲग्रोप्लस+</p>
+                        </div>
+                    </div>
+                    <a href="sub(M).html"><button class="text-xs bg-purple-100 text-purple-700 px-3 py-1 rounded-full font-bold">व्यवस्थापित करा</button></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- SETTINGS LIST -->
+        <h3 class="text-slate-800 font-bold text-lg mb-4 px-2">सेटिंग्ज</h3>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+            
+            <!-- Language -->
+            <div onclick="toggleLangModal()" class="p-4 flex items-center justify-between border-b border-slate-50 hover:bg-slate-50 transition cursor-pointer">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center">
+                        <i class="fas fa-globe"></i>
+                    </div>
+                    <span class="font-medium text-slate-700">ॲप भाषा</span>
+                </div>
+                <span class="text-sm text-slate-400 font-medium flex items-center">
+                    मराठी <i class="fas fa-chevron-right text-xs ml-2"></i>
+                </span>
+            </div>
+
+            <!-- Notifications (Toggle) -->
+            <div class="p-4 flex items-center justify-between border-b border-slate-50 hover:bg-slate-50 transition">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <span class="font-medium text-slate-700">सूचना</span>
+                </div>
+                <!-- Toggle Switch -->
+                <div class="relative inline-block w-10 mr-2 align-middle select-none transition duration-200 ease-in">
+                    <input type="checkbox" name="toggle" id="toggle" class="toggle-checkbox absolute block w-5 h-5 rounded-full bg-white border-4 appearance-none cursor-pointer border-gray-300 transition-all duration-300" checked/>
+                    <label for="toggle" class="toggle-label block overflow-hidden h-5 rounded-full bg-gray-300 cursor-pointer transition-colors duration-300"></label>
+                </div>
+            </div>
+
+            <!-- Help & Support -->
+            <div class="p-4 flex items-center justify-between hover:bg-slate-50 transition cursor-pointer">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-slate-100 text-slate-500 flex items-center justify-center">
+                        <i class="fas fa-headset"></i>
+                    </div>
+                    <span class="font-medium text-slate-700">मदत आणि आधार</span>
+                </div>
+                <i class="fas fa-chevron-right text-xs text-slate-400"></i>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Logout Button (Fixed Bottom) -->
+    <div class="fixed bottom-0 left-0 right-0 p-6 bg-white/80 backdrop-blur-md border-t border-slate-200 z-50">
+        <a href="login page.html" class="w-full py-3 rounded-xl bg-red-50 text-red-600 font-bold border border-red-100 hover:bg-red-100 active:scale-95 transition flex items-center justify-center gap-2">
+            <i class="fas fa-sign-out-alt"></i> बाहेर पडा
+        </a>
+    </div>
+
+    <!-- LANGUAGE MODAL (Bottom Sheet) -->
+    <div id="lang-modal" class="fixed inset-0 z-[60] hidden">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" onclick="toggleLangModal()"></div>
+        
+        <!-- Sheet Content -->
+        <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl p-6 animate-slide-up shadow-2xl">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="font-bold text-xl text-slate-800">भाषा निवडा</h3>
+                <button onclick="toggleLangModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center hover:bg-slate-200">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            
+            <div class="space-y-3">
+                <!-- English Option -->
+                <a href="profile.html" class="flex items-center justify-between w-full p-4 rounded-xl bg-slate-50 text-slate-700 font-semibold border border-transparent hover:bg-green-50 hover:border-green-200 hover:text-green-700 transition active:scale-98">
+                    <span>English</span>
+                    <span class="text-xs text-slate-400 font-medium">EN</span>
+                </a>
+
+                <!-- Hindi Option -->
+                <a href="profile(H).html" class="flex items-center justify-between w-full p-4 rounded-xl bg-slate-50 text-slate-700 font-semibold border border-transparent hover:bg-green-50 hover:border-green-200 hover:text-green-700 transition active:scale-98">
+                    <span>Hindi</span>
+                    <span class="text-sm font-bold opacity-60">हिंदी</span>
+                </a>
+
+                <!-- Marathi Option -->
+                <a href="profile(M).html" class="flex items-center justify-between w-full p-4 rounded-xl bg-slate-50 text-slate-700 font-semibold border border-transparent hover:bg-green-50 hover:border-green-200 hover:text-green-700 transition active:scale-98">
+                    <span>Marathi</span>
+                    <span class="text-xs bg-white border px-2 py-1 rounded shadow-sm text-slate-400">निवडलेली</span>
+                </a>
+            </div>
+            
+            <p class="text-center text-xs text-slate-400 mt-6">भाषा बदलल्यास ॲप्लिकेशन पुन्हा लोड होईल.</p>
+        </div>
+    </div>
+
+    <!-- Script for Edit Mode -->
+    <script>
+        const profileCard = document.getElementById('profile-card');
+        const editBtn = document.getElementById('edit-toggle-btn');
+        const saveBtn = document.getElementById('save-btn');
+        const inputs = document.querySelectorAll('.editable-input');
+        const langModal = document.getElementById('lang-modal');
+        
+        let isEditing = false;
+
+        function toggleEditMode() {
+            isEditing = !isEditing;
+            
+            if (isEditing) {
+                // Enable Edit Mode
+                profileCard.classList.add('editing');
+                editBtn.innerHTML = '<i class="fas fa-times"></i> <span>रद्द करा</span>';
+                editBtn.classList.replace('bg-white/20', 'bg-red-500/80');
+                saveBtn.classList.remove('hidden');
+                
+                inputs.forEach(input => {
+                    input.disabled = false;
+                    // Focus on the name field first
+                    if(input.id === 'input-name') input.focus();
+                });
+            } else {
+                // Disable Edit Mode (Cancel)
+                resetView();
+            }
+        }
+
+        function saveChanges() {
+            // Simulate saving
+            const newName = document.getElementById('input-name').value;
+            alert(`${newName} साठी प्रोफाइल अपडेट केले!`);
+            resetView();
+        }
+
+        function resetView() {
+            isEditing = false;
+            profileCard.classList.remove('editing');
+            editBtn.innerHTML = '<i class="fas fa-pen"></i> <span>बदल करा</span>';
+            editBtn.classList.replace('bg-red-500/80', 'bg-white/20');
+            saveBtn.classList.add('hidden');
+            
+            inputs.forEach(input => {
+                input.disabled = true;
+            });
+        }
+
+        // Toggle Language Modal
+        function toggleLangModal() {
+            if (langModal.classList.contains('hidden')) {
+                langModal.classList.remove('hidden');
+            } else {
+                langModal.classList.add('hidden');
+            }
+        }
+
+        // Image Upload Simulation
+        document.getElementById('file-upload').addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.querySelector('img').src = e.target.result;
+                }
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+    </script>
+</body>
+</html>

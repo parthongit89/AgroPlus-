@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kisan Connect - Farmer Login</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-yellow': '#facc15',
+                        'farm-green': '#15803d',
+                        'otp-blue': '#3b82f6'
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.3s ease-out forwards',
+                        'slide-down': 'slideDown 0.5s cubic-bezier(0.17, 0.67, 0.83, 0.67) forwards',
+                        'shake': 'shake 0.4s focus-within'
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        },
+                        slideDown: {
+                            '0%': { transform: 'translateY(-100%)', opacity: '0' },
+                            '100%': { transform: 'translateY(20px)', opacity: '1' },
+                        },
+                        shake: {
+                            '0%, 100%': { transform: 'translateX(0)' },
+                            '25%': { transform: 'translateX(-5px)' },
+                            '75%': { transform: 'translateX(5px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .farm-bg {
+            background-image: url('https://i.supaimg.com/4f2b3438-4977-4616-a55a-0f95187a60c8.jpg');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+        }
+        .farm-bg::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 0;
+        }
+        .form-input {
+            background-color: transparent;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding-bottom: 8px;
+            transition: all 0.3s;
+        }
+        .form-input:focus {
+            border-color: #facc15;
+            outline: none;
+        }
+        .loader {
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            border-top: 3px solid #facc15;
+            width: 24px;
+            height: 24px;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .otp-box {
+            border: 2px solid #3b82f6;
+            background: rgba(59, 130, 246, 0.1);
+        }
+    </style>
+</head>
+<body class="farm-bg font-sans min-h-screen flex flex-col items-center justify-center p-4 overflow-hidden">
+
+    <!-- FAKE SMS NOTIFICATION (Simulates real OTP arrival) -->
+    <div id="smsNotification" class="fixed top-0 left-1/2 -translate-x-1/2 w-full max-w-xs z-[100] hidden">
+        <div class="bg-white/95 backdrop-blur shadow-2xl rounded-2xl p-4 flex items-start gap-3 border-l-4 border-otp-blue animate-slide-down">
+            <div class="bg-blue-100 p-2 rounded-full text-otp-blue">
+                <i data-lucide="message-square" class="w-5 h-5"></i>
+            </div>
+            <div class="flex-1">
+                <p class="text-xs font-bold text-gray-500 uppercase tracking-wider">Messages</p>
+                <p class="text-sm text-gray-800"><span class="font-bold">Kisan Connect:</span> Your verification code is <span id="notifOtp" class="font-black text-otp-blue">0000</span>. Do not share this with anyone.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Container -->
+    <div class="z-10 w-full max-w-sm mx-auto relative min-h-[520px] flex flex-col justify-center">
+        
+        <!-- Logo Section -->
+        <div id="logoContainer" class="flex justify-center mb-8">
+            <div class="relative group">
+                <img 
+                    src="https://i.supaimg.com/e409a04b-622b-45c4-b801-446ac1064f93.png" 
+                    alt="Logo" 
+                    class="rounded-full shadow-2xl border-4 border-white/20 w-24 h-24 object-cover bg-white/10 backdrop-blur-sm p-2"
+                />
+                <div class="absolute -bottom-2 w-full text-center">
+                    <span class="bg-primary-yellow text-black text-[10px] font-black uppercase px-2 py-0.5 rounded-full shadow-md">Kisan Connect</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 1: LOGIN FORM -->
+        <div id="loginView" class="animate-fade-in w-full bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/10 shadow-2xl">
+            <form id="loginForm" class="space-y-6">
+                <div class="text-center space-y-1">
+                    <h2 class="text-white text-2xl font-bold">Welcome Back</h2>
+                    <p class="text-gray-400 text-sm">Enter details to generate OTP</p>
+                </div>
+                
+                <div id="errorMessage" class="hidden bg-red-500/20 border border-red-500/50 text-red-200 text-xs p-3 rounded-xl text-center"></div>
+
+                <div class="space-y-4">
+                    <div class="relative">
+                        <label class="block text-white/60 text-xs font-semibold mb-1 uppercase ml-1">Mobile / Email</label>
+                        <div class="relative">
+                            <i data-lucide="user" class="absolute left-0 bottom-2.5 text-white/40 w-4 h-4"></i>
+                            <input type="text" id="email" placeholder="9876543210" class="form-input w-full pl-7 text-lg" required>
+                        </div>
+                    </div>
+
+                    <div class="relative">
+                        <label class="block text-white/60 text-xs font-semibold mb-1 uppercase ml-1">Password</label>
+                        <div class="relative">
+                            <i data-lucide="lock" class="absolute left-0 bottom-2.5 text-white/40 w-4 h-4"></i>
+                            <input type="password" id="password" placeholder="••••••••" class="form-input w-full pl-7 text-lg" required>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" id="btnGenerate" class="w-full bg-primary-yellow text-black font-black py-4 px-4 rounded-2xl shadow-xl hover:bg-yellow-400 active:scale-95 transition-all flex justify-center items-center gap-2">
+                    <span>GENERATE OTP</span>
+                    <i data-lucide="zap" class="w-4 h-4 fill-current"></i>
+                </button>
+            </form>
+        </div>
+
+        <!-- VIEW 2: OTP FORM -->
+        <div id="otpView" class="hidden w-full bg-black/40 backdrop-blur-md p-8 rounded-3xl border border-white/10 shadow-2xl">
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-otp-blue/20 mb-4 text-otp-blue border border-otp-blue/30">
+                    <i data-lucide="shield-check" class="w-8 h-8"></i>
+                </div>
+                <h2 class="text-white text-2xl font-bold">Verification</h2>
+                <p class="text-gray-400 text-sm mt-2">Enter the code sent to your device</p>
+                
+                <!-- BLUE OUTLINED VERIFICATION BOX -->
+                <div class="mt-5 p-3 rounded-xl otp-box border-dashed">
+                   <p class="text-blue-300 text-[10px] uppercase font-bold tracking-widest">SafePlus Verification</p>
+                   <p class="text-white text-lg font-medium">OTP: <span id="displayOtp" class="font-black text-primary-yellow tracking-widest">----</span></p>
+                </div>
+            </div>
+
+            <form id="otpForm" class="space-y-8">
+                <div class="flex justify-between gap-2">
+                    <input type="number" maxlength="1" class="otp-digit w-14 h-16 text-center text-2xl font-black bg-white/5 border-2 border-white/10 rounded-2xl text-white focus:border-primary-yellow focus:bg-white/10 focus:outline-none transition-all appearance-none" oninput="this.value=this.value.slice(0,1)">
+                    <input type="number" maxlength="1" class="otp-digit w-14 h-16 text-center text-2xl font-black bg-white/5 border-2 border-white/10 rounded-2xl text-white focus:border-primary-yellow focus:bg-white/10 focus:outline-none transition-all appearance-none" oninput="this.value=this.value.slice(0,1)">
+                    <input type="number" maxlength="1" class="otp-digit w-14 h-16 text-center text-2xl font-black bg-white/5 border-2 border-white/10 rounded-2xl text-white focus:border-primary-yellow focus:bg-white/10 focus:outline-none transition-all appearance-none" oninput="this.value=this.value.slice(0,1)">
+                    <input type="number" maxlength="1" class="otp-digit w-14 h-16 text-center text-2xl font-black bg-white/5 border-2 border-white/10 rounded-2xl text-white focus:border-primary-yellow focus:bg-white/10 focus:outline-none transition-all appearance-none" oninput="this.value=this.value.slice(0,1)">
+                </div>
+                
+                <div class="space-y-3">
+                    <button type="submit" class="w-full bg-otp-blue text-white font-black py-4 px-4 rounded-2xl shadow-lg hover:bg-blue-600 active:scale-95 transition-all">
+                        VERIFY & LOGIN
+                    </button>
+                    
+                    <button type="button" id="backToLogin" class="w-full text-gray-400 text-xs font-bold uppercase py-2 hover:text-white transition">
+                        ← Edit Credentials
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- LOADING OVERLAY -->
+        <div id="loadingOverlay" class="hidden absolute inset-0 z-50 flex flex-col items-center justify-center bg-black/60 backdrop-blur-sm rounded-3xl">
+            <div class="loader mb-4"></div>
+            <p id="loadingText" class="text-white text-sm font-bold uppercase tracking-widest animate-pulse">Processing</p>
+        </div>
+
+    </div>
+
+    <!-- Logic -->
+    <script>
+        lucide.createIcons();
+
+        let currentOtp = "";
+        const loginForm = document.getElementById('loginForm');
+        const otpForm = document.getElementById('otpForm');
+        const loginView = document.getElementById('loginView');
+        const otpView = document.getElementById('otpView');
+        const loadingOverlay = document.getElementById('loadingOverlay');
+        const loadingText = document.getElementById('loadingText');
+        const errorMessage = document.getElementById('errorMessage');
+        const otpInputs = document.querySelectorAll('.otp-digit');
+        const smsNotif = document.getElementById('smsNotification');
+        const notifOtp = document.getElementById('notifOtp');
+        const displayOtp = document.getElementById('displayOtp');
+
+        function showLoader(message = "Processing") {
+            loadingText.textContent = message;
+            loadingText.classList.remove('text-green-400', 'text-red-400');
+            loadingOverlay.classList.remove('hidden');
+        }
+
+        function hideLoader() {
+            loadingOverlay.classList.add('hidden');
+        }
+
+        function triggerVibration() {
+            if ("vibrate" in navigator) {
+                // Vibrate pattern: 200ms on, 100ms off, 200ms on
+                navigator.vibrate([200, 100, 200]);
+            }
+        }
+
+        function generateAndShowOTP() {
+            // Generate 4 digit OTP
+            currentOtp = Math.floor(1000 + Math.random() * 9000).toString();
+            
+            // Update UI components
+            notifOtp.textContent = currentOtp;
+            displayOtp.textContent = currentOtp;
+            
+            // Show SMS Notification
+            smsNotif.classList.remove('hidden');
+            triggerVibration();
+
+            // Hide notification after 6 seconds
+            setTimeout(() => {
+                smsNotif.classList.add('hidden');
+            }, 6000);
+        }
+
+        // Login Submission
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            showLoader("Securing Connection");
+
+            try {
+                // Attempt to send to PHP (will fail in preview, handled by catch)
+                const response = await fetch('save_user.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                if (data.status !== 'success') throw new Error(data.message);
+                
+                proceedToOtp();
+            } catch (err) {
+                // If PHP fails or isn't there, we still proceed for the demo
+                console.warn("Backend not detected, running in local demo mode.");
+                setTimeout(() => {
+                    proceedToOtp();
+                }, 1200);
+            }
+        });
+
+        function proceedToOtp() {
+            generateAndShowOTP();
+            hideLoader();
+            loginView.classList.add('hidden');
+            otpView.classList.remove('hidden');
+            otpView.classList.add('animate-fade-in');
+            otpInputs[0].focus();
+        }
+
+        // OTP Input Navigation
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('keyup', (e) => {
+                if (e.target.value.length === 1 && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+            });
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && !e.target.value && index > 0) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+        });
+
+        // OTP Verification
+        otpForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            let enteredOtp = "";
+            otpInputs.forEach(input => enteredOtp += input.value);
+
+            if (enteredOtp.length < 4) return;
+
+            showLoader("Verifying Code");
+
+            setTimeout(() => {
+                if (enteredOtp === currentOtp) {
+                    loadingText.textContent = "Access Granted";
+                    loadingText.classList.add('text-green-400');
+                    setTimeout(() => {
+                        window.location.href = "login page 2.html";
+                    }, 1000);
+                } else {
+                    hideLoader();
+                    // Shake effect on error
+                    otpForm.classList.add('animate-shake');
+                    setTimeout(() => otpForm.classList.remove('animate-shake'), 400);
+                    otpInputs.forEach(input => {
+                        input.value = "";
+                        input.classList.add('border-red-500');
+                    });
+                    otpInputs[0].focus();
+                    alert("Incorrect OTP. Please check your messages.");
+                }
+            }, 1500);
+        });
+
+        document.getElementById('backToLogin').addEventListener('click', () => {
+            otpView.classList.add('hidden');
+            loginView.classList.remove('hidden');
+            loginView.classList.add('animate-fade-in');
+        });
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agroplus+ Home</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <!-- Custom config -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'agro-primary': '#16a34a', // Green-600
+                        'agro-dark': '#14532d',    // Green-900
+                        'agro-light': '#22c55e',   // Green-500
+                        'agro-bg': '#f8fafc',      // Slate-50
+                        'agro-warn': '#f59e0b',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'soft': '0 10px 40px -10px rgba(0,0,0,0.05)',
+                        'card': '0 4px 20px -5px rgba(0,0,0,0.06)',
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #f8fafc;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Hide Scrollbar but keep functionality */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Feature Card Interactions */
+        .feature-card {
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        .feature-card:active {
+            transform: scale(0.92);
+        }
+        .feature-card:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Gradient Border Logic */
+        .gradient-border-card {
+            background: linear-gradient(135deg, #9333ea, #3b82f6);
+            padding: 2px;
+            border-radius: 1.5rem; /* rounded-3xl */
+            position: relative;
+        }
+        .gradient-border-inner {
+            background: white;
+            border-radius: calc(1.5rem - 2px);
+            height: 100%;
+        }
+
+        /* Loader */
+        .loader-spinner {
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid #16a34a;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body class="bg-agro-bg font-body text-slate-800 pb-28 antialiased selection:bg-green-100 selection:text-green-800">
+
+    <!-- FULL SCREEN LOADING OVERLAY -->
+    <div id="app-loader" class="fixed inset-0 bg-white/90 backdrop-blur-sm flex flex-col items-center justify-center z-[60] hidden transition-opacity duration-300">
+        <div class="loader-spinner mb-4"></div>
+        <p class="text-slate-600 font-medium text-sm animate-pulse">Syncing Farm Data...</p>
+    </div>
+
+    <!-- LEAF HEADER (New Layout) -->
+    <header class="bg-gradient-to-r from-green-600 to-emerald-600 pt-10 pb-20 px-6 rounded-br-[4rem] shadow-lg relative z-20">
+        <div class="flex justify-between items-start">
+            <!-- Logo Section -->
+            <div class="text-white">
+                <h1 class="text-3xl font-sans font-extrabold tracking-tight drop-shadow-sm">Agro<span class="font-light">plus+</span></h1>
+                <p class="text-green-100 text-xs mt-1 opacity-90 font-medium flex items-center gap-1">
+                    <i class="fas fa-leaf text-[10px]"></i> Growing Smarter
+                </p>
+            </div>
+
+            <!-- Profile/Location -->
+            <div class="flex items-center gap-3">
+                <div class="text-right text-white hidden sm:block"><div class="text-right text-white hidden sm:block"></div>
+                    <p class="text-sm font-semibold">Parth Sonavane</p>
+                    <p class="text-xs text-green-100 opacity-90">Boisar, MH</p>
+                </div>
+                <a href="profile.html" class="bg-white/20 backdrop-blur-md border border-white/20 p-2.5 rounded-full text-white hover:bg-white/30 transition shadow-sm active:scale-95">
+                    <i class="fas fa-user text-lg w-6 h-6 flex items-center justify-center"></i>
+                </a>
+            </div>
+        </div>
+        
+        <!-- Welcome Message (Subtle) -->
+        <div class="mt-6 text-white/90">
+            <p class="text-sm font-medium">Good Morning,User</p>
+            <p class="text-xs text-green-100">Market rates are up by 2% today.</p>
+        </div>
+    </header>
+
+    <!-- FLOATING SEARCH BAR -->
+    <div class="px-6 -mt-8 relative z-30 mb-8">
+        <div class="bg-white rounded-2xl shadow-card p-2 flex items-center border border-slate-100">
+            <i class="fas fa-search text-slate-400 ml-4 text-lg"></i>
+            <input type="text" placeholder="Search Mandi, Crops, Schemes..." 
+                   class="w-full py-3 px-3 text-slate-700 outline-none placeholder-slate-400 font-medium bg-transparent text-sm">
+            <button class="bg-gradient-to-br from-green-500 to-emerald-600 text-white rounded-xl w-10 h-10 flex items-center justify-center shadow-md active:scale-90 transition transform hover:shadow-lg">
+                <i class="fas fa-sliders-h text-sm"></i>
+            </button>
+        </div>
+    </div>
+
+    <!-- MAIN CONTENT Wrapper with increased spacing -->
+    <main class="space-y-8">
+        
+        <!-- 1. EXPLORE GRID -->
+        <div class="px-6">
+            <div class="flex justify-between items-center mb-5">
+                <h2 class="text-xl font-extrabold text-slate-900 tracking-tight">Explore</h2>
+                <span class="text-xs text-green-600 font-bold bg-green-50 px-3 py-1.5 rounded-full hover:bg-green-100 transition cursor-pointer">All Services</span>
+            </div>
+
+            <div class="grid grid-cols-4 gap-y-6 gap-x-4 text-center">
+                <!-- Market -->
+                <a href="agromart.html" onclick="handleFeatureClick('market')" class="feature-card flex flex-col items-center gap-2 group cursor-pointer">
+                    <div class="w-14 h-14 rounded-2xl bg-green-50 text-green-600 flex items-center justify-center text-xl shadow-sm border border-green-100 group-hover:bg-green-500 group-hover:text-white group-hover:shadow-green-200 group-hover:shadow-lg transition-all duration-300">
+                        <i class="fas fa-store-alt"></i>
+                    </div>
+                    <span class="text-[13px] font-bold text-slate-600 group-hover:text-green-700">Mandi</span>
+                </a>
+
+                <!-- Chat -->
+                <a href="agrochat.html" onclick="handleFeatureClick('chat')" class="feature-card flex flex-col items-center gap-2 group cursor-pointer">
+                    <div class="w-14 h-14 rounded-2xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl shadow-sm border border-blue-100 group-hover:bg-blue-500 group-hover:text-white group-hover:shadow-blue-200 group-hover:shadow-lg transition-all duration-300">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <span class="text-[13px] font-bold text-slate-600 group-hover:text-blue-700">Chat</span>
+                </a>
+
+                <!-- Health -->
+                <a href="agrohealth.html" onclick="handleFeatureClick('health')" class="feature-card flex flex-col items-center gap-2 group cursor-pointer">
+                    <div class="w-14 h-14 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center text-xl shadow-sm border border-red-100 group-hover:bg-red-500 group-hover:text-white group-hover:shadow-red-200 group-hover:shadow-lg transition-all duration-300">
+                        <i class="fas fa-heartbeat"></i>
+                    </div>
+                    <span class="text-[13px] font-bold text-slate-600 group-hover:text-red-700">Health</span>
+                </a>
+
+                <!-- Drone -->
+                <a href="droneupgrade.html" onclick="handleFeatureClick('drone')" class="feature-card flex flex-col items-center gap-2 group cursor-pointer">
+                    <div class="w-14 h-14 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-xl shadow-sm border border-purple-100 group-hover:bg-purple-500 group-hover:text-white group-hover:shadow-purple-200 group-hover:shadow-lg transition-all duration-300">
+                        <i class="fas fa-helicopter"></i>
+                    </div>
+                    <span class="text-[13px] font-bold text-slate-600 group-hover:text-purple-700">Drone</span>
+                </a>
+
+                <!-- IOT -->
+                <a href="iot.html" onclick="handleFeatureClick('iot')" class="feature-card flex flex-col items-center gap-2 group cursor-pointer">
+                    <div class="w-14 h-14 rounded-2xl bg-cyan-50 text-cyan-600 flex items-center justify-center text-xl shadow-sm border border-cyan-100 group-hover:bg-cyan-500 group-hover:text-white group-hover:shadow-cyan-200 group-hover:shadow-lg transition-all duration-300">
+                        <i class="fas fa-wifi"></i>
+                    </div>
+                    <span class="text-[13px] font-bold text-slate-600 group-hover:text-cyan-700">IoT</span>
+                </a>
+                 <!-- records -->
+                <a href="summary.html" onclick="handleFeatureClick('iot')" class="feature-card flex flex-col items-center gap-2 group cursor-pointer">
+                    <div class="w-14 h-14 rounded-2xl bg-cyan-50 text-red-600 flex items-center justify-center text-xl shadow-sm border border-cyan-100 group-hover:bg-red-500 group-hover:text-white group-hover:shadow-red-200 group-hover:shadow-lg transition-all duration-300">
+                        <i class="fas fa-clipboard-list"></i>
+                    </div>
+                    <span class="text-[13px] font-bold text-slate-600 group-hover:text-cyan-700">records</span>
+                </a>
+
+                <!-- Solar -->
+                <a href="agrodefector.html" class="feature-card flex flex-col items-center gap-2 group cursor-pointer">
+                    <div class="w-14 h-14 rounded-2xl bg-black-50 text-black-600 flex items-center justify-center text-xl shadow-sm border border-black-100 group-hover:bg-black-500 group-hover:text-white group-hover:shadow-yellow-200 group-hover:shadow-lg transition-all duration-300">
+                        <i class="fas fa-satellite-dish"></i>
+                    </div>
+                    <span class="text-[13px] font-bold text-slate-600 group-hover:text-yellow-700">Radar</span>
+                </a>
+
+                <!-- Schemes -->
+                <a href="agrohelp.html" class="feature-card flex flex-col items-center gap-2 group cursor-pointer">
+                    <div class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-xl shadow-sm border border-indigo-100 group-hover:bg-indigo-500 group-hover:text-white group-hover:shadow-indigo-200 group-hover:shadow-lg transition-all duration-300">
+                        <i class="fas fa-hand-holding-usd"></i>
+                    </div>
+                    <span class="text-[13px] font-bold text-slate-600 group-hover:text-indigo-700">Schemes</span>
+                </a>
+                <!-- farmpay-->
+                <a href="frampay.html" class="feature-card flex flex-col items-center gap-2 group cursor-pointer">
+                    <div class="w-14 h-14 rounded-2xl bg-yellow-50 text-indigo-600 flex items-center justify-center text-xl shadow-sm border border-yellow-100 group-hover:bg-yellow-500 group-hover:text-white group-hover:shadow-yellow-200 group-hover:shadow-lg transition-all duration-300">
+                        <i class="fas fa-indian-rupee-sign"></i>
+                    </div>
+                    <span class="text-[13px] font-bold text-slate-600 group-hover:text-indigo-700">farmpay</span>
+                </a>
+                <!-- More -->
+                <a href="#" class="feature-card flex flex-col items-center gap-2 group cursor-pointer">
+                    <div class="w-14 h-14 rounded-2xl bg-slate-100 text-slate-600 flex items-center justify-center text-xl shadow-sm border border-slate-200 group-hover:bg-slate-800 group-hover:text-white group-hover:shadow-slate-300 group-hover:shadow-lg transition-all duration-300">
+                        <i class="fas fa-th-large"></i>
+                    </div>
+                    <span class="text-[13px] font-bold text-slate-600 group-hover:text-slate-800">More</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- 2. TOP FEATURES CARD (Gradient Border) -->
+        <div class="px-6">
+            <div class="gradient-border-card shadow-card hover:shadow-lg transition-shadow duration-300">
+                <div class="gradient-border-inner p-6">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-1.5 h-6 bg-gradient-to-b from-purple-500 to-blue-500 rounded-full"></div>
+                        <h2 class="text-xl font-extrabold text-slate-900 tracking-tight">Top Features</h2>
+                    </div>
+                    
+                    <div class="flex justify-between items-start px-2 text-center">
+                        <!-- Detector -->
+                        <a href="icapured.html" class="flex flex-col items-center group w-1/3 cursor-pointer feature-card">
+                            <div class="w-16 h-16 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl shadow-sm border border-purple-100 group-hover:bg-purple-600 group-hover:text-white transition-all duration-300">
+                                <i class="fas fa-magnifying-glass-location"></i>
+                            </div>
+                            <span class="text-[13px] font-bold text-slate-700 mt-2 group-hover:text-purple-700">Detector</span>
+                        </a>
+
+                        <!-- Daily prices -->
+                        <a href="agrodaily.html" class="flex flex-col items-center group w-1/3 cursor-pointer feature-card">
+                            <div class="w-16 h-16 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl shadow-sm border border-purple-100 group-hover:bg-purple-600 group-hover:text-white transition-all duration-300" >                         
+                             <i class="fas fa-chart-line"></i>
+                            </div>
+                            <span class="text-[13px] font-bold text-slate-700 mt-2 leading-tight group-hover:text-blue-700">Daily<br>Prices</span>
+                        </a>
+
+                        <!-- Records -->
+                        <a href="agrorecord1.html" class="flex flex-col items-center group w-1/3 cursor-pointer feature-card">
+            <div class="w-16 h-16 rounded-2xl bg-purple-50 text-purple-600 flex items-center justify-center text-2xl shadow-sm border border-purple-100 group-hover:bg-purple-600 group-hover:text-white transition-all duration-300">
+                                <i class="fas fa-clipboard-list"></i>
+                            </div>
+                            <span class="text-[13px] font-bold text-slate-700 mt-2 group-hover:text-emerald-700">Records</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. WEATHER CARD -->
+        <div class="px-6">
+            <div id="weather-card" class="bg-white p-6 rounded-3xl shadow-card hover:shadow-lg border border-slate-100 cursor-pointer relative overflow-hidden group transition-all duration-300 active:scale-[0.98]" onclick="toggleWeatherAdvice()">
+                <!-- Decorative background blob -->
+                <div class="absolute -right-10 -top-10 w-32 h-32 bg-yellow-50 rounded-full blur-2xl opacity-60 group-hover:bg-yellow-100 transition-colors duration-500"></div>
+                <div class="absolute -left-10 -bottom-10 w-24 h-24 bg-blue-50 rounded-full blur-2xl opacity-60 group-hover:bg-blue-100 transition-colors duration-500"></div>
+                
+                <div class="flex justify-between items-start relative z-10">
+                    <div>
+                        <span class="bg-red-50 text-red-600 text-[10px] font-bold px-2 py-1 rounded-full border border-red-100 tracking-wide">HEAT ALERT</span>
+                        <h3 class="text-4xl font-extrabold text-slate-800 mt-3 tracking-tight">34°C</h3>
+                        <p class="text-sm text-slate-500 font-semibold mt-1">Partly Cloudy</p>
+                    </div>
+                    <i class="fas fa-cloud-sun text-yellow-500 text-5xl drop-shadow-sm group-hover:scale-110 transition-transform duration-300"></i>
+                </div>
+
+                <!-- Metrics Grid -->
+                <div class="grid grid-cols-3 gap-2 mt-5 pt-5 border-t border-slate-100 relative z-10">
+                    <div class="text-center group-hover:transform group-hover:-translate-y-1 transition-transform delay-75">
+                        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Humidity</p>
+                        <p class="text-slate-800 font-bold text-sm mt-0.5">85%</p>
+                    </div>
+                    <div class="text-center border-l border-slate-100 group-hover:transform group-hover:-translate-y-1 transition-transform delay-100">
+                        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-wider">Wind</p>
+                        <p class="text-slate-800 font-bold text-sm mt-0.5">12 km/h</p>
+                    </div>
+                    <div class="text-center border-l border-slate-100 group-hover:transform group-hover:-translate-y-1 transition-transform delay-150">
+                        <p class="text-slate-400 text-[10px] font-bold uppercase tracking-wider">AQI</p>
+                        <p class="text-slate-800 font-bold text-sm mt-0.5">78</p>
+                    </div>
+                </div>
+                    
+                <!-- Hidden Advice -->
+                <div id="crop-advice-details" class="hidden mt-4 pt-3 border-t border-slate-100 text-sm text-slate-600 animate-fadeIn">
+                    <ul class="space-y-2.5">
+                        <li class="flex gap-3 items-center p-2 rounded-lg hover:bg-slate-50 transition-colors">
+                            <div class="w-8 h-8 rounded-full bg-red-100 text-red-500 flex items-center justify-center text-xs"><i class="fas fa-bug"></i></div>
+                            <span class="font-medium">High pest risk for Okra.</span>
+                        </li>
+                        <li class="flex gap-3 items-center p-2 rounded-lg hover:bg-slate-50 transition-colors">
+                            <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-500 flex items-center justify-center text-xs"><i class="fas fa-tint"></i></div>
+                            <span class="font-medium">Irrigate mango orchards.</span>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="absolute bottom-2 right-1/2 translate-x-1/2 text-slate-300 text-xs transition-transform duration-300" id="advice-arrow-container">
+                    <i class="fas fa-chevron-down" id="advice-toggle-icon"></i>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. MARKETING BANNER (Moved inside flow) -->
+        <div class="px-6">
+            <div class="rounded-3xl overflow-hidden shadow-card border border-slate-100 relative group cursor-pointer">
+                <div class="absolute inset-0 bg-black/10 group-hover:bg-black/0 transition-colors z-10"></div>
+                <!-- Simulating a promo banner -->
+                 <div class="bg-gradient-to-r from-orange-400 to-pink-500 w-full h-40 flex items-center justify-between px-6 relative overflow-hidden">
+                    <div class="relative z-20 text-white">
+                         <span class="bg-white/20 backdrop-blur px-2 py-1 rounded-md text-[10px] font-bold uppercase tracking-widest border border-white/20">Offer</span>
+                        <h4 class="font-extrabold text-xl mt-2 leading-tight">Get 50% Off<br>Soil Testing</h4>
+                        <button class="mt-3 bg-white text-orange-500 text-xs font-bold px-4 py-2 rounded-xl shadow-sm hover:scale-105 transition-transform">Book Now</button>
+                    </div>
+                    <i class="fas fa-flask text-white/30 text-8xl absolute -right-4 -bottom-4 rotate-12"></i>
+                 </div>
+            </div>
+        </div>
+
+        <!-- 5. FEED / NEW ARRIVAL -->
+        <div class="px-6 pb-6">
+            <h3 class="text-xl font-extrabold text-slate-800 mb-4 tracking-tight">For You</h3>
+            
+            <a href="droneupgrade.html" class="block bg-gradient-to-br from-purple-700 to-indigo-800 rounded-3xl p-6 text-white shadow-lg relative overflow-hidden group active:scale-[0.98] transition-transform duration-300">
+                <div class="absolute right-0 bottom-0 opacity-20 transform translate-x-8 translate-y-8 group-hover:scale-110 transition-transform duration-500">
+                    <i class="fas fa-drone text-[10rem]"></i>
+                </div>
+                <div class="relative z-10">
+                    <span class="bg-white/20 backdrop-blur px-2 py-1 rounded text-[10px] font-bold tracking-wide border border-white/10">NEW ARRIVAL</span>
+                    <h4 class="text-2xl font-extrabold mt-3 leading-tight">Agrodrone X1<br>Now Available</h4>
+                    <p class="text-purple-200 text-xs mt-2 font-medium max-w-[60%]">Advanced spray technology with 2x battery life.</p>
+                    <button class="mt-5 bg-white text-purple-700 px-5 py-2.5 rounded-xl text-xs font-bold shadow-md hover:bg-purple-50 transition-colors flex items-center gap-2">
+                        View Kit <i class="fas fa-arrow-right text-[10px]"></i>
+                    </button>
+                </div>
+            </a>
+        </div>
+
+    </main>
+
+    <!-- JS for Interactions -->
+    <script>
+        function toggleWeatherAdvice() {
+            const details = document.getElementById('crop-advice-details');
+            const icon = document.getElementById('advice-toggle-icon');
+            const arrowContainer = document.getElementById('advice-arrow-container');
+            
+            if (details.classList.contains('hidden')) {
+                details.classList.remove('hidden');
+                icon.classList.add('rotate-180');
+                arrowContainer.classList.add('opacity-0'); // Hide arrow when open
+            } else {
+                details.classList.add('hidden');
+                icon.classList.remove('rotate-180');
+                arrowContainer.classList.remove('opacity-0');
+            }
+        }
+
+        function handleFeatureClick(name) {
+            const loader = document.getElementById('app-loader');
+            loader.classList.remove('hidden');
+            // Simulate loading
+            setTimeout(() => {
+                // In a real app, this would redirect. 
+                // For demo, we just hide loader
+                // window.location.href = ...
+                loader.classList.add('hidden');
+            }, 800);
+        }
+    </script>
+</body>
+</html>

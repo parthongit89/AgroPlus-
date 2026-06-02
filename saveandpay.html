@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="en" class="dark"> <!-- Default to Dark Mode for premium feel -->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Farmpay+ Add Contact</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        'fp-dark': '#0f172a',      /* Slate-950 */
+                        'fp-surface': '#1e293b',   /* Slate-800 */
+                        'fp-gold': '#fbbf24',      /* Amber-400 */
+                        'fp-gold-dark': '#d97706', /* Amber-600 */
+                        'fp-green': '#10b981',     /* Emerald-500 */
+                        'fp-red': '#ef4444',       /* Red-500 */
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['Space Grotesk', 'monospace'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-5px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        /* Base Styles */
+        body {
+            transition: background-color 0.3s ease, color 0.3s ease;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Hide Scrollbar */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Ambient Background Orbs */
+        .bg-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: 0;
+            transition: opacity 0.5s ease;
+            pointer-events: none;
+        }
+        .orb-1 { top: -10%; left: -10%; width: 300px; height: 300px; background: #fbbf24; }
+        .orb-2 { bottom: 10%; right: -10%; width: 250px; height: 250px; background: #10b981; }
+        
+        html.light .bg-orb { opacity: 0.3; }
+        html.dark .bg-orb { opacity: 0.15; }
+
+        /* Glassmorphism */
+        .glass-panel {
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            transition: all 0.3s ease;
+        }
+        html.dark .glass-panel {
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        html.light .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            border: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        /* Input Styling adapted for Glass */
+        .glass-input {
+            width: 100%;
+            padding: 16px 16px 16px 48px;
+            background: transparent;
+            border-bottom: 1px solid;
+            outline: none;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        html.dark .glass-input {
+            border-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+        html.light .glass-input {
+            border-color: rgba(0, 0, 0, 0.1);
+            color: #1e293b;
+        }
+        .glass-input:focus {
+            border-color: #fbbf24;
+        }
+
+        /* Nav Bar */
+        .bottom-nav {
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top-left-radius: 24px;
+            border-top-right-radius: 24px;
+        }
+        html.dark .bottom-nav {
+            background: rgba(15, 23, 42, 0.95);
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        html.light .bottom-nav {
+            background: rgba(255, 255, 255, 0.95);
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+        }
+
+        /* Scan FAB */
+        .scan-fab {
+            width: 64px; height: 64px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%);
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 8px 20px rgba(251, 191, 36, 0.4);
+            transform: translateY(-24px);
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 51;
+        }
+        html.dark .scan-fab { border: 6px solid #0f172a; }
+        html.light .scan-fab { border: 6px solid #f8fafc; }
+        .scan-fab:active { transform: translateY(-24px) scale(0.9); }
+
+        /* Animation for History Items */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .history-item {
+            animation: slideIn 0.3s ease-out forwards;
+        }
+    </style>
+</head>
+<body class="h-screen w-full flex flex-col relative bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 overflow-hidden">
+
+    <!-- Ambient Background -->
+    <div class="bg-orb orb-1 animate-pulse-slow"></div>
+    <div class="bg-orb orb-2"></div>
+
+    <!-- Top Navigation -->
+    <header class="px-6 pt-12 pb-4 flex items-center justify-between z-30 relative">
+        <!-- Back Button -->
+        <button onclick="window.history.back()" class="w-10 h-10 rounded-full bg-white/50 dark:bg-fp-surface/50 border border-slate-200 dark:border-white/5 flex items-center justify-center text-slate-600 dark:text-white hover:bg-white dark:hover:bg-white/10 transition backdrop-blur-sm">
+            <i class="fas fa-arrow-left"></i>
+        </button>
+
+        <!-- Title -->
+        <h1 class="text-xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-fp-gold to-orange-500">
+            Add Contact
+        </h1>
+
+        <!-- Theme Toggle -->
+        <button onclick="toggleTheme()" class="w-10 h-10 rounded-full bg-white/50 dark:bg-fp-surface/50 border border-slate-200 dark:border-white/5 flex items-center justify-center text-slate-600 dark:text-white hover:bg-white dark:hover:bg-white/10 transition backdrop-blur-sm">
+            <i class="fas fa-moon dark:hidden"></i>
+            <i class="fas fa-sun hidden dark:inline text-fp-gold"></i>
+        </button>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow relative w-full h-full px-6 z-20 overflow-y-auto no-scrollbar pb-32">
+        
+        <!-- Form Section -->
+        <div class="glass-panel p-6 rounded-3xl mb-8 relative overflow-hidden border-t border-white/10">
+            <!-- Decorative Glow -->
+            <div class="absolute top-0 right-0 w-32 h-32 bg-fp-gold/10 rounded-full blur-2xl -mr-10 -mt-10 pointer-events-none"></div>
+
+            <div class="flex flex-col gap-6">
+                <!-- Name Input -->
+                <div class="relative group">
+                    <i class="fas fa-user absolute left-0 top-4 text-slate-400 group-focus-within:text-fp-gold transition-colors pl-3"></i>
+                    <input type="text" id="inputName" placeholder="Recipient Name" class="glass-input" autocomplete="off">
+                </div>
+
+                <!-- Phone Input -->
+                <div class="relative group">
+                    <i class="fas fa-phone absolute left-0 top-4 text-slate-400 group-focus-within:text-fp-gold transition-colors pl-3"></i>
+                    <input type="tel" id="inputPhone" placeholder="Phone Number" class="glass-input" autocomplete="off" maxlength="10">
+                </div>
+
+                <!-- Action Button -->
+                <button onclick="addContact()" class="w-full bg-gradient-to-r from-fp-gold to-orange-500 text-white font-bold py-4 rounded-xl shadow-lg shadow-orange-500/20 active:scale-95 transition-transform flex items-center justify-center gap-2 mt-2">
+                    <i class="fas fa-check-circle"></i> Save Contact
+                </button>
+            </div>
+        </div>
+
+        <!-- History Section -->
+        <div class="mb-6">
+            <div class="flex justify-between items-center mb-4 px-1">
+                <h3 class="text-lg font-bold text-slate-800 dark:text-white flex items-center gap-2">
+                    <i class="fas fa-history text-fp-gold"></i> History
+                </h3>
+                
+                <div class="flex items-center gap-2">
+                    <span class="text-[10px] font-mono text-slate-400 bg-slate-200/50 dark:bg-white/5 px-2 py-1 rounded-full" id="count-badge">0 saved</span>
+                    <button onclick="clearAll()" class="w-6 h-6 rounded-full bg-red-500/10 text-red-500 flex items-center justify-center hover:bg-red-500/20 transition">
+                        <i class="fas fa-trash-alt text-[10px]"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- List Container -->
+            <div id="contact-list" class="space-y-3 min-h-[100px]">
+                <!-- Empty State -->
+                <div id="empty-state" class="text-center py-12">
+                    <div class="w-16 h-16 rounded-full bg-slate-100 dark:bg-white/5 flex items-center justify-center mx-auto mb-3 text-slate-300 dark:text-slate-600">
+                        <i class="fas fa-address-book text-2xl"></i>
+                    </div>
+                    <p class="text-sm text-slate-400">No contacts saved yet.</p>
+                </div>
+                <!-- Items will be added here -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Bottom Navigation (Consistent with Unified App) -->
+    <nav class="bottom-nav fixed bottom-0 left-0 right-0 h-24 px-6 pb-2 flex justify-between items-center z-40">
+         <a href="frampay.html"><button class="flex flex-col items-center gap-1.5 text-slate-500 w-16" onclick="window.location.href='farmpay.html'">
+          <i class="fas fa-home text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">Home</span> 
+        </button></a>
+        <button class="flex flex-col items-center gap-1.5 text-fp-gold w-16">
+            <i class="fas fa-wallet text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">Cards</span>
+            <div class="w-1 h-1 rounded-full bg-fp-gold"></div>
+        </button>
+        <div class="relative w-16 flex justify-center">
+            <button class="scan-fab animate-float" onclick="window.location.href='scanqrpay.html'">
+                <i class="fas fa-qrcode text-white text-2xl"></i>
+            </button>
+        </div>
+        <button class="flex flex-col items-center gap-1.5 text-slate-500 w-16" onclick="window.location.href='saveandpay.html'">
+            <i class="fas fa-paper-plane text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">Pay</span>
+        </button>
+        <button class="flex flex-col items-center gap-1.5 text-slate-500 w-16">
+            <i class="fas fa-cog text-xl mb-1"></i>
+            <span class="text-[10px] font-bold">Menu</span>
+        </button>
+    </nav>
+
+    <!-- Success Toast -->
+    <div id="toast" class="fixed top-24 left-1/2 transform -translate-x-1/2 bg-fp-green text-white px-6 py-3 rounded-full shadow-lg shadow-emerald-500/20 flex items-center gap-2 transition-all duration-300 opacity-0 translate-y-[-20px] pointer-events-none z-50 backdrop-blur-md border border-white/20">
+        <i class="fas fa-check-circle"></i>
+        <span class="font-medium text-sm font-mono">Contact Saved!</span>
+    </div>
+
+    <script>
+        const inputName = document.getElementById('inputName');
+        const inputPhone = document.getElementById('inputPhone');
+        const contactList = document.getElementById('contact-list');
+        const emptyState = document.getElementById('empty-state');
+        const countBadge = document.getElementById('count-badge');
+        const toast = document.getElementById('toast');
+        
+        // Load contacts from LocalStorage or start empty
+        let contacts = JSON.parse(localStorage.getItem('farmpay_contacts')) || [];
+
+        // Initialize view
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('fp_theme');
+            if (savedTheme === 'light') {
+                document.documentElement.classList.remove('dark');
+                document.documentElement.classList.add('light');
+            }
+            renderList();
+        });
+
+        function saveContacts() {
+            localStorage.setItem('farmpay_contacts', JSON.stringify(contacts));
+        }
+
+        function addContact() {
+            const name = inputName.value.trim();
+            const phone = inputPhone.value.trim();
+
+            if (!name || !phone) {
+                // Using a more subtle alert or visual cue would be better, but standard alert for now
+                alert("Please enter both Name and Phone Number.");
+                return;
+            }
+
+            const newContact = {
+                id: Date.now(),
+                name: name,
+                phone: phone,
+                time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+            };
+
+            contacts.unshift(newContact);
+            saveContacts();
+            
+            renderList();
+            showToast();
+            
+            inputName.value = '';
+            inputPhone.value = '';
+            inputName.focus();
+        }
+
+        function clearAll() {
+            if (contacts.length === 0) return;
+            
+            if (confirm('Are you sure you want to delete all saved contacts?')) {
+                contacts = [];
+                saveContacts();
+                renderList();
+            }
+        }
+
+        function renderList() {
+            if (contacts.length > 0) {
+                emptyState.style.display = 'none';
+            } else {
+                emptyState.style.display = 'block';
+            }
+
+            countBadge.innerText = `${contacts.length} saved`;
+            contactList.innerHTML = ''; 
+            if (contacts.length === 0) contactList.appendChild(emptyState);
+
+            contacts.forEach(contact => {
+                const item = document.createElement('div');
+                // Adopting the glass-panel style from unified app
+                item.className = 'history-item glass-panel p-4 rounded-2xl flex items-center justify-between border-l-4 border-l-transparent hover:border-l-fp-gold transition-all mb-3';
+                
+                const initials = contact.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+                
+                item.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500/10 to-purple-500/10 flex items-center justify-center text-indigo-400 font-bold text-sm border border-white/5">
+                            ${initials}
+                        </div>
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-800 dark:text-white">${contact.name}</h4>
+                            <p class="text-[10px] text-slate-500 font-mono tracking-wide">${contact.phone}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-3">
+                         <button onclick="window.location.href='payments.html'" 
+                            class="bg-fp-gold/10 hover:bg-fp-gold/20 text-fp-gold border border-fp-gold/20 text-[10px] font-bold px-3 py-1.5 rounded-lg transition">
+                            Pay <i class="fas fa-chevron-right text-[8px] ml-1"></i>
+                        </button>
+                    </div>
+                `;
+                
+                contactList.appendChild(item);
+            });
+        }
+
+        function showToast() {
+            toast.classList.remove('opacity-0', 'translate-y-[-20px]');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-[-20px]');
+            }, 2000);
+        }
+
+        function toggleTheme() {
+            const html = document.documentElement;
+            if (html.classList.contains('dark')) {
+                html.classList.replace('dark', 'light');
+                localStorage.setItem('fp_theme', 'light');
+            } else {
+                html.classList.replace('light', 'dark');
+                localStorage.setItem('fp_theme', 'dark');
+            }
+        }
+    </script>
+</body>
+</html>

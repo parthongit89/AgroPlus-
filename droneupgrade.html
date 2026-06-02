@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agrodrone+ Features</title>
+    
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'drone-purple': '#9333ea',
+                        'drone-fuchsia': '#c026d3',
+                        'drone-dark': '#2e1065',
+                        'tech-bg': '#f3f4f6',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        body: ['Inter', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'pulse-fast': 'pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'float': 'float 3s ease-in-out infinite',
+                    },
+                    boxShadow: {
+                        'glow': '0 0 20px rgba(192, 38, 211, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            background-color: #F8FAFC;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Tech Background Grid */
+        .bg-grid {
+            background-size: 30px 30px;
+            background-image: 
+                linear-gradient(to right, rgba(192, 38, 211, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(192, 38, 211, 0.05) 1px, transparent 1px);
+        }
+
+        /* Marquee */
+        .marquee-container {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        .marquee-content {
+            display: inline-block;
+            animation: marquee 25s linear infinite;
+        }
+        @keyframes marquee {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* Slider Styles */
+        .slider-container {
+            position: relative;
+            border-radius: 9999px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(192, 38, 211, 0.4);
+        }
+
+        .slider-thumb {
+            transition: transform 0.1s;
+            cursor: grab;
+        }
+        
+        /* Card Hover Effects */
+        .feature-card {
+            transition: all 0.3s ease;
+        }
+        .feature-card:active {
+            transform: scale(0.98);
+        }
+    </style>
+</head>
+<body class="h-screen w-full flex flex-col relative bg-white font-body text-slate-800">
+
+    <!-- HEADER (Purple Gradient Leaf Style) -->
+    <header class="bg-gradient-to-r from-fuchsia-600 to-purple-700 pt-8 px-6 pb-12 flex justify-between items-center shadow-lg relative z-50 rounded-br-[5rem] shrink-0">
+        <!-- Left Icon -->
+        <button onclick="history.back()" class="text-white hover:text-fuchsia-100 transition transform hover:-translate-x-1">
+             <i class="fas fa-arrow-left text-xl"></i>
+        </button>
+        
+        <!-- Center Title -->
+        <div class="text-center">
+            <h1 class="text-white text-3xl font-sans font-normal tracking-wide">Agrodrone+</h1>
+        </div>
+
+        <!-- Right Icon -->
+        <a href="profile.html" class="text-white hover:text-fuchsia-100 transition transform hover:scale-110" aria-label="User Profile">
+            <i class="fas fa-circle-user text-3xl"></i>
+        </a>
+    </header>
+
+    <!-- Busy Status Ticker -->
+    <div class="bg-purple-50 border-b border-purple-100 py-1.5 marquee-container z-40 shrink-0">
+        <div class="marquee-content text-[10px] font-bold text-purple-800 font-mono flex items-center">
+            <span class="mx-4"><i class="fas fa-satellite-dish text-fuchsia-500 mr-1"></i>SYSTEM ONLINE</span> • 
+            <span class="mx-4">🚁 DRONE-X1: ACTIVE (85% BATTERY)</span> • 
+            <span class="mx-4">📡 GPS SIGNAL: STRONG</span> • 
+            <span class="mx-4">🌦️ WEATHER: CLEAR FOR FLIGHT</span> •
+            <span class="mx-4">📦 NEW KIT: "AGRO-PRO" AVAILABLE</span>
+        </div>
+    </div>
+
+    <!-- Main Content -->
+    <main class="flex-grow overflow-y-auto relative pb-24 bg-grid">
+        
+        <!-- Hero Drone Visual -->
+        <div class="relative h-48 w-full flex items-center justify-center overflow-hidden mb-4">
+            <div class="absolute inset-0 bg-gradient-to-b from-purple-100/50 to-transparent z-0"></div>
+            <!-- Animated Drone Icon -->
+            <div class="relative z-10 animate-float">
+                <i class="fas fa-drone text-8xl text-transparent bg-clip-text bg-gradient-to-br from-fuchsia-600 to-purple-800 drop-shadow-xl"></i>
+                <img src="https://i.supaimg.com/fef9f2ce-3c17-408f-a87e-b4efd80a48b1.png" alt="drone">
+                <!-- Propeller blur effects -->
+                <div class="absolute -top-2 -left-2 w-8 h-1 bg-gray-300 blur-sm animate-pulse-fast"></div>
+                <div class="absolute -top-2 -right-2 w-8 h-1 bg-gray-300 blur-sm animate-pulse-fast"></div>
+                <div class="absolute -bottom-2 -left-2 w-8 h-1 bg-gray-300 blur-sm animate-pulse-fast"></div>
+                <div class="absolute -bottom-2 -right-2 w-8 h-1 bg-gray-300 blur-sm animate-pulse-fast"></div>
+            </div>
+            
+            <!-- Live Telemetry Stats (Floating) -->
+            <div class="absolute top-4 left-4 bg-white/90 backdrop-blur border border-purple-100 p-2 rounded-lg shadow-sm text-xs font-mono">
+                <div class="flex items-center gap-2 text-slate-500"><i class="fas fa-battery-three-quarters text-green-500"></i> 87%</div>
+                <div class="flex items-center gap-2 text-slate-500 mt-1"><i class="fas fa-wifi text-blue-500"></i> 5G</div>
+            </div>
+            <div class="absolute bottom-4 right-4 bg-white/90 backdrop-blur border border-purple-100 p-2 rounded-lg shadow-sm text-xs font-mono text-right">
+                <div class="text-purple-700 font-bold">RANGE: 5KM</div>
+                <div class="text-slate-400">ALT: 120M</div>
+            </div>
+        </div>
+
+        <!-- Section Title -->
+        <div class="px-6 mb-4 flex justify-between items-end">
+            <div>
+                <h2 class="text-xl font-bold text-slate-800 leading-none">Drone Features</h2>
+                <p class="text-xs text-slate-400 mt-1">Advanced Aerial Solutions</p>
+            </div>
+            <span class="bg-fuchsia-100 text-fuchsia-700 text-[10px] font-bold px-2 py-1 rounded-full animate-pulse">LIVE DEALS</span>
+        </div>
+
+        <!-- Busy Feature Grid -->
+        <div class="px-4 grid grid-cols-1 gap-4">
+            
+            <!-- Card 1: Installations -->
+            <a href="droneupgrade1.html" class="feature-card bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-fuchsia-300 relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-fuchsia-50 to-transparent opacity-0 group-hover:opacity-100 transition"></div>
+                <div class="flex items-center gap-4 relative z-10">
+                    <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-600 flex items-center justify-center text-xl">
+                        <i class="fas fa-map-marked-alt"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">Drone Installations</h3>
+                        <p class="text-[10px] text-slate-500">View coverage maps & data</p>
+                    </div>
+                </div>
+                <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-fuchsia-500 group-hover:text-white transition z-10">
+                    <i class="fas fa-chevron-right text-xs"></i>
+                </div>
+            </a>
+
+            <!-- Card 2: Purchase Analysis -->
+            <a href="droneupgrade2.html" class="feature-card bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-fuchsia-300 relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-fuchsia-50 to-transparent opacity-0 group-hover:opacity-100 transition"></div>
+                <div class="flex items-center gap-4 relative z-10">
+                    <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-600 flex items-center justify-center text-xl">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">Purchase Analysis</h3>
+                        <p class="text-[10px] text-slate-500">ROI calculator & costs</p>
+                    </div>
+                </div>
+                <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-fuchsia-500 group-hover:text-white transition z-10">
+                    <i class="fas fa-chevron-right text-xs"></i>
+                </div>
+            </a>
+
+            <!-- Card 3: Kit Components -->
+            <a href="droneupgrade4.html" class="feature-card bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-fuchsia-300 relative overflow-hidden">
+                <div class="absolute top-2 right-2 bg-red-500 text-white text-[9px] font-bold px-1.5 rounded">HOT</div>
+                <div class="absolute inset-0 bg-gradient-to-r from-fuchsia-50 to-transparent opacity-0 group-hover:opacity-100 transition"></div>
+                <div class="flex items-center gap-4 relative z-10">
+                    <div class="w-12 h-12 rounded-xl bg-orange-100 text-orange-600 flex items-center justify-center text-xl">
+                        <i class="fas fa-toolbox"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">Drone Kit Components</h3>
+                        <p class="text-[10px] text-slate-500">Spare parts & upgrades</p>
+                    </div>
+                </div>
+                <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-fuchsia-500 group-hover:text-white transition z-10">
+                    <i class="fas fa-chevron-right text-xs"></i>
+                </div>
+            </a>
+
+            <!-- Card 4: Expected Performance -->
+            <a href="droneupgrade3.html" class="feature-card bg-white p-4 rounded-2xl shadow-sm border border-slate-100 flex items-center justify-between group hover:border-fuchsia-300 relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-fuchsia-50 to-transparent opacity-0 group-hover:opacity-100 transition"></div>
+                <div class="flex items-center gap-4 relative z-10">
+                    <div class="w-12 h-12 rounded-xl bg-green-100 text-green-600 flex items-center justify-center text-xl">
+                        <i class="fas fa-tachometer-alt"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-slate-800 text-sm">Performance Stats</h3>
+                        <p class="text-[10px] text-slate-500">Speed, spray rate & flight</p>
+                    </div>
+                </div>
+                <div class="w-8 h-8 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-fuchsia-500 group-hover:text-white transition z-10">
+                    <i class="fas fa-chevron-right text-xs"></i>
+                </div>
+            </a>
+
+        </div>
+
+        <!-- Disclaimer -->
+        <div class="mx-4 mt-6 p-3 bg-purple-50 rounded-lg border border-purple-100 flex gap-3 items-start">
+            <i class="fas fa-info-circle text-purple-500 mt-0.5 text-sm"></i>
+            <p class="text-[10px] text-purple-800 leading-snug">
+                <strong>Pre-flight Check:</strong> Ensure local regulations permit drone usage for agriculture in your zone. Read the manual before purchase.
+            </p>
+        </div>
+
+    </main>
+
+    <!-- Slider Footer (Purple Gradient) -->
+    <div class="absolute bottom-6 left-0 right-0 px-8 z-50">
+        <div class="slider-container h-14 w-full max-w-sm mx-auto cursor-pointer bg-gradient-to-r from-fuchsia-600 to-purple-700" id="slider-track">
+            <div class="slider-text absolute inset-0 flex items-center justify-center text-white font-bold text-sm tracking-wide z-10 pointer-events-none" id="slider-label">SLIDE TO ORDER</div>
+            <div class="slider-thumb h-12 w-12 bg-white rounded-full m-1 shadow-lg flex items-center justify-center text-purple-600 relative z-20" id="slider-thumb">
+                <i class="fas fa-arrow-right"></i>
+            </div>
+        </div>
+        <div class="text-center mt-2">
+            <p class="text-[9px] text-slate-400 font-mono tracking-wider">SECURE CHECKOUT • AGROTECH CERTIFIED</p>
+        </div>
+    </div>
+
+    <!-- Alert Modal -->
+    <div id="alert-modal" class="fixed inset-0 bg-black/50 z-[60] hidden flex items-center justify-center p-4 backdrop-blur-sm">
+        <div class="bg-white rounded-2xl p-6 max-w-xs w-full shadow-2xl transform scale-95 transition-all" id="alert-content">
+            <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center text-purple-600 text-xl mb-4 mx-auto">
+                <i class="fas fa-shopping-cart"></i>
+            </div>
+            <h3 class="text-center font-bold text-slate-800 text-lg mb-2">Order Initiated</h3>
+            <p class="text-center text-slate-500 text-sm mb-6">Connecting to secure payment gateway for Drone Kit #X1...</p>
+            <button onclick="document.getElementById('alert-modal').classList.add('hidden')" class="w-full bg-gradient-to-r from-fuchsia-600 to-purple-700 text-white font-bold py-3 rounded-xl shadow-lg hover:opacity-90 transition">
+               <a href="droneupgradepurchace.html">CONTINUE</a> 
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // --- Slider Logic ---
+        const sliderTrack = document.getElementById('slider-track');
+        const sliderThumb = document.getElementById('slider-thumb');
+        const sliderLabel = document.getElementById('slider-label');
+        const alertModal = document.getElementById('alert-modal');
+        const alertContent = document.getElementById('alert-content');
+        
+        let isDragging = false;
+        let startX = 0;
+        let currentX = 0;
+        
+        function getX(e) { return e.type.includes('mouse') ? e.clientX : e.touches[0].clientX; }
+
+        function startDrag(e) {
+            isDragging = true;
+            startX = getX(e);
+            sliderThumb.style.transition = 'none'; 
+        }
+
+        function moveDrag(e) {
+            if (!isDragging) return;
+            if(e.type.includes('touch')) e.preventDefault();
+
+            const trackWidth = sliderTrack.clientWidth;
+            const thumbWidth = sliderThumb.clientWidth;
+            const maxTravel = trackWidth - thumbWidth - 8; // 8 for margins
+            
+            let moveX = getX(e) - sliderTrack.getBoundingClientRect().left - 4; // 4 for left margin
+            
+            if (moveX < 0) moveX = 0;
+            if (moveX > maxTravel) moveX = maxTravel;
+            
+            currentX = moveX;
+            sliderThumb.style.transform = `translateX(${currentX}px)`;
+            
+            const opacity = 1 - (currentX / maxTravel);
+            sliderLabel.style.opacity = Math.max(0, opacity);
+        }
+
+        function endDrag() {
+            if (!isDragging) return;
+            isDragging = false;
+            
+            const trackWidth = sliderTrack.clientWidth;
+            const thumbWidth = sliderThumb.clientWidth;
+            const maxTravel = trackWidth - thumbWidth - 8;
+            
+            if (currentX > maxTravel * 0.8) {
+                sliderThumb.style.transition = 'transform 0.2s ease-out';
+                sliderThumb.style.transform = `translateX(${maxTravel}px)`;
+                sliderLabel.textContent = "PROCESSING...";
+                sliderLabel.style.opacity = 1;
+                
+                setTimeout(() => {
+                    alertModal.classList.remove('hidden');
+                    alertContent.classList.remove('scale-95');
+                    alertContent.classList.add('scale-100');
+                    resetSlider();
+                }, 600);
+            } else {
+                resetSlider();
+            }
+        }
+
+        function resetSlider() {
+            sliderThumb.style.transition = 'transform 0.3s ease-out';
+            sliderThumb.style.transform = `translateX(0px)`;
+            sliderLabel.style.opacity = 1;
+            setTimeout(() => {
+                sliderLabel.textContent = "SLIDE TO ORDER";
+            }, 300);
+        }
+
+        sliderThumb.addEventListener('mousedown', startDrag);
+        sliderThumb.addEventListener('touchstart', startDrag);
+        document.addEventListener('mousemove', moveDrag);
+        document.addEventListener('touchmove', moveDrag, { passive: false });
+        document.addEventListener('mouseup', endDrag);
+        document.addEventListener('touchend', endDrag);
+    </script>
+</body>
+</html>

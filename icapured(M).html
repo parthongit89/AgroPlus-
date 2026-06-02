@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>आय कॅपचर्ड+</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        /* Custom Animations */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes zoomIn { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        @keyframes flash { 
+            0% { opacity: 0; } 
+            10% { opacity: 0.8; } 
+            100% { opacity: 0; } 
+        }
+        .animate-fade-in { animation: fadeIn 0.3s ease-out; }
+        .animate-zoom-in { animation: zoomIn 0.3s ease-out; }
+        .animate-slide-up { animation: slideUp 0.4s ease-out; }
+        .animate-flash { animation: flash 0.3s ease-out; pointer-events: none; }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+
+        /* Mode Switcher Active State */
+        .mode-active {
+            color: #fbbf24; /* Amber-400 */
+            text-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
+            font-weight: 800;
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-900 h-[100dvh] w-full overflow-hidden text-gray-800 font-sans select-none">
+
+    <!-- ================= CAMERA VIEW ================= -->
+     
+    <div id="view-camera" class="absolute inset-0 z-10 flex flex-col bg-black">
+        <canvas id="capture-canvas" class="hidden"></canvas>
+        
+        <!-- Shutter Flash Overlay -->
+        <div id="shutter-flash" class="absolute inset-0 bg-white opacity-0 z-40 pointer-events-none"></div>
+
+        <!-- Hidden File Input for Fallback -->
+        <input type="file" id="file-input" accept="image/*" class="hidden" capture="environment">
+
+        <!-- Video Feed -->
+        <div class="absolute inset-0 z-0 bg-gray-900">
+            <video id="camera-feed" autoplay playsinline muted class="w-full h-full object-cover"></video>
+        </div>
+
+        <!-- Permission / Error Overlay -->
+        <div id="permission-overlay" class="absolute inset-0 z-50 bg-gray-900 flex flex-col items-center justify-center p-8 text-center hidden">
+            <div class="w-20 h-20 bg-gray-800 rounded-full flex items-center justify-center mb-6 relative">
+                <i data-lucide="camera-off" class="text-gray-400 w-10 h-10"></i>
+                <div class="absolute top-0 right-0 w-6 h-6 bg-red-500 rounded-full border-2 border-gray-900"></div>
+            </div>
+            <h2 id="error-title" class="text-2xl font-bold text-white mb-2">कॅमेरा उपलब्ध नाही</h2>
+            <p id="perm-error-text" class="text-gray-400 mb-8 text-sm leading-relaxed max-w-xs mx-auto">
+                आम्ही तुमच्या कॅमेऱ्यात प्रवेश करू शकलो नाही. हे सहसा तुम्ही HTTPS वापरत नसल्यास किंवा परवानग्या नाकारल्या असल्यास घडते.
+            </p>
+            
+            <div class="flex flex-col gap-3 w-full max-w-xs">
+                <button onclick="startCamera()" class="bg-gray-700 text-white px-6 py-3 rounded-xl font-medium active:scale-95 transition-transform flex items-center justify-center gap-2">
+                    <i data-lucide="refresh-cw" class="w-4 h-4"></i> पुन्हा प्रयत्न करा
+                </button>
+                <div class="text-gray-500 text-xs font-medium uppercase tracking-widest my-1">किंवा</div>
+                <button onclick="triggerFileUpload()" class="bg-gradient-to-r from-pink-500 to-purple-600 text-white px-6 py-3 rounded-xl font-bold shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
+                    <i data-lucide="upload" class="w-4 h-4"></i> अपलोड करा / फोटो घ्या
+                </button>
+            </div>
+        </div>
+
+        <!-- Top Header -->
+        <div class="relative z-10 pt-6 px-6 pb-4 bg-gradient-to-b from-black/70 to-transparent">
+            <div class="flex items-center justify-between">
+                <h1 class="text-2xl font-black text-white tracking-tighter flex items-center gap-2">
+                    <i data-lucide="leaf" class="text-green-400 w-6 h-6"></i>
+                    <span>आय कॅपचर्ड<span class="text-pink-500">+</span></span>
+                </h1>
+                <div id="ai-badge" class="bg-white/20 backdrop-blur-md text-white text-xs px-3 py-1 rounded-full font-medium border border-white/10 flex items-center gap-2 transition-all">
+                    <i data-lucide="activity" class="text-green-400 w-3 h-3 animate-pulse"></i>
+                    <span id="ai-mode-text">वनस्पती डॉक्टर</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Viewfinder Area -->
+        <div class="flex-1 relative z-10 flex flex-col items-center justify-center p-6">
+            <div class="relative w-full aspect-square max-w-sm mx-auto">
+                <div id="focus-box" class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 border-2 border-yellow-400 opacity-0 transition-all duration-300 pointer-events-none"></div>
+                
+                <svg class="w-full h-full drop-shadow-lg" viewBox="0 0 300 300" fill="none">
+                    <path d="M40 20 H20 A20 20 0 0 0 0 40 V100" stroke="white" stroke-width="4" stroke-linecap="round" />
+                    <path d="M260 20 H280 A20 20 0 0 1 300 40 V100" stroke="white" stroke-width="4" stroke-linecap="round" />
+                    <path d="M40 280 H20 A20 20 0 0 1 0 260 V200" stroke="white" stroke-width="4" stroke-linecap="round" />
+                    <path d="M260 280 H280 A20 20 0 0 0 300 260 V200" stroke="white" stroke-width="4" stroke-linecap="round" />
+                    <path d="M140 150 H160" stroke="white" stroke-width="2" stroke-opacity="0.8" />
+                    <path d="M150 140 V160" stroke="white" stroke-width="2" stroke-opacity="0.8" />
+                </svg>
+            </div>
+
+            <!-- Non-blocking Analysis Toast (Replaced the fullscreen blocker) -->
+            <div id="capture-toast" class="absolute top-24 left-1/2 transform -translate-x-1/2 bg-black/70 backdrop-blur-md px-5 py-2 rounded-full text-white font-medium text-sm border border-white/20 flex items-center gap-2 transition-all duration-300 opacity-0 pointer-events-none">
+                <i data-lucide="check-circle" class="text-green-400 w-4 h-4"></i>
+                <span>कॅप्चर केले! प्रक्रिया करत आहे...</span>
+            </div>
+        </div>
+
+        <!-- Bottom Controls -->
+        <div class="relative z-20 pb-8 pt-4 bg-gradient-to-t from-black/90 via-black/50 to-transparent">
+            
+            <!-- Mode Switcher -->
+            <div class="flex justify-center gap-8 mb-6 text-sm font-medium tracking-wide">
+                <button onclick="setMode('plant')" id="mode-plant" class="text-white/60 hover:text-white transition-all uppercase mode-active">वनस्पती डॉक्टर</button>
+                <button onclick="setMode('soil')" id="mode-soil" class="text-white/60 hover:text-white transition-all uppercase">माती तज्ञ</button>
+            </div>
+
+            <!-- Tools Row -->
+            <div class="flex justify-center gap-8 mb-6">
+                <button id="btn-flash" class="w-10 h-10 rounded-full flex items-center justify-center transition-all bg-white/10 text-white backdrop-blur-md border border-white/20 active:scale-95">
+                    <i data-lucide="zap-off" class="w-4 h-4"></i>
+                </button>
+                <button id="btn-focus" class="w-10 h-10 rounded-full flex items-center justify-center transition-all bg-white/10 text-white backdrop-blur-md border border-white/20 active:scale-95">
+                    <i data-lucide="scan" class="w-4 h-4"></i>
+                </button>
+                <!-- Upload Button in Main UI too -->
+                <button onclick="triggerFileUpload()" class="w-10 h-10 rounded-full flex items-center justify-center transition-all bg-white/10 text-white backdrop-blur-md border border-white/20 active:scale-95">
+                    <i data-lucide="image-plus" class="w-4 h-4"></i>
+                </button>
+            </div>
+
+            <!-- Main Action Row -->
+            <div class="flex items-center justify-around px-8">
+                <div class="flex flex-col items-center gap-1 w-16">
+                    <button id="nav-history" class="w-12 h-12 rounded-xl bg-gray-800/50 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white active:scale-95 transition-all">
+                        <i data-lucide="history" class="w-5 h-5"></i>
+                    </button>
+                    <span class="text-[10px] text-white/60 font-medium">इतिहास</span>
+                </div>
+
+                <div class="relative group">
+                    <div class="absolute -inset-1 bg-gradient-to-tr from-pink-500 to-purple-600 rounded-full blur opacity-70"></div>
+                    <button id="btn-capture" class="relative w-20 h-20 bg-white rounded-full border-4 border-gray-100 shadow-xl flex items-center justify-center active:scale-90 transition-all duration-150">
+                        <div class="w-16 h-16 bg-gray-100 rounded-full border border-gray-300 flex items-center justify-center">
+                            <i data-lucide="camera" class="text-gray-400 w-8 h-8"></i>
+                        </div>
+                    </button>
+                </div>
+
+                <div class="flex flex-col items-center gap-1 w-16">
+                    <button id="nav-preview-mini" class="w-12 h-12 rounded-xl bg-gray-800/50 backdrop-blur-sm border border-white/10 flex items-center justify-center text-white overflow-hidden active:scale-95 transition-all">
+                        <img id="mini-preview-img" src="" class="w-full h-full object-cover hidden">
+                        <i id="mini-preview-icon" data-lucide="image" class="w-5 h-5"></i>
+                    </button>
+                    <span class="text-[10px] text-white/60 font-medium">पूर्वावलोकन</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= PREVIEW / RESULT VIEW ================= -->
+    <div id="view-preview" class="absolute inset-0 z-20 bg-gray-50 flex flex-col hidden overflow-hidden">
+        <!-- Header -->
+        <div id="preview-header" class="bg-gradient-to-r from-pink-500 to-purple-600 p-4 pt-8 pb-12 rounded-b-[40px] shadow-lg flex justify-between items-center z-10 sticky top-0 shrink-0 transition-colors">
+            <button onclick="router('camera')" class="text-white hover:bg-white/20 p-2 rounded-full transition">
+                <i data-lucide="chevron-left" class="w-7 h-7"></i>
+            </button>
+            <h1 id="report-title" class="text-2xl font-bold text-white tracking-wide">विश्लेषण अहवाल</h1>
+            <div class="w-10"></div>
+        </div>
+
+        <!-- Scrollable Content -->
+        <div class="flex-1 -mt-8 px-4 pb-24 overflow-y-auto no-scrollbar flex flex-col items-center w-full">
+            
+            <!-- Result Image Card -->
+            <div class="bg-white p-2 rounded-3xl shadow-xl w-full max-w-md animate-zoom-in mb-6">
+                <div class="relative">
+                    <img id="result-image" src="" class="w-full h-56 object-cover rounded-2xl border border-gray-100">
+                    <div id="result-badge" class="absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm flex items-center gap-1"></div>
+                </div>
+                
+                <!-- PLANT RESULT CONTENT -->
+                <div id="plant-content" class="p-4 hidden">
+                    <h2 id="result-disease" class="text-2xl font-bold text-gray-800">विश्लेषण करत आहे...</h2>
+                    <p id="result-confidence" class="text-sm text-gray-500 font-medium mb-2">खात्री: --%</p>
+                    <p id="result-desc" class="text-gray-600 text-sm leading-relaxed border-t pt-3 mt-2">...</p>
+                </div>
+
+                <!-- SOIL RESULT CONTENT -->
+                <div id="soil-content" class="p-4 hidden">
+                    <h2 id="soil-type-title" class="text-2xl font-bold text-amber-800">माती विश्लेषण</h2>
+                    <p id="soil-summary" class="text-gray-600 text-sm leading-relaxed border-t border-amber-100 pt-3 mt-2 italic">
+                        "कापसासाठी चांगली माती दिसते."
+                    </p>
+                </div>
+            </div>
+
+            <!-- PLANT Treatment Card -->
+            <div id="plant-treatment-card" class="w-full max-w-md bg-white rounded-3xl shadow-md p-6 animate-slide-up hidden">
+                <div class="flex items-center gap-2 mb-4">
+                    <div class="p-2 bg-pink-100 text-pink-600 rounded-lg">
+                        <i data-lucide="pill" class="w-6 h-6"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-gray-800">उपचार योजना</h3>
+                </div>
+                <ul id="treatment-list" class="space-y-4"></ul>
+                <div id="isolation-warning" class="mt-6 p-4 bg-yellow-50 rounded-xl border border-yellow-100 flex gap-3 hidden">
+                    <i data-lucide="thermometer-sun" class="text-yellow-600 shrink-0 w-5 h-5"></i>
+                    <p class="text-xs text-yellow-800 font-medium leading-relaxed">
+                        पसरणे टाळण्यासाठी त्वरित वेगळे करा.
+                    </p>
+                </div>
+            </div>
+
+            <!-- SOIL Dashboard Card -->
+            <div id="soil-dashboard-card" class="w-full max-w-md space-y-4 animate-slide-up hidden">
+                
+                <!-- Parameters Grid -->
+                <div class="bg-white rounded-3xl shadow-md p-5">
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">मातीची माहिती</h3>
+                    <div class="grid grid-cols-2 gap-y-4 gap-x-2">
+                        <div class="p-3 bg-gray-50 rounded-xl">
+                            <span class="text-xs text-gray-500 block">प्रकार</span>
+                            <span id="soil-type" class="font-bold text-gray-800">पोयटा</span>
+                        </div>
+                        <div class="p-3 bg-gray-50 rounded-xl">
+                            <span class="text-xs text-gray-500 block">रंग</span>
+                            <span id="soil-color" class="font-bold text-gray-800">गडद तपकिरी</span>
+                        </div>
+                        <div class="p-3 bg-gray-50 rounded-xl">
+                            <span class="text-xs text-gray-500 block">पोत</span>
+                            <span id="soil-texture" class="font-bold text-gray-800">मिश्र</span>
+                        </div>
+                         <div class="p-3 bg-gray-50 rounded-xl">
+                            <span class="text-xs text-gray-500 block">ओलावा</span>
+                            <span id="soil-moisture" class="font-bold text-blue-600">ओलसर</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chemistry Meters -->
+                <div class="bg-white rounded-3xl shadow-md p-5">
+                    <h3 class="text-sm font-bold text-gray-400 uppercase tracking-wider mb-4">रसायनशास्त्र</h3>
+                    
+                    <!-- pH -->
+                    <div class="mb-4">
+                        <div class="flex justify-between text-sm mb-1">
+                            <span class="font-medium text-gray-600">pH पातळी</span>
+                            <span id="soil-ph" class="font-bold text-purple-600">७.० (तठस्थ)</span>
+                        </div>
+                        <div class="w-full bg-gray-200 rounded-full h-2.5">
+                            <div id="ph-bar" class="bg-gradient-to-r from-red-400 via-green-400 to-blue-500 h-2.5 rounded-full" style="width: 50%"></div>
+                        </div>
+                    </div>
+
+                    <!-- NPK -->
+                    <div class="grid grid-cols-3 gap-2 text-center">
+                        <div class="bg-blue-50 p-2 rounded-lg">
+                            <div class="text-xs text-blue-500 font-bold">N</div>
+                            <div id="val-n" class="text-sm font-bold text-gray-700">मध्यम</div>
+                        </div>
+                        <div class="bg-orange-50 p-2 rounded-lg">
+                            <div class="text-xs text-orange-500 font-bold">P</div>
+                            <div id="val-p" class="text-sm font-bold text-gray-700">उच्च</div>
+                        </div>
+                        <div class="bg-purple-50 p-2 rounded-lg">
+                            <div class="text-xs text-purple-500 font-bold">K</div>
+                            <div id="val-k" class="text-sm font-bold text-gray-700">कमी</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Crops & Solutions -->
+                <div class="bg-white rounded-3xl shadow-md p-5">
+                    <div class="flex items-center gap-2 mb-3">
+                        <i data-lucide="sprout" class="text-green-600 w-5 h-5"></i>
+                        <h3 class="text-lg font-bold text-gray-800">सर्वोत्तम पिके</h3>
+                    </div>
+                    <div id="crop-tags" class="flex flex-wrap gap-2 mb-6">
+                        <!-- Tags injected here -->
+                    </div>
+
+                    <div class="flex items-center gap-2 mb-3 border-t pt-4">
+                        <i data-lucide="clipboard-list" class="text-amber-600 w-5 h-5"></i>
+                        <h3 class="text-lg font-bold text-gray-800">सुधारणा</h3>
+                    </div>
+                    <div class="space-y-3 text-sm">
+                        <div class="flex gap-3">
+                            <div class="w-1 bg-green-500 rounded-full h-auto"></div>
+                            <div>
+                                <span class="block text-xs font-bold text-green-600 uppercase">सेंद्रिय</span>
+                                <span id="rec-organic" class="text-gray-600">कंपोस्ट घाला.</span>
+                            </div>
+                        </div>
+                        <div class="flex gap-3">
+                            <div class="w-1 bg-blue-500 rounded-full h-auto"></div>
+                            <div>
+                                <span class="block text-xs font-bold text-blue-600 uppercase">पाणी</span>
+                                <span id="rec-water" class="text-gray-600">ठिबक सिंचन शिफारस केली आहे.</span>
+                            </div>
+                        </div>
+                         <div class="flex gap-3">
+                            <div class="w-1 bg-purple-500 rounded-full h-auto"></div>
+                            <div>
+                                <span class="block text-xs font-bold text-purple-600 uppercase">सुधारणा</span>
+                                <span id="rec-chem" class="text-gray-600">NPK १०-१०-१० वापरा.</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ERROR / OBJECT DETECTED CARD -->
+            <div id="error-card" class="w-full max-w-md bg-white rounded-3xl shadow-md p-6 animate-slide-up hidden">
+                <div class="flex flex-col items-center text-center gap-4">
+                    <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center text-red-500">
+                         <i data-lucide="alert-octagon" class="w-8 h-8"></i>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-bold text-gray-800">ओळख अयशस्वी</h3>
+                        <p id="error-message" class="text-gray-600 mt-2 leading-relaxed">
+                            AI ने मातीऐवजी वस्तू (खडक, कचरा किंवा साधन) शोधली.
+                        </p>
+                    </div>
+                    <div class="p-4 bg-gray-50 rounded-xl border border-gray-100 w-full text-sm text-gray-500">
+                        जागा साफ करून पुन्हा फक्त माती स्कॅन करण्याचा प्रयत्न करा.
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bottom Action Bar -->
+        <div class="absolute bottom-6 left-0 right-0 flex justify-center gap-4 px-6 z-30">
+            <button onclick="router('camera')" class="flex-1 max-w-[200px] bg-white text-gray-700 py-4 rounded-2xl font-semibold text-lg hover:bg-gray-50 transition shadow-lg border border-gray-100 flex items-center justify-center gap-2">
+                <i data-lucide="trash-2" class="w-5 h-5"></i> नवीन स्कॅन
+            </button>
+            <button onclick="router('camera')" class="flex-1 max-w-[200px] bg-gradient-to-r from-pink-500 to-purple-600 text-white py-4 rounded-2xl font-bold text-lg shadow-lg flex items-center justify-center gap-2 active:scale-95 transition-transform">
+                <i data-lucide="check" class="w-5 h-5"></i> झाले
+            </button>
+        </div>
+    </div>
+
+    <!-- ================= HISTORY VIEW ================= -->
+    <div id="view-history" class="absolute inset-0 z-20 bg-gray-50 flex flex-col hidden">
+        <div class="bg-white p-4 pt-8 shadow-sm flex items-center justify-between sticky top-0 z-10">
+            <button onclick="router('camera')" class="p-2 bg-gray-100 rounded-full hover:bg-gray-200 transition">
+                <i data-lucide="x" class="w-6 h-6 text-gray-700"></i>
+            </button>
+            <h2 class="text-xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-purple-600">
+                गॅलरी
+            </h2>
+            <div class="w-10"></div>
+        </div>
+
+        <div id="history-grid" class="flex-1 p-4 grid grid-cols-2 gap-4 overflow-y-auto content-start">
+            <!-- Grid items injected by JS -->
+        </div>
+        
+        <div id="empty-history" class="hidden absolute inset-0 flex flex-col items-center justify-center text-gray-400 opacity-60 pointer-events-none">
+            <i data-lucide="image" class="w-16 h-16 mb-4"></i>
+            <p>अद्याप कोणतेही फोटो नाहीत</p>
+        </div>
+    </div>
+
+    <script>
+        // --- DATA & STATE ---
+        let currentStream = null;
+        let flashOn = false;
+        let history = [];
+        let isAnalyzing = false;
+        let currentMode = 'plant'; // 'plant' or 'soil'
+        
+        // MOCK DATA: Plant Diseases
+        const mockDiagnoses = [
+            {
+                status: 'Infected',
+                disease: 'करपा (Early Blight)',
+                confidence: '८९%',
+                description: 'बुरशीजन्य संसर्ग ज्यामुळे जुन्या पानांवर लक्ष्यासारखे डाग पडतात.',
+                treatment: ['बाधित पाने त्वरित छाटा.', 'तांबे-आधारित बुरशीनाशक वापरा.', 'मुळाशी पाणी द्या, पानांवर टाळा.']
+            },
+            {
+                status: 'Infected',
+                disease: 'भुरी रोग (Powdery Mildew)',
+                confidence: '९५%',
+                description: 'पाने आणि खोडांवर पांढरी पावडरसारखी बुरशीची वाढ.',
+                treatment: ['१ चमचा बेकिंग सोडा + १/२ चमचा साबण १ गॅलन पाण्यात मिसळा.', 'कडुनिंबाच्या तेलाचा फवारा वापरा.', 'अधिक सूर्यप्रकाश मिळेल याची खात्री करा.']
+            },
+            {
+                status: 'Healthy',
+                disease: 'निरोगी वनस्पती',
+                confidence: '९८%',
+                description: 'वनस्पती टवटवीत दिसते. डाग किंवा विवर्णतेचे कोणतेही चिन्ह नाही.',
+                treatment: ['नियमित पाणी देणे सुरू ठेवा.', 'कीटकांचे साप्ताहिक निरीक्षण करा.', 'पुरेशा सूर्यप्रकाशाची खात्री करा.']
+            }
+        ];
+
+        // MOCK DATA: Soil Types
+        const mockSoilData = [
+            {
+                type: 'लाल जांभा',
+                color: 'लालसर तपकिरी',
+                texture: 'वालुकामय चिकणमाती',
+                moisture: 'कोरडी',
+                ph: { val: 5.5, label: 'आम्लयुक्त' },
+                npk: { n: 'कमी', p: 'कमी', k: 'मध्यम' },
+                crops: ['काजू', 'नारळ', 'रबर', 'चहा'],
+                summary: 'लाल माती लोहानी समृद्ध असते पण आम्लता संतुलित करण्यासाठी सहसा चुन्याची गरज असते.',
+                improvements: {
+                    organic: 'समृद्ध कंपोस्ट किंवा खत घाला.',
+                    water: 'पाणी टिकवून ठेवण्यासाठी भरपूर आच्छादन करा.',
+                    chem: 'pH वाढवण्यासाठी चुना वापरा.'
+                }
+            },
+            {
+                type: 'काळी कापसाची',
+                color: 'गडद काळी',
+                texture: 'चिकणमाती',
+                moisture: 'ओलसर',
+                ph: { val: 7.8, label: 'अल्कधर्मी' },
+                npk: { n: 'मध्यम', p: 'कमी', k: 'जास्त' },
+                crops: ['कापूस', 'ऊस', 'सूर्यफूल', 'सोयाबीन'],
+                summary: 'उत्तम पाणी धरून ठेवण्याची क्षमता पण खूप चिकट होते. जास्त खत लागणाऱ्या पिकांसाठी चांगली.',
+                improvements: {
+                    organic: 'चिकणमाती फोडण्यासाठी जिप्सम घाला.',
+                    water: 'जास्त पाणी देणे टाळा; पाण्याचा निचरा होणे महत्वाचे आहे.',
+                    chem: 'N साठी अमोनियम सल्फेट वापरा.'
+                }
+            },
+            {
+                type: 'गाळाची',
+                color: 'फिकट तपकिरी',
+                texture: 'गाळाची लोम',
+                moisture: 'किंचित ओलसर',
+                ph: { val: 7.0, label: 'तठस्थ' },
+                npk: { n: 'मध्यम', p: 'मध्यम', k: 'मध्यम' },
+                crops: ['गहू', 'तांदूळ', 'मका', 'भाज्या'],
+                summary: 'जवळजवळ सर्व पिकांसाठी योग्य अशी अत्यंत सुपीक माती. संतुलित ठेवा.',
+                improvements: {
+                    organic: 'हिरवळीच्या खतांची शिफारस केली जाते.',
+                    water: 'मानक सिंचन चांगले काम करते.',
+                    chem: 'संतुलित NPK १०-१०-१०.'
+                }
+            }
+        ];
+
+        // MOCK DATA: Object Detection (Error State)
+        const mockInvalidSoil = {
+            isError: true,
+            type: 'अज्ञात वस्तू',
+            color: 'N/A',
+            texture: 'N/A',
+            moisture: 'N/A',
+            ph: { val: 0, label: 'N/A' },
+            npk: { n: '-', p: '-', k: '-' },
+            crops: [],
+            summary: 'विश्लेषण अयशस्वी: प्रतिमेमध्ये माती नसलेल्या वस्तू (प्लास्टिक, खडक किंवा साधने) असल्याचे दिसते. कृपया स्वच्छ माती स्कॅन करा.',
+            improvements: { organic: '', water: '', chem: '' }
+        };
+
+        // --- INIT ---
+        window.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            loadHistory();
+            startCamera();
+            setupListeners();
+            updateMiniPreview();
+            
+            // File input listener
+            document.getElementById('file-input').addEventListener('change', handleFileUpload);
+        });
+
+        // --- MODE SWITCHING ---
+        function setMode(mode) {
+            currentMode = mode;
+            
+            // Update UI styles
+            const pBtn = document.getElementById('mode-plant');
+            const sBtn = document.getElementById('mode-soil');
+            const badge = document.getElementById('ai-badge');
+            const badgeText = document.getElementById('ai-mode-text');
+            const focusBox = document.getElementById('focus-box');
+
+            if (mode === 'plant') {
+                pBtn.classList.add('mode-active');
+                sBtn.classList.remove('mode-active');
+                badgeText.innerText = "वनस्पती डॉक्टर";
+                badge.className = "bg-white/20 backdrop-blur-md text-white text-xs px-3 py-1 rounded-full font-medium border border-white/10 flex items-center gap-2 transition-all";
+                focusBox.className = "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 border-2 border-yellow-400 opacity-0 transition-all duration-300 pointer-events-none";
+            } else {
+                sBtn.classList.add('mode-active');
+                pBtn.classList.remove('mode-active');
+                badgeText.innerText = "माती तज्ञ";
+                badge.className = "bg-amber-900/40 backdrop-blur-md text-amber-100 text-xs px-3 py-1 rounded-full font-medium border border-amber-500/30 flex items-center gap-2 transition-all";
+                focusBox.className = "absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-16 h-16 border-2 border-amber-500 rounded-full opacity-0 transition-all duration-300 pointer-events-none";
+            }
+            lucide.createIcons();
+        }
+
+        // --- CAMERA LOGIC ---
+        async function startCamera() {
+            try {
+                // Initial check for Secure Context (HTTPS or Localhost)
+                if (!window.isSecureContext) {
+                    throw new Error("INSECURE_CONTEXT");
+                }
+
+                // Try to get permission - using more permissive constraints initially
+                const constraints = { 
+                    video: { 
+                        facingMode: 'environment' // Prefer rear camera
+                    }, 
+                    audio: false 
+                };
+
+                currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+                
+                const videoEl = document.getElementById('camera-feed');
+                videoEl.srcObject = currentStream;
+                // Explicitly play video to satisfy some mobile browser policies
+                await videoEl.play();
+                
+                // If successful, hide permission overlay if it was open
+                document.getElementById('permission-overlay').classList.add('hidden');
+                
+            } catch (err) {
+                console.error("Camera Error:", err);
+                // Show permission overlay
+                const overlay = document.getElementById('permission-overlay');
+                const errText = document.getElementById('perm-error-text');
+                const title = document.getElementById('error-title');
+                
+                overlay.classList.remove('hidden');
+                lucide.createIcons();
+
+                if (err.message === "INSECURE_CONTEXT") {
+                     title.innerText = "कनेक्शन सुरक्षित नाही";
+                     errText.innerText = "कॅमेऱ्यासाठी सुरक्षित (HTTPS) कनेक्शन आवश्यक आहे. जर तुम्ही आयपी पत्त्याद्वारे फोनवर चाचणी करत असाल, तर कृपया त्याऐवजी 'अपलोड' बटण वापरा.";
+                } else if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+                     title.innerText = "कॅमेरा प्रवेश नाकारला";
+                     errText.innerText = "परवानगी नाकारली गेली. कृपया तुमच्या ब्राउझर सेटिंग्जमध्ये कॅमेरा प्रवेशास अनुमती द्या किंवा अपलोड बटण वापरा.";
+                } else if (err.name === 'NotFoundError') {
+                     title.innerText = "कॅमेरा सापडला नाही";
+                     errText.innerText = "आम्हाला या डिव्हाइसवर कॅमेरा सापडला नाही. कृपया अपलोड बटण वापरा.";
+                } else {
+                     errText.innerText = "कॅमेऱ्यात प्रवेश करताना त्रुटी: " + (err.message || "Unknown error") + ". कृपया अपलोड वापरा.";
+                }
+            }
+        }
+
+        function triggerFileUpload() {
+            document.getElementById('file-input').click();
+        }
+
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                // Simulate "Capture" with the loaded image
+                processImage(event.target.result);
+                // Hide permission overlay if it was visible
+                document.getElementById('permission-overlay').classList.add('hidden');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function toggleFlash() {
+            if (!currentStream) return;
+            // Get video track
+            const track = currentStream.getVideoTracks()[0];
+            const btn = document.getElementById('btn-flash');
+            
+            // Check if getCapabilities is available
+            if (!track.getCapabilities) {
+                flashOn = !flashOn;
+                updateFlashBtnStyle(btn);
+                return;
+            }
+
+            const caps = track.getCapabilities();
+            
+            if (caps.torch) {
+                try {
+                    await track.applyConstraints({ advanced: [{ torch: !flashOn }] });
+                    flashOn = !flashOn;
+                    updateFlashBtnStyle(btn);
+                } catch(e) {
+                    console.error("Torch error", e);
+                }
+            } else {
+                 flashOn = !flashOn;
+                 updateFlashBtnStyle(btn);
+            }
+        }
+
+        function updateFlashBtnStyle(btn) {
+             btn.innerHTML = flashOn ? '<i data-lucide="zap" class="w-5 h-5"></i>' : '<i data-lucide="zap-off" class="w-5 h-5"></i>';
+             btn.className = flashOn 
+                ? "w-10 h-10 rounded-full flex items-center justify-center bg-yellow-400 text-yellow-900 shadow-lg active:scale-95"
+                : "w-10 h-10 rounded-full flex items-center justify-center bg-white/10 text-white backdrop-blur-md border border-white/20 active:scale-95";
+             lucide.createIcons();
+        }
+
+        function triggerFocus() {
+            const box = document.getElementById('focus-box');
+            box.style.opacity = '1';
+            box.style.transform = 'translate(-50%, -50%) scale(1)';
+            setTimeout(() => {
+                box.style.opacity = '0';
+                box.style.transform = 'translate(-50%, -50%) scale(1.5)';
+            }, 800);
+        }
+
+        function captureFrame() {
+            if (isAnalyzing) return; // Prevent spamming if blocked (though we want fast scan now)
+            
+            const video = document.getElementById('camera-feed');
+            const canvas = document.getElementById('capture-canvas');
+            
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            canvas.getContext('2d').drawImage(video, 0, 0);
+            const imageData = canvas.toDataURL('image/png');
+            
+            // Visual feedback
+            const flash = document.getElementById('shutter-flash');
+            flash.classList.remove('animate-flash');
+            void flash.offsetWidth; // trigger reflow
+            flash.classList.add('animate-flash');
+
+            processImage(imageData);
+        }
+
+        function processImage(imageData) {
+             // Show Toast
+             const toast = document.getElementById('capture-toast');
+             toast.style.opacity = '1';
+             toast.style.transform = 'translate(-50%, 0)';
+             
+             // Hide Toast after 1.5s
+             setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translate(-50%, -20px)';
+             }, 1500);
+
+             // Start Async Analysis in Background
+             setTimeout(() => {
+                const resultData = performMockAnalysis();
+                const newItem = {
+                    id: Date.now(),
+                    data: imageData,
+                    timestamp: new Date().toLocaleString(),
+                    mode: currentMode,
+                    result: resultData
+                };
+                
+                history.unshift(newItem);
+                saveHistory();
+                
+                // Update Mini Preview Immediately
+                updateMiniPreview();
+            }, 800); // reduced delay for background processing
+        }
+
+        function performMockAnalysis() {
+            if (currentMode === 'plant') {
+                return Math.random() > 0.3 ? mockDiagnoses[Math.floor(Math.random() * 2)] : mockDiagnoses[2];
+            } else {
+                // Soil Mode with 25% Object Detection Chance
+                const r = Math.random();
+                if (r < 0.25) { 
+                     return mockInvalidSoil;
+                }
+                return mockSoilData[Math.floor(Math.random() * mockSoilData.length)];
+            }
+        }
+
+        // --- NAVIGATION & UI ---
+        function router(viewName) {
+            ['view-camera', 'view-preview', 'view-history'].forEach(id => document.getElementById(id).classList.add('hidden'));
+            document.getElementById('view-' + viewName).classList.remove('hidden');
+            if (viewName === 'history') renderHistoryGrid();
+            if (viewName === 'camera') updateMiniPreview();
+        }
+
+        function showResult(item) {
+            const imgEl = document.getElementById('result-image');
+            const badgeEl = document.getElementById('result-badge');
+            const header = document.getElementById('preview-header');
+
+            // Common
+            imgEl.src = item.data;
+            
+            // Branch Logic
+            if (item.mode === 'plant') {
+                // Header Styling
+                header.className = "bg-gradient-to-r from-pink-500 to-purple-600 p-4 pt-8 pb-12 rounded-b-[40px] shadow-lg flex justify-between items-center z-10 sticky top-0 shrink-0";
+                
+                // Show/Hide Containers
+                document.getElementById('plant-content').classList.remove('hidden');
+                document.getElementById('plant-treatment-card').classList.remove('hidden');
+                document.getElementById('soil-content').classList.add('hidden');
+                document.getElementById('soil-dashboard-card').classList.add('hidden');
+                document.getElementById('error-card').classList.add('hidden'); // Ensure error card is hidden
+
+                // Populate Plant Data
+                document.getElementById('result-disease').innerText = item.result.disease;
+                document.getElementById('result-confidence').innerText = `खात्री: ${item.result.confidence}`;
+                document.getElementById('result-desc').innerText = item.result.description;
+                
+                const isInfected = item.result.status === 'Infected';
+                badgeEl.className = `absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm flex items-center gap-1 ${isInfected ? 'bg-red-500' : 'bg-green-500'}`;
+                badgeEl.innerHTML = isInfected ? `<i data-lucide="alert-triangle" class="w-3 h-3"></i> संक्रमित` : `<i data-lucide="shield-check" class="w-3 h-3"></i> निरोगी`;
+
+                const listEl = document.getElementById('treatment-list');
+                listEl.innerHTML = '';
+                item.result.treatment.forEach((step, idx) => {
+                    listEl.innerHTML += `<li class="flex gap-3 text-sm text-gray-700"><span class="flex-shrink-0 w-6 h-6 rounded-full bg-purple-100 text-purple-600 flex items-center justify-center font-bold text-xs mt-0.5">${idx + 1}</span><span class="leading-5">${step}</span></li>`;
+                });
+                
+                const warnEl = document.getElementById('isolation-warning');
+                isInfected ? warnEl.classList.remove('hidden') : warnEl.classList.add('hidden');
+
+            } else {
+                // Soil Mode Layout
+                header.className = "bg-gradient-to-r from-amber-600 to-orange-600 p-4 pt-8 pb-12 rounded-b-[40px] shadow-lg flex justify-between items-center z-10 sticky top-0 shrink-0";
+
+                document.getElementById('plant-content').classList.add('hidden');
+                document.getElementById('plant-treatment-card').classList.add('hidden');
+                
+                // Check for Object/Error State
+                if (item.result.isError) {
+                    document.getElementById('soil-content').classList.add('hidden');
+                    document.getElementById('soil-dashboard-card').classList.add('hidden');
+                    document.getElementById('error-card').classList.remove('hidden');
+                    
+                    // Badge for Error
+                    badgeEl.className = "absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm bg-red-500 flex items-center gap-1";
+                    badgeEl.innerHTML = `<i data-lucide="x-circle" class="w-3 h-3"></i> अवैध`;
+                } else {
+                    document.getElementById('soil-content').classList.remove('hidden');
+                    document.getElementById('soil-dashboard-card').classList.remove('hidden');
+                    document.getElementById('error-card').classList.add('hidden');
+
+                    // Badge for Soil
+                    badgeEl.className = "absolute top-4 right-4 px-3 py-1 rounded-full text-xs font-bold text-white shadow-sm bg-amber-500 flex items-center gap-1";
+                    badgeEl.innerHTML = `<i data-lucide="mountain" class="w-3 h-3"></i> माती`;
+
+                    // Populate Soil Data
+                    const res = item.result;
+                    document.getElementById('soil-type-title').innerText = res.type;
+                    document.getElementById('soil-summary').innerText = `"${res.summary}"`;
+                    
+                    // Dashboard
+                    document.getElementById('soil-type').innerText = res.type;
+                    document.getElementById('soil-color').innerText = res.color;
+                    document.getElementById('soil-texture').innerText = res.texture;
+                    document.getElementById('soil-moisture').innerText = res.moisture;
+
+                    // Chemistry
+                    document.getElementById('soil-ph').innerText = `${res.ph.val} (${res.ph.label})`;
+                    let phPercent = ((res.ph.val - 4) / 6) * 100;
+                    document.getElementById('ph-bar').style.width = `${Math.min(100, Math.max(0, phPercent))}%`;
+
+                    document.getElementById('val-n').innerText = res.npk.n;
+                    document.getElementById('val-p').innerText = res.npk.p;
+                    document.getElementById('val-k').innerText = res.npk.k;
+
+                    // Crops
+                    const tagsContainer = document.getElementById('crop-tags');
+                    tagsContainer.innerHTML = '';
+                    res.crops.forEach(crop => {
+                        tagsContainer.innerHTML += `<span class="px-2 py-1 bg-green-100 text-green-700 text-xs font-bold rounded-lg border border-green-200">${crop}</span>`;
+                    });
+
+                    // Improvements
+                    document.getElementById('rec-organic').innerText = res.improvements.organic;
+                    document.getElementById('rec-water').innerText = res.improvements.water;
+                    document.getElementById('rec-chem').innerText = res.improvements.chem;
+                }
+            }
+
+            lucide.createIcons();
+            router('preview');
+        }
+
+        function renderHistoryGrid() {
+            const grid = document.getElementById('history-grid');
+            const empty = document.getElementById('empty-history');
+            grid.innerHTML = '';
+
+            if (history.length === 0) {
+                empty.classList.remove('hidden');
+                return;
+            }
+            empty.classList.add('hidden');
+
+            history.forEach(item => {
+                const div = document.createElement('div');
+                div.className = "bg-white rounded-2xl shadow-md overflow-hidden relative group active:scale-95 transition-transform";
+                
+                let title, color;
+                if (item.mode === 'plant') {
+                    title = item.result.disease;
+                    color = item.result.status === 'Infected' ? 'text-red-500' : 'text-green-600';
+                } else {
+                    title = item.result.type;
+                    color = item.result.isError ? 'text-red-500' : 'text-amber-700'; // Red for objects
+                }
+
+                div.innerHTML = `
+                    <img src="${item.data}" class="w-full h-40 object-cover" onclick='openHistoryItem(${item.id})'>
+                    <div class="p-3" onclick='openHistoryItem(${item.id})'>
+                        <div class="flex justify-between items-start">
+                            <p class="text-xs font-bold truncate ${color}">${title}</p>
+                        </div>
+                        <p class="text-[10px] text-gray-500 mt-1">${item.timestamp}</p>
+                    </div>
+                    <button onclick="deleteItem(event, ${item.id})" class="absolute top-2 right-2 bg-white/90 p-1.5 rounded-full text-red-500 shadow-sm z-10">
+                        <i data-lucide="trash-2" class="w-4 h-4"></i>
+                    </button>
+                `;
+                grid.appendChild(div);
+            });
+            lucide.createIcons();
+        }
+
+        function openHistoryItem(id) {
+            const item = history.find(i => i.id === id);
+            if(item) showResult(item);
+        }
+
+        function deleteItem(e, id) {
+            e.stopPropagation();
+            if(!confirm("हे स्कॅन हटवायचे?")) return;
+            history = history.filter(h => h.id !== id);
+            saveHistory();
+            renderHistoryGrid();
+        }
+
+        function updateMiniPreview() {
+            const img = document.getElementById('mini-preview-img');
+            const icon = document.getElementById('mini-preview-icon');
+            if (history.length > 0) {
+                img.src = history[0].data;
+                img.classList.remove('hidden');
+                icon.classList.add('hidden');
+            } else {
+                img.classList.add('hidden');
+                icon.classList.remove('hidden');
+            }
+        }
+
+        function saveHistory() { localStorage.setItem('icaptured_history', JSON.stringify(history)); }
+        function loadHistory() { const saved = localStorage.getItem('icaptured_history'); if (saved) history = JSON.parse(saved); }
+        function setupListeners() {
+            document.getElementById('btn-flash').addEventListener('click', toggleFlash);
+            document.getElementById('btn-focus').addEventListener('click', triggerFocus);
+            document.getElementById('btn-capture').addEventListener('click', captureFrame);
+            document.getElementById('nav-history').addEventListener('click', () => router('history'));
+            document.getElementById('nav-preview-mini').addEventListener('click', () => { if(history.length > 0) openHistoryItem(history[0].id); });
+        }
+    </script>
+</body>
+</html>

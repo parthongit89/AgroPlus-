@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="mr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ड्रोन इन्स्टॉलेशन आणि माहिती</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Load Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <!-- Custom config for Tailwind colors and Inter font -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'agro-dark-violet': '#3A1E63', // Darker violet for header
+                        'agro-violet': '#5b21b6', // Primary violet for accents/buttons
+                        'agro-lavender': '#9C77E5', // Lighter violet for subtle accents
+                        'agro-accent-orange': '#f97316', // Orange for highlight/toggle
+                        'agro-light-gray': '#f0f0f5', // Very light gray for background
+                        'agro-text-dark': '#1a1a1a', // Dark text for readability
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        // Adding a Marathi compatible font stack
+                        marathi: ['Mukta', 'Inter', 'sans-serif'], 
+                    },
+                    boxShadow: {
+                        'soft': '0 4px 12px rgba(0, 0, 0, 0.1)',
+                        'medium': '0 8px 20px rgba(0, 0, 0, 0.15)',
+                        'lg-violet': '0 10px 25px -5px rgba(91, 33, 182, 0.3), 0 4px 10px -4px rgba(91, 33, 182, 0.2)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Mukta:wght@400;500;600;700;800&display=swap');
+        
+        body {
+            background-color: #ffffff;
+            color: #1a1a1a;
+            font-family: 'Mukta', 'Inter', sans-serif; /* Applied Marathi font */
+        }
+
+        .fixed-header {
+            background-color: #3A1E63;
+        }
+        
+        /* Updated Hero/Banner section */
+        .hero-background {
+            /* Keep the violet-themed placeholder image */
+            background-image: url('https://placehold.co/1200x350/9C77E5/5b21b6?text=Agricultural+Drone+Over+Field');
+            background-size: cover;
+            background-position: center;
+            height: 200px; 
+            /* Added a simple gradient overlay instead for a softer look */
+            background-image: linear-gradient(to bottom, rgba(156,119,229,0.5), rgba(91,33,182,0.5)), url('https://placehold.co/1200x350/9C77E5/5b21b6?text=Krushi+Drone');
+        }
+        
+        @media (min-width: 768px) {
+            .hero-background {
+                height: 350px;
+            }
+        }
+
+        /* New Table Styling */
+        .data-table-container {
+            border: 1px solid #ddd;
+            border-radius: 1rem;
+            overflow: hidden; /* Ensures borders/shadows look clean */
+            box-shadow: 0 10px 25px -5px rgba(91, 33, 182, 0.1), 0 4px 10px -4px rgba(91, 33, 182, 0.1);
+        }
+
+        .table-header-row {
+            background-color: #5b21b6;
+            color: white;
+            font-weight: 700;
+        }
+
+        .table-row-odd {
+            background-color: #f7f3ff; /* Very light lavender */
+        }
+
+        .table-row-even {
+            background-color: #ffffff; /* White */
+        }
+        
+        .row-category {
+            font-weight: 600;
+            color: #3A1E63;
+        }
+
+        /* Responsive Table adjustments for small screens (CLEANED UP LABELS) */
+        @media (max-width: 767px) {
+            .data-table-container table {
+                display: block;
+                width: 100%;
+            }
+            .data-table-container thead {
+                display: none; /* Hide header row on mobile */
+            }
+            .data-table-container tbody, .data-table-container tr {
+                display: block;
+            }
+            /* Each TR becomes a distinct vertical card */
+            .data-table-container tr {
+                margin-bottom: 1.5rem; /* Increased vertical space between sections */
+                border-radius: 0.75rem;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+                overflow: hidden;
+                border: 1px solid #eee; 
+                padding: 0; /* Remove internal padding from TR */
+            }
+            
+            /* Hide the details/value labels and only show the Category label once */
+            .data-table-container td[data-label="Details"],
+            .data-table-container td[data-label="Value"] {
+                display: none; 
+            }
+            
+            /* Style the main Category header for mobile */
+            .data-table-container td[data-label="Category"] {
+                display: block;
+                text-align: center;
+                font-size: 1.1rem;
+                font-weight: 800;
+                padding: 0.75rem;
+                background-color: #f0f0f5; /* Light background for category bar */
+                color: #5b21b6;
+                border-bottom: 2px solid #D8C7FF;
+            }
+            
+            /* Display the content fields (details and example) as single blocks */
+            .data-table-container td:not([data-label="Category"]) {
+                display: block;
+                text-align: left;
+                padding: 0.5rem 1rem;
+                font-size: 0.9rem;
+                border-bottom: 1px solid #f7f7f7;
+                background-color: white;
+            }
+
+            /* Display the custom labels (Category, Details, Example) ONLY inside the TD content */
+            .data-table-container td::before {
+                 /* Hide the automatically generated label */
+                content: none; 
+            }
+            
+            /* Manually insert labels for content rows using hardcoded text and flex */
+            .data-table-container td[data-label="Details"]::before {
+                /* --- MARATHI TRANSLATION --- */
+                content: 'तपशील:';
+                font-weight: 600;
+                color: #3A1E63;
+                margin-right: 0.5rem;
+                display: inline;
+                float: none;
+            }
+            
+            .data-table-container td[data-label="Value"]::before {
+                /* --- MARATHI TRANSLATION --- */
+                content: 'मूल्य:';
+                font-weight: 600;
+                color: #3A1E63;
+                margin-right: 0.5rem;
+                display: inline;
+                float: none;
+            }
+
+            /* --- RENDER FIX: Display the content TDs on Mobile --- */
+            .data-table-container td:nth-child(2), 
+            .data-table-container td:nth-child(3) {
+                display: block; /* Show the blocks */
+                text-align: right; /* Align value content to the right */
+                display: flex; /* Use flex to align label and value */
+                justify-content: space-between;
+            }
+
+            .data-table-container td:nth-child(1) {
+                /* Special handling for category row to ensure full width */
+                display: block;
+            }
+            
+            /* Apply background coloring on content rows */
+            .data-table-container tr:nth-child(odd) td {
+                background-color: #f7f3ff;
+            }
+            .data-table-container tr:nth-child(even) td {
+                background-color: #ffffff;
+            }
+        }
+    </style>
+</head>
+<body class="font-sans">
+
+    <!-- HEADER / TOP BAR -->
+    <header class="fixed-header text-white shadow-lg sticky top-0 z-20">
+        <div class="px-4 py-3 flex justify-between items-center max-w-7xl mx-auto w-full">
+            
+            <!-- Back Button and Logo Container -->
+            <div class="flex items-center">
+                <!-- Back Button -->
+                <button onclick="history.back(); showMessage('मागे जात आहे')" class="text-white opacity-80 p-1 mr-4">
+                    <i class="fas fa-arrow-left text-xl"></i>
+                </button>
+                
+                <!-- Logo -->
+                <div class="text-2xl font-extrabold tracking-tight">
+                    <span class="text-white">ॲग्रो</span><span class="text-agro-lavender">टेक</span><span class="text-white">+</span>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-3 ml-3 flex-shrink-0">
+                <!-- Profile/User Info -->
+                <div class="text-xs text-right hidden sm:block leading-none mr-2">
+                    <div class="text-gray-200">पार्थ सोनवणे</div>
+                    <div class="text-gray-400">बोईसर, महाराष्ट्र</div>
+                </div>
+                <!-- Profile Icon -->
+                <a href="#" class="block p-2 rounded-full bg-agro-violet transition flex-shrink-0 hover:bg-agro-lavender" onclick="showMessage('प्रोफाइल पाहत आहे')">
+                    <i class="fas fa-user text-white w-4 h-4 flex items-center justify-center"></i>
+                </a>
+            </div>
+        </div>
+    </header>
+    
+    <!-- HERO/BANNER SECTION -->
+    <div class="hero-background w-full">
+        <!-- The content of this div is now empty -->
+    </div>
+    
+    <main class="max-w-4xl mx-auto p-4 md:p-8 pb-12">
+        
+        <!-- MAIN TITLE CARD -->
+        <div class="bg-agro-violet text-white p-4 rounded-xl shadow-lg-violet -mt-8 mb-8 text-center">
+            <h1 class="text-2xl md:text-3xl font-extrabold">ड्रोन इन्स्टॉलेशन आणि माहिती</h1>
+        </div>
+
+        <!-- DETAILED SPECIFICATION TABLE -->
+        <section class="data-table-container">
+            <table class="w-full text-left text-gray-700 border-collapse">
+                <thead class="hidden md:table-header-group">
+                    <tr class="table-header-row">
+                        <th class="p-3 w-1/4">श्रेणी</th>
+                        <th class="p-3 w-1/3">तपशील</th>
+                        <th class="p-3 w-auto">मूल्य</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Row 1: Purpose -->
+                    <tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">उद्देश</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">फवारणी, पेरणी आणि मॅपिंगसाठी कृषी ड्रोन-एज-अ-सर्व्हिस (DaaS)</td>
+                        <td data-label="Value" class="p-3 md:w-auto">स्मार्ट शेती ऑटोमेशन</td>
+                    </tr>
+                    <!-- Row 2: Drone Type -->
+                    <tr class="table-row-even">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">ड्रोनचा प्रकार</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">मल्टी-रोटर कृषी ड्रोन</td>
+                        <td data-label="Value" class="p-3 md:w-auto">१० लि - २० लि पेलोड ड्रोन</td>
+                    </tr>
+                    <!-- Row 3: Coverage Area -->
+                    <tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">कव्हरेज क्षेत्र</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">१ एकर प्रति उड्डाण</td>
+                        <td data-label="Value" class="p-3 md:w-auto">२० एकर/दिवस</td>
+                    </tr>
+                    <!-- Row 4: Operating Range -->
+                    <tr class="table-row-even">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">ऑपरेटिंग रेंज</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">१-५ किमी</td>
+                        <td data-label="Value" class="p-3 md:w-auto">२.५ किमी साधारणपणे</td>
+                    </tr>
+                    <!-- Row 5: Flight Duration -->
+                    <tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">उड्डाण कालावधी</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">१५-२५ मिनिटे प्रति बॅटरी</td>
+                        <td data-label="Value" class="p-3 md:w-auto">बदलण्यायोग्य बॅटरी प्रणाली</td>
+                    </tr>
+                    <!-- Row 6: Battery Capacity -->
+                    <tr class="table-row-even">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">बॅटरी क्षमता</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">१२,०००–२२,००० mAh LiPo</td>
+                        <td data-label="Value" class="p-3 md:w-auto">२२.२V(6S)</td>
+                    </tr>
+                    <!-- Row 7: Charging Time -->
+                    <tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">चार्जिंग वेळ</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">४५-६० मिनिटे</td>
+                        <td data-label="Value" class="p-3 md:w-auto">फास्ट चार्जर वापरले</td>
+                    </tr>
+                    <!-- Row 8: Sensors Installed -->
+                    <tr class="table-row-even">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">इन्स्टॉल केलेले सेन्सर्स</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">जीपीएस + आयएमयू + अल्टीमीटर + फवारणी नोजल सेन्सर</td>
+                        <td data-label="Value" class="p-3 md:w-auto">वैकल्पिक: एनडीव्हीआय (NDVI) कॅमेरा</td>
+                    </tr>
+                    <!-- Row 9: Spray Capacity -->
+                    <tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">फवारणी क्षमता</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">१० लि टाकी १-१.५ एकर कव्हर करते</td>
+                        <td data-label="Value" class="p-3 md:w-auto">सरासरी १० मिनिटांत १ एकर</td>
+                    </tr>
+                    <!-- Row 10: No. of Motors -->
+                    <tr class="table-row-even">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">मोटर्सची संख्या</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">४ आणि ६</td>
+                        <td data-label="Value" class="p-3 md:w-auto">लहान शेतांसाठी ४ प्राधान्य</td>
+                    </tr>
+                    <!-- Row 11: Spray Width -->
+                    <tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">फवारणी रुंदी</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">४-६ मीटर</td>
+                        <td data-label="Value" class="p-3 md:w-auto">बदलता येण्याजोगे (Adjustable)</td>
+                    </tr>
+                    <!-- Row 12: Seed Spreading Capacity -->
+                    <tr class="table-row-even">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">बियाणे पसरविण्याची क्षमता</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">५-६ किलो प्रति लोड</td>
+                        <td data-label="Value" class="p-3 md:w-auto">मोहिमेनुसार बदलता येते</td>
+                    </tr>
+                    <!-- Row 13: Mapping Capability -->
+                    <tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">मॅपिंग क्षमता</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">रिअल-टाइम जीपीएस-आधारित इमेजिंग</td>
+                        <td data-label="Value" class="p-3 md:w-auto">मोबाईल अॅप इंटिग्रेशनसह</td>
+                    </tr>
+                    <!-- Row 14: Required Manpower -->
+                    <tr class="table-row-even">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">आवश्यक मनुष्यबळ</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">१ प्रशिक्षित ऑपरेटर + १ मदतनीस</td>
+                        <td data-label="Value" class="p-3 md:w-auto">प्लॅटफॉर्मद्वारे मूलभूत प्रशिक्षण</td>
+                    </tr>
+                    <!-- Row 15: Installation Time -->
+                    <tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">इन्स्टॉलेशन वेळ</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">१ दिवस सेटअप आणि कॅलिब्रेशन</td>
+                        <td data-label="Value" class="p-3 md:w-auto">सॉफ्टवेअर सेटअप समाविष्ट</td>
+                    </tr>
+                    <!-- Row 16: Maintenance Interval -->
+                    <tr class="table-row-even">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">देखभाल कालावधी</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">५० उड्डाण तासांनंतर</td>
+                        <td data-label="Value" class="p-3 md:w-auto">साफसफाई, ल्युब्रिकेशन, प्रोपेलर तपासणी</td>
+                    </tr>
+                    <!-- Row 17: Subsidy Availability -->
+                    <tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">अनुदान उपलब्धता</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">होय</td>
+                        <td data-label="Value" class="p-3 md:w-auto">शेतकऱ्यांसाठी ४०-५०%</td>
+                    </tr>
+                    <!-- Row 18: Platform Cost Model -->
+                    <tr class="table-row-even">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">प्लॅटफॉर्म किंमत मॉडेल</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">सबस्क्रिप्शन किंवा पे-पर-यूज</td>
+                        <td data-label="Value" class="p-3 md:w-auto">₹५००-₹८०० प्रति एकर फवारणी शुल्क</td>
+                    </tr>
+                    <!-- Row 19: Drone Kit Cost (Owner) -->
+                    <tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">ड्रोन किट किंमत (मालक)</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">₹३,००,००० – ₹६,५०,०००</td>
+                        <td data-label="Value" class="p-3 md:w-auto">ड्रोन, बॅटरी, चार्जर, प्रशिक्षण समाविष्ट</td>
+                    </tr>
+                    <!-- Row 20: Annual Maintenance Cost -->
+                    <tr class="table-row-even">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">वार्षिक देखभाल खर्च</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">₹१०,००० – ₹२०,०००</td>
+                        <td data-label="Value" class="p-3 md:w-auto">किरकोळ बदल आणि अपडेट्स</td>
+                    </tr>
+                    <!-- Row 21: Mobile App Features -->
+                    <tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">मोबाईल अॅप वैशिष्ट्ये</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">बुकिंग, ट्रॅकिंग, फवारणी लॉग, पेमेंट</td>
+                        <td data-label="Value" class="p-3 md:w-auto">बहुभाषिक इंटरफेस</td>
+                    </tr>
+                    <!-- Row 22: Connectivity Required -->
+                    <tr class="table-row-even">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">कनेक्टिव्हिटी आवश्यक</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">4G/5G किंवा ऑफलाइन जीपीएस मोड</td>
+                        <td data-label="Value" class="p-3 md:w-auto">नेटवर्क परत आल्यावर ऑटो-सिंक</td>
+                    </tr>
+                    <!-- Row 23: Safety Features -->
+                    <tr class="table-row-odd">
+                        <td data-label="Category" class="row-category p-3 md:w-1/4">सुरक्षा वैशिष्ट्ये</td>
+                        <td data-label="Details" class="p-3 md:w-1/3">ऑटो रिटर्न, जीपीएस लॉक, कमी बॅटरी चेतावणी</td>
+                        <td data-label="Value" class="p-3 md:w-auto">सुरक्षित ऑपरेशन सुनिश्चित करते</td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+    </main>
+
+    <!-- Simple Message Box for Clicks (Notification style) -->
+    <div id="message-box" class="fixed bottom-4 left-4 right-4 bg-agro-dark-violet text-white p-3 rounded-xl shadow-xl hidden transition transform duration-300 z-40" role="alert">
+        <p id="message-content" class="text-center"></p>
+    </div>
+
+    <!-- JAVASCRIPT BLOCK -->
+    <script>
+        /**
+         * Shows a temporary notification message at the bottom of the screen.
+         * @param {string} content The message to display.
+         */
+        function showMessage(content) {
+            const messageBox = document.getElementById('message-box');
+            const messageContent = document.getElementById('message-content');
+            
+            messageContent.textContent = content;
+            messageBox.classList.remove('hidden');
+            
+            clearTimeout(messageBox.timer);
+            
+            messageBox.timer = setTimeout(() => {
+                messageBox.classList.add('hidden');
+            }, 2000);
+        }
+        
+        // Ensure back button functions if history is available
+        document.querySelector('.fixed-header button[onclick*="history.back"]').onclick = function() {
+            history.back();
+            showMessage('मागे जात आहे');
+        };
+    </script>
+</body>
+</html>
